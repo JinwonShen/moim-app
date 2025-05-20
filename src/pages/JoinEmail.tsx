@@ -115,9 +115,8 @@ export default function JoinEmail() {
 					<span className="text-[12px] mb-[4px]">생년월일</span>
 					<input
 						type="date"
-						placeholder="비밀번호 확인"
-						value={confirmPassword}
-						onChange={(e) => setConfirmPassword(e.target.value)}
+						value={birthdate}
+						onChange={(e) => setBirthdate(e.target.value)}
 						className="mb-4 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px]"
 					/>
 				</label>
