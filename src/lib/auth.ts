@@ -1,7 +1,21 @@
 // src/lib/auth.ts
-import { GoogleAuthProvider, type User, signInWithPopup } from "firebase/auth";
+import {
+	GoogleAuthProvider,
+	type User,
+	createUserWithEmailAndPassword,
+	signInWithEmailAndPassword,
+	signInWithPopup,
+} from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
+
+export const loginWithEmail = async (email: string, password: string) => {
+	return await signInWithEmailAndPassword(auth, email, password);
+};
+
+export const registerWithEmail = async (email: string, password: string) => {
+	return await createUserWithEmailAndPassword(auth, email, password);
+};
 
 export async function loginWithGoogle(): Promise<User> {
 	const provider = new GoogleAuthProvider();

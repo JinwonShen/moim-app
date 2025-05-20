@@ -24,14 +24,15 @@ export default function Login() {
 	};
 
 	return (
-		<div className="login-wrapper">
-			<span>
+		<div className="min-h-screen flex flex-col justify-center items-center">
+			<span className="w-[225px] mb-[48px]">
 				<svg
-					width="224"
-					height="73"
+					width="144"
+					height="72"
 					viewBox="0 0 224 73"
 					fill="currentColor"
 					xmlns="http://www.w3.org/2000/svg"
+					className="w-full"
 				>
 					<title>moim</title>
 					<path
@@ -52,14 +53,39 @@ export default function Login() {
 					/>
 				</svg>
 			</span>
-			<p>이메일 로그인</p>
-			<button type="button">카카오로 시작하기</button>
-			<button type="button">네이버로 시작하기</button>
-			<button type="button" onClick={handleGoogleLogin}>
-				구글로 시작하기
-			</button>
-			<div>
-				<a href="/EmailLogin">로그인 / 회원가입</a>
+			<div className="w-full max-w-[375px] flex flex-col">
+				<a
+					href="./EmailLogin"
+					type="button"
+					className="mb-[12px] border-none bg-transparent no-underline text-[14px] text-center text-black hover:underline"
+				>
+					이메일 로그인
+				</a>
+				<button
+					type="button"
+					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+				>
+					카카오로 시작하기
+				</button>
+				<button
+					type="button"
+					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+				>
+					네이버로 시작하기
+				</button>
+				<button
+					type="button"
+					onClick={handleGoogleLogin}
+					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+				>
+					구글로 시작하기
+				</button>
+				<a
+					href="/JoinTerms"
+					className="mt-[24px] text-[14px] no-underline text-center hover:underline"
+				>
+					이메일 회원가입
+				</a>
 			</div>
 		</div>
 	);

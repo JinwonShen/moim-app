@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useUserStore } from "../store/userStore";
 
 export default function PinRegister() {
-	const { user } = useUserStore();
-	const [pin, setPin] = useState<string>("");
+	const [pin, setPin] = useState<string>([]);
 
 	const handleClick = (digit: string) => {
 		if (pin.length < 6) {
