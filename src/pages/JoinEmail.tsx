@@ -9,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 export default function JoinEmail() {
 	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
