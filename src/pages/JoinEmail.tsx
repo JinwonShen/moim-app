@@ -8,9 +8,10 @@ import {
 	setDoc,
 	where,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../lib/firebase";
+import { useAuthStore } from "../store/authStore";
 
 export default function JoinEmail() {
 	const navigate = useNavigate();
@@ -26,6 +27,15 @@ export default function JoinEmail() {
 	const [birthdate, setBirthdate] = useState("");
 	const [nicknameChecked, setNicknameChecked] = useState(false);
 	const [isChecking, setIsChecking] = useState(false);
+
+	const verified = useAuthStore((state) => state.verified);
+
+	useEffect(() => {
+		if (!verified) {
+			alert("휴대폰 인증이 필요합니다.");
+			navigate("/JoinPhone");
+		}
+	}, [verified, navigate]);
 
 	// 중복확인 로직
 	const handleCheckNickname = async () => {
@@ -148,7 +158,7 @@ export default function JoinEmail() {
 			});
 			alert("회원가입이 완료되었습니다.");
 			console.log(userCredential.user);
-			navigate("/JoinSuccess");
+			navigate("/PinRegister");
 		} catch (error) {
 			const firebaseError = error as FirebaseError;
 			if (firebaseError.code === "auth/email-already-in-use") {
@@ -251,6 +261,23 @@ export default function JoinEmail() {
 				>
 					회원가입 완료
 				</button>
+
+				<div className="flex justify-between">
+					<button
+						type="button"
+						onClick={() => navigate(-1)}
+						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
+					>
+						이전으로
+					</button>
+					<button
+						type="button"
+						onClick={() => navigate("/")}
+						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
+					>
+						소셜 로그인으로 돌아가기
+					</button>
+				</div>
 			</form>
 		</div>
 	);

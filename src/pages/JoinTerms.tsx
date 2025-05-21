@@ -75,6 +75,13 @@ export default function JoinTerms() {
 			>
 				다음
 			</button>
+			<button
+				type="button"
+				onClick={() => navigate("/")}
+				className="mt-[24px] text-[14px] no-underline text-center hover:underline"
+			>
+				소셜 로그인으로 돌아가기
+			</button>
 		</div>
 	);
 }

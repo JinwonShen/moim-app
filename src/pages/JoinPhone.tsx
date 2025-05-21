@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 export default function JoinPhone() {
 	const navigate = useNavigate();
@@ -7,6 +8,9 @@ export default function JoinPhone() {
 	const [codeSent, setCodeSent] = useState(false);
 	const [verificationCode, setVerificationCode] = useState("");
 	const [inputCode, setInputCode] = useState("");
+
+	// 상태 가져오기
+	const setVerified = useAuthStore((state) => state.setVerified);
 
 	const handleSendCode = () => {
 		if (!phone.match(/^01[016789]-?\d{3,4}-?\d{4}$/)) {
@@ -22,6 +26,7 @@ export default function JoinPhone() {
 
 	const handleVerify = () => {
 		if (inputCode === verificationCode) {
+			setVerified(true);
 			alert("인증이 완료되었습니다.");
 			navigate("/JoinEmail");
 		} else {
@@ -70,6 +75,23 @@ export default function JoinPhone() {
 						</button>
 					</>
 				)}
+
+				<div className="flex justify-between">
+					<button
+						type="button"
+						onClick={() => navigate(-1)}
+						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
+					>
+						이전으로
+					</button>
+					<button
+						type="button"
+						onClick={() => navigate("/")}
+						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
+					>
+						소셜 로그인으로 돌아가기
+					</button>
+				</div>
 			</div>
 		</div>
 	);
