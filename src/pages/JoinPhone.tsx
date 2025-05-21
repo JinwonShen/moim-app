@@ -7,7 +7,6 @@ export default function JoinPhone() {
 	const [codeSent, setCodeSent] = useState(false);
 	const [verificationCode, setVerificationCode] = useState("");
 	const [inputCode, setInputCode] = useState("");
-	const [verified, setVerified] = useState(false);
 
 	const handleSendCode = () => {
 		if (!phone.match(/^01[016789]-?\d{3,4}-?\d{4}$/)) {
@@ -23,7 +22,6 @@ export default function JoinPhone() {
 
 	const handleVerify = () => {
 		if (inputCode === verificationCode) {
-			setVerified(true);
 			alert("인증이 완료되었습니다.");
 			navigate("/JoinEmail");
 		} else {

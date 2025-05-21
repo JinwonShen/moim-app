@@ -1,3 +1,4 @@
+import type { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
 	collection,
@@ -10,33 +11,111 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../lib/firebase";
+
 export default function JoinEmail() {
 	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [passwordError, setPasswordError] = useState("");
+	const [passwordTouched, setPasswordTouched] = useState(false);
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [confirmTouched, setConfirmTouched] = useState(false);
+	const [confirmError, setConfirmError] = useState("");
 	const [nickname, setNickname] = useState("");
+	const [nicknameCheckedValue, setNicknameCheckedValue] = useState("");
 	const [birthdate, setBirthdate] = useState("");
 	const [nicknameChecked, setNicknameChecked] = useState(false);
+	const [isChecking, setIsChecking] = useState(false);
 
+	// 중복확인 로직
 	const handleCheckNickname = async () => {
 		if (!nickname) {
 			alert("닉네임을 입력해주세요!");
 			return;
 		}
+		if (nickname.length < 2) {
+			alert("닉네임은 최소 2자 이상이어야 합니다.");
+			return;
+		}
 
-		const usersRef = collection(db, "users");
-		const q = query(usersRef, where("nickname", "==", nickname));
-		const snapshot = await getDocs(q);
-		if (snapshot.empty) {
-			alert("사용 가능한 닉네임입니다.");
-			setNicknameChecked(true);
-		} else {
-			alert("이미 사용중인 닉네임입니다.");
-			setNicknameChecked(false);
+		setIsChecking(true); // 로딩 시작
+
+		try {
+			const usersRef = collection(db, "users");
+			const q = query(usersRef, where("nickname", "==", nickname));
+			const snapshot = await getDocs(q);
+
+			if (snapshot.empty) {
+				alert("사용 가능한 닉네임입니다.");
+				setNicknameChecked(true);
+				setNicknameCheckedValue(nickname);
+			} else {
+				alert("이미 사용중인 닉네임입니다.");
+				setNicknameChecked(false);
+				setNicknameCheckedValue("");
+			}
+		} catch (err) {
+			console.error("닉네임 중복 확인 에러:", err);
+			alert("중복 확인 중 오류가 발생했습니다.");
+		} finally {
+			setIsChecking(false); // ✅ 로딩 종료
 		}
 	};
 
+	const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNickname(e.target.value);
+		setNicknameChecked(false); // 닉네임이 바뀌면 다시 확인 필요
+	};
+
+	// 비밀번호 로직(8자리 이상의 영문 대소문자, 특수문자 포함)
+	const validatePassword = (pw: string) => {
+		const regex =
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=\-]).{8,}$/;
+
+		return regex.test(pw);
+	};
+
+	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setPassword(value);
+
+		if (passwordTouched && !validatePassword(value)) {
+			setPasswordError(
+				"비밀번호는 최소 8자 이상, 1개 이상의 문자, 숫자, 특수문자를 포함해야 합니다.",
+			);
+		} else {
+			setPasswordError("");
+		}
+	};
+
+	const handlePasswordBlur = () => {
+		setPasswordTouched(true);
+		if (!validatePassword(password)) {
+			setPasswordError(
+				"비밀번호는 최소 8자 이상, 1개 이상의 문자, 숫자, 특수문자를 포함해야 합니다.",
+			);
+		}
+	};
+
+	const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setConfirmPassword(value);
+
+		if (confirmTouched && password !== value) {
+			setConfirmError("비밀번호가 일치하지 않습니다.");
+		} else {
+			setConfirmError("");
+		}
+	};
+
+	const handleConfirmBlur = () => {
+		setConfirmTouched(true);
+		if (confirmPassword !== password) {
+			setConfirmError("비밀번호가 일치하지 않습니다.");
+		}
+	};
+
+	// form 형식 체크 로직
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -45,9 +124,15 @@ export default function JoinEmail() {
 		if (password.length < 6)
 			return alert("비밀번호는 최소 6자 이상이어야 합니다.");
 		if (password !== confirmPassword)
+			return alert(
+				"비밀번호는 영문 대/소문자, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.",
+			);
+		if (password !== confirmPassword)
 			return alert("비밀번호가 일치하지 않습니다.");
-		if (!nicknameChecked) return alert("닉네임 중복 확인을 해주세요.");
 		if (!birthdate) return alert("생년월일을 입력해주세요.");
+		if (!nicknameChecked || nickname !== nicknameCheckedValue) {
+			return alert("닉네임 중복 확인을 해주세요.");
+		}
 
 		try {
 			const userCredential = await createUserWithEmailAndPassword(
@@ -65,8 +150,13 @@ export default function JoinEmail() {
 			console.log(userCredential.user);
 			navigate("/JoinSuccess");
 		} catch (error) {
-			alert("회원가입에 실패했습니다.");
-			console.error(error);
+			const firebaseError = error as FirebaseError;
+			if (firebaseError.code === "auth/email-already-in-use") {
+				alert("이미 사용 중인 이메일입니다.");
+			} else {
+				alert("회원가입에 실패했습니다.");
+				console.error(error);
+			}
 		}
 	};
 
@@ -95,9 +185,15 @@ export default function JoinEmail() {
 						type="password"
 						placeholder="비밀번호"
 						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						className="mb-[8px] h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px]"
+						onChange={handlePasswordChange}
+						onBlur={handlePasswordBlur}
+						className={`mb-[8px] h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px] ${
+							passwordTouched && passwordError ? "border border-red-500" : ""
+						} `}
 					/>
+					{passwordTouched && passwordError && (
+						<span className="text-red-500 text-[12px]">{passwordError}</span>
+					)}
 				</label>
 
 				<label className="flex flex-col">
@@ -106,9 +202,15 @@ export default function JoinEmail() {
 						type="password"
 						placeholder="비밀번호 확인"
 						value={confirmPassword}
-						onChange={(e) => setConfirmPassword(e.target.value)}
-						className="mb-4 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px]"
+						onChange={handleConfirmChange}
+						onBlur={handleConfirmBlur}
+						className={`mb-4 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px] ${
+							confirmTouched && confirmError ? "border border-red-500" : ""
+						}`}
 					/>
+					{confirmTouched && confirmError && (
+						<span className="text-red-500 text-[12px]">{confirmError}</span>
+					)}
 				</label>
 
 				<label className="flex flex-col">
@@ -128,15 +230,16 @@ export default function JoinEmail() {
 							type="text"
 							placeholder="닉네임"
 							value={nickname}
-							onChange={(e) => setNickname(e.target.value)}
+							onChange={handleNicknameChange}
 							className="flex-1 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px]"
 						/>
 						<button
 							type="button"
 							onClick={handleCheckNickname}
+							disabled={isChecking}
 							className="px-[29px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px]"
 						>
-							중복확인
+							{isChecking ? "확인중..." : "중복확인"}
 						</button>
 					</div>
 				</label>
