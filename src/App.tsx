@@ -4,15 +4,13 @@ import {
 	BrowserRouter as Router,
 	Routes,
 } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
 import EmailLogin from "./pages/EmailLogin";
 import JoinEmail from "./pages/JoinEmail";
 import JoinPhone from "./pages/JoinPhone";
 import JoinTerms from "./pages/JoinTerms";
 import Login from "./pages/Login";
 import PinRegister from "./pages/PinRegister";
-// 나중에 추가할 페이지들 (예시)
-// import Dashboard from './pages/Dashboard';
-// import PinAuth from './pages/PinAuth';
 
 export default function App() {
 	return (
@@ -25,7 +23,7 @@ export default function App() {
 				<Route path="/JoinPhone" element={<JoinPhone />} />
 				<Route path="/JoinEmail" element={<JoinEmail />} />
 				<Route path="/PinRegister" element={<PinRegister />} />
-				{/* <Route path="/dashboard" element={<Dashboard />} /> */}
+				<Route path="/Dashboard" element={<Dashboard />} />
 				<Route path="*" element={<div>404 - 페이지를 찾을 수 없습니다</div>} />
 			</Routes>
 		</Router>

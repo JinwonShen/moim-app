@@ -1,4 +1,4 @@
-import * as bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,9 @@ export default function PinRegister() {
 	};
 
 	const handleSubmit = async () => {
-		if (pin.length !== 6 || !uid) return;
+		if (pin.length !== 6 || !uid) {
+			return;
+		}
 
 		const finalPin = pin.join("");
 		try {
@@ -28,7 +30,7 @@ export default function PinRegister() {
 				pinHash: hashedPin,
 			});
 			alert("PIN이 성공적으로 등록되었습니다.");
-			navigate("/dashboard");
+			navigate("/Dashboard");
 		} catch (error) {
 			console.error("PIN 저장 실패: ", error);
 			alert("PIN 저장 중 문제가 발생했습니다.");

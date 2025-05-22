@@ -1,38 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { loginWithGoogle } from "../lib/auth";
-import { useUserStore } from "../store/userStore";
 
-export default function Login() {
+export default function JoinSuccess() {
 	const navigate = useNavigate();
 
-	const handleGoogleLogin = async () => {
-		try {
-			const user = await loginWithGoogle();
-			useUserStore.getState().setUser({
-				uid: user.uid,
-				name: user.displayName ?? "",
-				email: user.email ?? "",
-				photoURL: user.photoURL,
-			});
-			alert(`${user.displayName}님 환영합니다!`);
-			// TODO: 상태 저장, 페이지 이동 등 처리
-			navigate("/pinregister");
-		} catch (err) {
-			alert("로그인에 실패했습니다.");
-			console.log(err);
-		}
-	};
-
-	const handleEmailLogin = () => {
-		navigate("/EmailLogin");
-	};
-
-	const handleJoinTerms = () => {
-		navigate("/JoinTerms");
+	const handleDashboard = () => {
+		navigate("/Dashboard");
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col justify-center items-center">
+		<div className="min-h-screen flex items-center justify-center">
 			<span className="w-[225px] mb-[48px]">
 				<svg
 					width="144"
@@ -61,41 +37,17 @@ export default function Login() {
 					/>
 				</svg>
 			</span>
-			<div className="w-full max-w-[375px] flex flex-col">
-				<button
-					onClick={handleEmailLogin}
-					type="button"
-					className="mb-[12px] border-none bg-transparent no-underline text-[14px] text-center text-black hover:underline"
-				>
-					이메일 로그인
-				</button>
-				<button
-					type="button"
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
-				>
-					카카오로 시작하기
-				</button>
-				<button
-					type="button"
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
-				>
-					네이버로 시작하기
-				</button>
-				<button
-					type="button"
-					onClick={handleGoogleLogin}
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
-				>
-					구글로 시작하기
-				</button>
-				<button
-					type="button"
-					onClick={handleJoinTerms}
-					className="mt-[24px] text-[14px] no-underline text-center hover:underline"
-				>
-					이메일 회원가입
-				</button>
+			<div>
+				<h2>가입을 축하드립니다 !</h2>
+				<span>아래 버튼을 클릭하면 홈(대시보드)으로 이동합니다.</span>
 			</div>
+			<button
+				type="button"
+				onClick={handleDashboard}
+				className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+			>
+				홈으로
+			</button>
 		</div>
 	);
 }

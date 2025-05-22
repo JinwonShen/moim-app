@@ -1,5 +1,11 @@
-import type { User } from "firebase/auth";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+interface User {
+	uid: string;
+	email: string;
+	nickname: string;
+}
 
 interface AuthState {
 	user: User | null;
@@ -8,9 +14,17 @@ interface AuthState {
 	setVerified: (value: boolean) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-	user: null,
-	verified: false,
-	setUser: (user) => set({ user }),
-	setVerified: (value) => set({ verified: value }),
-}));
+export const useAuthStore = create<AuthState>()(
+	persist(
+		(set) => ({
+			user: null,
+			verified: false,
+			setUser: (user) => set({ user }),
+			setVerified: (verified) => set({ verified }),
+		}),
+		{
+			name: "auth-storage",
+			storage: createJSONStorage(() => localStorage), // ✅ 명시적으로 localStorage 설정
+		},
+	),
+);

@@ -29,6 +29,7 @@ export default function JoinEmail() {
 	const [isChecking, setIsChecking] = useState(false);
 
 	const verified = useAuthStore((state) => state.verified);
+	const setUser = useAuthStore((state) => state.setUser);
 
 	useEffect(() => {
 		if (!verified) {
@@ -151,16 +152,31 @@ export default function JoinEmail() {
 				password,
 			);
 
+			const user = userCredential.user;
+
+			if (!user) {
+				alert("유저 정보를 가져오지 못했습니다.");
+				return;
+			}
+
 			await setDoc(doc(db, "users", userCredential.user.uid), {
 				email,
 				nickname,
 				birthdate,
 			});
+
+			setUser({
+				uid: userCredential.user.uid,
+				email: email,
+				nickname: nickname,
+			});
+
 			alert("회원가입이 완료되었습니다.");
 			console.log(userCredential.user);
 			navigate("/PinRegister");
 		} catch (error) {
 			const firebaseError = error as FirebaseError;
+
 			if (firebaseError.code === "auth/email-already-in-use") {
 				alert("이미 사용 중인 이메일입니다.");
 			} else {
