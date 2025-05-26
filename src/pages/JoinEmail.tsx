@@ -34,7 +34,7 @@ export default function JoinEmail() {
 	useEffect(() => {
 		if (!verified) {
 			alert("휴대폰 인증이 필요합니다.");
-			navigate("/JoinPhone");
+			navigate("/joinphone");
 		}
 	}, [verified, navigate]);
 
@@ -163,17 +163,19 @@ export default function JoinEmail() {
 				email,
 				nickname,
 				birthdate,
+				profileImage: "/default-image.png",
 			});
 
 			setUser({
 				uid: userCredential.user.uid,
 				email: email,
 				nickname: nickname,
+				profileImage: "/default-image.png",
 			});
 
 			alert("회원가입이 완료되었습니다.");
 			console.log(userCredential.user);
-			navigate("/PinRegister");
+			navigate("/pinregister");
 		} catch (error) {
 			const firebaseError = error as FirebaseError;
 
@@ -263,7 +265,7 @@ export default function JoinEmail() {
 							type="button"
 							onClick={handleCheckNickname}
 							disabled={isChecking}
-							className="px-[29px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px]"
+							className="px-[29px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 						>
 							{isChecking ? "확인중..." : "중복확인"}
 						</button>
@@ -272,7 +274,7 @@ export default function JoinEmail() {
 
 				<button
 					type="submit"
-					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px]"
+					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 					onClick={handleSubmit}
 				>
 					회원가입 완료
@@ -288,7 +290,7 @@ export default function JoinEmail() {
 					</button>
 					<button
 						type="button"
-						onClick={() => navigate("/")}
+						onClick={() => navigate("/login")}
 						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
 					>
 						소셜 로그인으로 돌아가기

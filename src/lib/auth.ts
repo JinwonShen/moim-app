@@ -5,8 +5,11 @@ import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 	signInWithPopup,
+	signOut,
 } from "firebase/auth";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import type { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 import { auth, db } from "./firebase";
 
 export const loginWithEmail = async (email: string, password: string) => {
@@ -33,6 +36,7 @@ export async function loginWithGoogle(): Promise<User> {
 			await setDoc(userRef, {
 				uid: user.uid,
 				name: user.displayName ?? "",
+				nickname: user.displayName ?? "",
 				email: user.email ?? "",
 				createdAt: serverTimestamp(),
 				pinHash: null,
@@ -52,3 +56,59 @@ export async function loginWithGoogle(): Promise<User> {
 		throw new Error("알 수 없는 오류가 발생했습니다.");
 	}
 }
+
+export const handleLoginSuccess = async (
+	user: {
+		uid: string;
+		displayName?: string | null;
+		email?: string | null;
+		photoURL?: string | null;
+	},
+	navigate: ReturnType<typeof useNavigate>,
+) => {
+	try {
+		const userRef = doc(db, "users", user.uid);
+		const userSnap = await getDoc(userRef);
+
+		if (!userSnap.exists()) {
+			alert("유저 정보가 존재하지 않습니다.");
+			navigate("/login");
+			return;
+		}
+
+		const data = userSnap.data();
+		const hasPin = !!data.pinHash;
+
+		// ✅ Zustand 상태 저장 (통일)
+		useAuthStore.getState().setUser({
+			uid: user.uid,
+			email: user.email ?? "",
+			nickname: data.nickname ?? "",
+			name: data.name ?? user.displayName ?? "",
+			profileImage: data.profileImage ?? "",
+		});
+
+		if (hasPin) {
+			navigate("/PinConfirm");
+		} else {
+			navigate("/PinRegister");
+		}
+	} catch (error) {
+		console.error("로그인 후 처리 실패:", error);
+		alert("로그인 후 처리 중 문제가 발생했습니다.");
+	}
+};
+
+export const logout = async (navigate: ReturnType<typeof useNavigate>) => {
+	try {
+		await signOut(auth);
+		useAuthStore.getState().setUser(null);
+		useAuthStore.getState().setVerified(false);
+
+		sessionStorage.removeItem("pin_verified");
+		navigate("/login");
+	} catch (error) {
+		console.error("로그아웃 실패: ", error);
+		alert("로그아웃 중 문제가 발생했습니다.");
+	}
+};

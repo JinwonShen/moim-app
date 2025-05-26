@@ -20,7 +20,7 @@ export default function JoinTerms() {
 			alert("필수 항목에 모두 동의해주세요.");
 			return;
 		}
-		navigate("/JoinPhone");
+		navigate("/joinphone");
 	};
 
 	return (
@@ -70,14 +70,14 @@ export default function JoinTerms() {
 			</div>
 			<button
 				type="button"
-				className="w-[375px] h-[48px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] mt-[12px]"
+				className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px] mt-[12px]"
 				onClick={handleNext}
 			>
 				다음
 			</button>
 			<button
 				type="button"
-				onClick={() => navigate("/")}
+				onClick={() => navigate("/login")}
 				className="mt-[24px] text-[14px] no-underline text-center hover:underline"
 			>
 				소셜 로그인으로 돌아가기

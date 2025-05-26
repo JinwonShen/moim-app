@@ -28,7 +28,7 @@ export default function JoinPhone() {
 		if (inputCode === verificationCode) {
 			setVerified(true);
 			alert("인증이 완료되었습니다.");
-			navigate("/JoinEmail");
+			navigate("/joinemail");
 		} else {
 			alert("인증번호가 일치하지 않습니다. 다시 시도해주세요.");
 		}
@@ -52,7 +52,7 @@ export default function JoinPhone() {
 				<button
 					type="button"
 					onClick={handleSendCode}
-					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px]"
+					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 				>
 					인증번호 발송
 				</button>
@@ -69,7 +69,7 @@ export default function JoinPhone() {
 						<button
 							type="button"
 							onClick={handleVerify}
-							className="w-[375px] h-[48px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px]"
+							className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 						>
 							인증하기
 						</button>
@@ -86,7 +86,7 @@ export default function JoinPhone() {
 					</button>
 					<button
 						type="button"
-						onClick={() => navigate("/")}
+						onClick={() => navigate("/login")}
 						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
 					>
 						소셜 로그인으로 돌아가기

@@ -1,0 +1,137 @@
+import bcrypt from "bcryptjs";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { db } from "../lib/firebase";
+import { useAuthStore } from "../store/authStore";
+
+export default function PinConfirm() {
+	const [pin, setPin] = useState<string[]>([]);
+	const [error, setError] = useState("");
+	const navigate = useNavigate();
+	const user = useAuthStore((state) => state.user);
+	const location = useLocation();
+	const redirecTo = location.state?.from || "";
+
+	useEffect(() => {
+		if (!user) {
+			alert("로그인이 필요합니다.");
+			navigate("/login");
+		}
+	}, [user, navigate]);
+
+	const handleClick = (digit: string) => {
+		if (pin.length < 6) setPin([...pin, digit]);
+	};
+
+	const handleDelete = () => {
+		setPin(pin.slice(0, -1));
+	};
+
+	const handleSubmit = async () => {
+		if (!user || pin.length !== 6) {
+			console.log("user 없음 또는 핀 길이 부족", user, pin);
+			return;
+		}
+
+		try {
+			const userDoc = await getDoc(doc(db, "users", user.uid));
+			const pinHash = userDoc.data()?.pinHash;
+
+			console.log("불러온 PIN 해시:", pinHash);
+			if (!pinHash) {
+				setError("등록된 PIN 정보가 없습니다.");
+				return;
+			}
+
+			const finalPin = pin.join("");
+			const isMatch = await bcrypt.compare(finalPin, pinHash);
+			console.log("비교 결과:", isMatch);
+
+			if (isMatch) {
+				console.log("✅ PIN 인증 성공, 이동 대상:", redirecTo);
+				sessionStorage.setItem("pin_verified", "true");
+
+				if (redirecTo) {
+					setTimeout(() => {
+						navigate(redirecTo);
+					}, 0);
+				} else {
+					navigate("/dashboard");
+				}
+			} else {
+				setError("PIN이 일치하지 않습니다.");
+				setPin([]);
+			}
+		} catch (err) {
+			console.error("PIN 확인 오류:", err);
+			setError("오류가 발생했습니다. 다시 시도해주세요.");
+		}
+	};
+
+	return (
+		<div className="min-h-screen flex items-center justify-center">
+			<div className="w-full max-w-[375px]">
+				<h2 className="text-[24px] font-bold mb-[48px]">
+					등록한 PIN을 입력해주세요
+				</h2>
+
+				<div className="flex justify-center gap-[12px] mb-[60px]">
+					{Array.from({ length: 6 }).map((_, i) => (
+						<div
+							key={`pin-${i}-${pin[i] ?? "empty"}`}
+							className={`w-[16px] h-[16px] rounded-full border-2 ${
+								pin[i]
+									? "bg-secondary-300 border-secondary-300"
+									: "border-secondary-300"
+							}`}
+						/>
+					))}
+				</div>
+
+				<div className="w-full max-w-[375px] grid grid-cols-3 gap-[8px]">
+					{[..."123456789"].map((num) => (
+						<button
+							type="button"
+							key={num}
+							onClick={() => handleClick(num)}
+							className="h-[48px] text-xl bg-gray-100 rounded hover:bg-gray-200"
+						>
+							{num}
+						</button>
+					))}
+					<button
+						type="button"
+						onClick={handleDelete}
+						className="h-12 text-xl bg-gray-100 rounded hover:bg-gray-200"
+					>
+						←
+					</button>
+					<button
+						type="button"
+						onClick={() => handleClick("0")}
+						className="h-12 text-xl bg-gray-100 rounded hover:bg-gray-200"
+					>
+						0
+					</button>
+					<button
+						type="button"
+						onClick={handleSubmit}
+						disabled={pin.length !== 6}
+						className={`h-12 text-l rounded ${
+							pin.length === 6
+								? "bg-secondary-300 hover:bg-primary transition-all duration-300 hover:text-[#ffffff]"
+								: "bg-gray-300 text-gray-400 cursor-not-allowed"
+						}`}
+					>
+						확인
+					</button>
+				</div>
+
+				{error && (
+					<p className="text-red-500 text-center mt-4 text-sm">{error}</p>
+				)}
+			</div>
+		</div>
+	);
+}

@@ -30,7 +30,7 @@ export default function PinRegister() {
 				pinHash: hashedPin,
 			});
 			alert("PIN이 성공적으로 등록되었습니다.");
-			navigate("/Dashboard");
+			navigate("/dashboard");
 		} catch (error) {
 			console.error("PIN 저장 실패: ", error);
 			alert("PIN 저장 중 문제가 발생했습니다.");
@@ -105,7 +105,7 @@ export default function PinRegister() {
 					</button>
 					<button
 						type="button"
-						onClick={() => navigate("/")}
+						onClick={() => navigate("/login")}
 						className="mt-[24px] text-[14px] no-underline text-center hover:underline"
 					>
 						소셜 로그인으로 돌아가기

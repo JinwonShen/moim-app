@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { loginWithGoogle } from "../lib/auth";
-import { useUserStore } from "../store/userStore";
+import { handleLoginSuccess, loginWithGoogle } from "../lib/auth";
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -8,15 +7,9 @@ export default function Login() {
 	const handleGoogleLogin = async () => {
 		try {
 			const user = await loginWithGoogle();
-			useUserStore.getState().setUser({
-				uid: user.uid,
-				name: user.displayName ?? "",
-				email: user.email ?? "",
-				photoURL: user.photoURL,
-			});
-			alert(`${user.displayName}님 환영합니다!`);
 			// TODO: 상태 저장, 페이지 이동 등 처리
-			navigate("/pinregister");
+			await handleLoginSuccess(user, navigate);
+			alert(`${user.displayName}님 환영합니다!`);
 		} catch (err) {
 			alert("로그인에 실패했습니다.");
 			console.log(err);
@@ -24,11 +17,11 @@ export default function Login() {
 	};
 
 	const handleEmailLogin = () => {
-		navigate("/EmailLogin");
+		navigate("/emaillogin");
 	};
 
 	const handleJoinTerms = () => {
-		navigate("/JoinTerms");
+		navigate("/jointerms");
 	};
 
 	return (
@@ -84,7 +77,7 @@ export default function Login() {
 				<button
 					type="button"
 					onClick={handleGoogleLogin}
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] rounded-[8px] transition-all duration-300"
 				>
 					구글로 시작하기
 				</button>

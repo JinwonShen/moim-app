@@ -1,42 +1,46 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { handleLoginSuccess, loginWithEmail } from "../lib/auth";
-import { auth } from "../lib/firebase";
+import {
+	FiBarChart2,
+	FiGrid,
+	FiInfo,
+	FiMenu,
+	FiUser,
+	FiUsers,
+	FiX,
+} from "react-icons/fi";
+import { useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../lib/auth";
 
-export default function EmailLogin() {
+export default function Sidebar() {
+	const [open, setOpen] = useState(false);
 	const navigate = useNavigate();
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+	const location = useLocation();
+	const pathname = location.pathname;
 
-	const handleLogin = async () => {
-		try {
-			const result = await loginWithEmail(email, password);
-			const userCredential = await signInWithEmailAndPassword(
-				auth,
-				email,
-				password,
-			);
-			console.log("로그인 성공!", result.user);
-			alert("로그인 성공!");
-			await handleLoginSuccess(userCredential.user, navigate);
-		} catch (error) {
-			console.error("로그인 실패: ", error);
-			alert("로그인 실패");
-		}
+	const isActive = (target: string) => pathname === target;
+
+	const handleLogout = async () => {
+		await logout(navigate);
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col justify-center items-center">
-			<div className="w-full max-w-[375px] flex flex-col justify-center items-center">
-				<span className="w-[225px] mb-[48px]">
+		<header className="w-[225px] h-[100vh] fixed pt-[36px] pl-[24px] border-r-[1px] border-secondary-200 z-50">
+			{/* 모바일용 햄버거 버튼 */}
+			<button
+				type="button"
+				className="md:hidden p-4"
+				onClick={() => setOpen(!open)}
+			>
+				<FiMenu />
+			</button>
+			<span className="cursor-pointer">
+				<h1>
 					<svg
-						width="144"
-						height="72"
+						width="125"
+						height="50"
 						viewBox="0 0 224 73"
 						fill="currentColor"
 						xmlns="http://www.w3.org/2000/svg"
-						className="w-full"
 					>
 						<title>moim</title>
 						<path
@@ -56,37 +60,108 @@ export default function EmailLogin() {
 							fill="#DFDFDF"
 						/>
 					</svg>
-				</span>
-				<h2 className="mb-[12px]">이메일 로그인</h2>
-				<input
-					type="email"
-					placeholder="이메일을 입력해주세요."
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					className="w-[375px] h-[48px] mb-[8px] bg-secondary-100 pl-[24px]"
-				/>
-				<input
-					type="password"
-					placeholder="비밀번호를 입력해주세요."
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-					className="w-[375px] h-[48px] mb-[8px] bg-secondary-100 pl-[24px]"
-				/>
-				<button
-					type="button"
-					onClick={handleLogin}
-					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
-				>
-					로그인
-				</button>
-				<button
-					type="button"
-					className="mt-[24px] text-[14px] no-underline text-center hover:underline"
-					onClick={() => navigate("/login")}
-				>
-					소셜 로그인으로 돌아가기
-				</button>
+				</h1>
+			</span>
+			<div className="mt-[82px] mb-[20px]">
+				<ul>
+					<li
+						className={`flex cursor-pointer hover:text-primary font-bold transition-all duration-300 ${isActive("/dashboard") ? "text-primary font-bold" : ""}`}
+					>
+						<FiGrid className="text-[20px]" />
+						<h3 className="pl-[8px] font-bold">
+							<button type="button" onClick={() => navigate("/dashboard")}>
+								대시보드
+							</button>
+						</h3>
+					</li>
+				</ul>
 			</div>
-		</div>
+			<div className="mb-[20px]">
+				<ul>
+					<li className="flex cursor-pointer">
+						<FiUser className="text-[20px]" />
+						<h3 className="pl-[8px] mb-[4px] font-bold">내 정보</h3>
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("/mypage") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						<button type="button" onClick={() => navigate("/MyPage")}>
+							마이페이지
+						</button>
+					</li>
+				</ul>
+			</div>
+			<div className="mb-[20px]">
+				<ul>
+					<li className="flex cursor-pointer">
+						<FiUsers className="text-[20px]" />
+						<h3 className="pl-[8px] mb-[4px] font-bold">모임 관리</h3>
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						내가 만든 모임
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						참여 중인 모임
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						새 모임 만들기
+					</li>
+				</ul>
+			</div>
+			<div className="mb-[20px]">
+				<ul>
+					<li className="flex cursor-pointer">
+						<FiBarChart2 className="text-[20px]" />
+						<h3 className="pl-[8px] mb-[4px] font-bold">지출 통계</h3>
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						월별 지출 일지
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						월별 지출 그래프
+					</li>
+				</ul>
+			</div>
+			<div className="mb-[20px]">
+				<ul>
+					<li className="flex cursor-pointer">
+						<FiInfo className="text-[20px]" />
+						<h3 className="pl-[8px] mb-[4px] font-bold">고객지원</h3>
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						고객센터
+					</li>
+					<li
+						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
+					>
+						문의하기
+					</li>
+				</ul>
+			</div>
+			<div className="mb-[20px]">
+				<ul>
+					<li className="flex cursor-pointer hover:text-primary font-bold transition-all duration-300">
+						<FiX className="text-[20px]" />
+						<h3 className="pl-[8px] font-bold">
+							<button type="button" onClick={handleLogout}>
+								로그아웃
+							</button>
+						</h3>
+					</li>
+				</ul>
+			</div>
+		</header>
 	);
 }

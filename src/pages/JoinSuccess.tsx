@@ -4,7 +4,7 @@ export default function JoinSuccess() {
 	const navigate = useNavigate();
 
 	const handleDashboard = () => {
-		navigate("/Dashboard");
+		navigate("/dashboard");
 	};
 
 	return (
@@ -44,7 +44,7 @@ export default function JoinSuccess() {
 			<button
 				type="button"
 				onClick={handleDashboard}
-				className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+				className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] rounded-[8px] transition-all duration-300"
 			>
 				홈으로
 			</button>
