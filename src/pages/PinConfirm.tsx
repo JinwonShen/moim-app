@@ -12,6 +12,7 @@ export default function PinConfirm() {
 	const user = useAuthStore((state) => state.user);
 	const location = useLocation();
 	const redirecTo = location.state?.from || "";
+	const mode = location.state?.mode;
 
 	useEffect(() => {
 		if (!user) {
@@ -52,13 +53,14 @@ export default function PinConfirm() {
 				console.log("✅ PIN 인증 성공, 이동 대상:", redirecTo);
 				sessionStorage.setItem("pin_verified", "true");
 
-				if (redirecTo) {
-					setTimeout(() => {
-						navigate(redirecTo);
-					}, 0);
-				} else {
-					navigate("/dashboard");
-				}
+				handleSuccess();
+				// if (redirecTo) {
+				// 	setTimeout(() => {
+				// 		navigate(redirecTo);
+				// 	}, 0);
+				// } else {
+				// 	navigate("/dashboard");
+				// }
 			} else {
 				setError("PIN이 일치하지 않습니다.");
 				setPin([]);
@@ -66,6 +68,18 @@ export default function PinConfirm() {
 		} catch (err) {
 			console.error("PIN 확인 오류:", err);
 			setError("오류가 발생했습니다. 다시 시도해주세요.");
+		}
+	};
+
+	const handleSuccess = () => {
+		if (mode === "changePin") {
+			navigate("/pinregister", {
+				state: { from: "/mypage", mode: "changePin" },
+			});
+		} else if (mode === "deleteUser") {
+			navigate("/withdraw");
+		} else {
+			navigate(redirecTo || "/dashboard");
 		}
 	};
 
@@ -81,9 +95,7 @@ export default function PinConfirm() {
 						<div
 							key={`pin-${i}-${pin[i] ?? "empty"}`}
 							className={`w-[16px] h-[16px] rounded-full border-2 ${
-								pin[i]
-									? "bg-secondary-300 border-secondary-300"
-									: "border-secondary-300"
+								pin[i] ? "bg-primary border-primary" : "border-primary"
 							}`}
 						/>
 					))}

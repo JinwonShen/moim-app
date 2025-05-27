@@ -28,7 +28,12 @@ export default function Header() {
 						<h1 className="text-[24px] font-bold">
 							{user.nickname || user.name || "사용자"}님, 안녕하세요 !
 						</h1>
-						<p>계좌잔액: 미연동</p>
+						<p>
+							계좌 잔액:{" "}
+							{user.account?.balance !== undefined
+								? `${user.account.balance.toLocaleString()} 원`
+								: "등록되지 않음"}
+						</p>
 					</div>
 				</div>
 			)}

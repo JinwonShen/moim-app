@@ -1,12 +1,20 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+interface Account {
+	bank: string;
+	number: string;
+	balance: number;
+}
+
 interface User {
 	uid: string;
 	name: string;
 	email: string;
 	nickname: string;
 	profileImage: string;
+	providerId: string;
+	account?: Account;
 }
 
 interface AuthState {
@@ -26,7 +34,7 @@ export const useAuthStore = create<AuthState>()(
 		}),
 		{
 			name: "auth-storage",
-			storage: createJSONStorage(() => localStorage), // ✅ 명시적으로 localStorage 설정
+			storage: createJSONStorage(() => localStorage),
 		},
 	),
 );

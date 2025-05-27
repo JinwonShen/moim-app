@@ -1,4 +1,5 @@
 // src/lib/auth.ts
+import type { User as FirebaseUser } from "firebase/auth";
 import {
 	GoogleAuthProvider,
 	type User,
@@ -58,12 +59,7 @@ export async function loginWithGoogle(): Promise<User> {
 }
 
 export const handleLoginSuccess = async (
-	user: {
-		uid: string;
-		displayName?: string | null;
-		email?: string | null;
-		photoURL?: string | null;
-	},
+	user: FirebaseUser,
 	navigate: ReturnType<typeof useNavigate>,
 ) => {
 	try {
@@ -79,13 +75,14 @@ export const handleLoginSuccess = async (
 		const data = userSnap.data();
 		const hasPin = !!data.pinHash;
 
-		// ✅ Zustand 상태 저장 (통일)
 		useAuthStore.getState().setUser({
 			uid: user.uid,
 			email: user.email ?? "",
 			nickname: data.nickname ?? "",
 			name: data.name ?? user.displayName ?? "",
 			profileImage: data.profileImage ?? "",
+			providerId: user.providerData?.[0]?.providerId ?? "unknown",
+			account: data.account || undefined,
 		});
 
 		if (hasPin) {
@@ -104,7 +101,6 @@ export const logout = async (navigate: ReturnType<typeof useNavigate>) => {
 		await signOut(auth);
 		useAuthStore.getState().setUser(null);
 		useAuthStore.getState().setVerified(false);
-
 		sessionStorage.removeItem("pin_verified");
 		navigate("/login");
 	} catch (error) {

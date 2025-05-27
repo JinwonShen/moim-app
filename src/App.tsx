@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import MyPage from "./pages/MyPage";
 import PinConfirm from "./pages/PinConfirm";
 import PinRegister from "./pages/PinRegister";
+import Withdraw from "./pages/Withdraw";
 
 export default function App() {
 	return (
@@ -28,6 +29,7 @@ export default function App() {
 				<Route path="/dashboard" element={<Dashboard />} />
 				<Route path="/mypage" element={<MyPage />} />
 				<Route path="/pinconfirm" element={<PinConfirm />} />
+				<Route path="/withdraw" element={<Withdraw />} />
 				<Route path="*" element={<div>404 - 페이지를 찾을 수 없습니다</div>} />
 			</Routes>
 		</Router>
