@@ -1,6 +1,8 @@
-import type { Group } from "@/types/group";
+// src/store/groupStore.ts
+
 import { create } from "zustand";
 import { fetchJoinedGroups, fetchMyGroups } from "../lib/api/groups";
+import type { Group } from "../types/group";
 
 type GroupStore = {
 	myGroups: Group[];
@@ -18,10 +20,11 @@ export const useGroupStore = create<GroupStore>((set) => ({
 		set({ loading: true });
 
 		try {
-			const [myGroups, joinedGroups] = await Promise.all([
+			const [myGroups, joinedGroups]: [Group[], Group[]] = await Promise.all([
 				fetchMyGroups(uid),
 				fetchJoinedGroups(uid),
 			]);
+
 			set({ myGroups, joinedGroups });
 		} catch (error) {
 			console.error("그룹 데이터 로딩 실패: ", error);

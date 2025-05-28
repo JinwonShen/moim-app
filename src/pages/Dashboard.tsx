@@ -38,7 +38,9 @@ export default function Dashboard() {
 									</button>
 								</>
 							) : (
-								myGroups.map((group) => <div key={group.id}>{group.name}</div>)
+								myGroups.map((group) => (
+									<div key={group.id}>{group.groupName}</div>
+								))
 							)}
 						</div>
 					</section>
@@ -58,7 +60,7 @@ export default function Dashboard() {
 								</>
 							) : (
 								joinedGroups.map((group) => (
-									<div key={group.id}>{group.name}</div>
+									<div key={group.id}>{group.groupName}</div>
 								))
 							)}
 						</div>

@@ -1,3 +1,5 @@
+// src/lib/api/groups.ts
+
 import {
 	collection,
 	doc,
@@ -6,31 +8,23 @@ import {
 	query,
 	where,
 } from "firebase/firestore";
-import { useAuthStore } from "../../store/authStore";
+import type { Group } from "../../types/group";
 import { db } from "../firebase";
 
-export const fetchMyGroups = async () => {
-	const user = useAuthStore.getState().user;
-	if (!user) return [];
+export const fetchMyGroups = async (uid: string): Promise<Group[]> => {
+	const q = query(collection(db, "groups"), where("creatorId", "==", uid));
+	const snapshot = await getDocs(q);
 
-	const q = query(collection(db, "groups"), where("creatorId", "==", user.uid));
-
-	const querySnapShot = await getDocs(q);
-	const groups = querySnapShot.docs.map((doc) => ({
+	return snapshot.docs.map((doc) => ({
 		id: doc.id,
-		...doc.data(),
+		...(doc.data() as Omit<Group, "id">),
 	}));
-
-	return groups;
 };
 
-export const fetchJoinedGroups = async () => {
-	const user = useAuthStore.getState().user;
-	if (!user) return [];
-
+export const fetchJoinedGroups = async (uid: string): Promise<Group[]> => {
 	const participantQuery = query(
 		collection(db, "participants"),
-		where("userId", "==", user.uid),
+		where("userId", "==", uid),
 	);
 
 	const participantSnapShot = await getDocs(participantQuery);
@@ -38,11 +32,15 @@ export const fetchJoinedGroups = async () => {
 
 	const groupPromises = groupIds.map(async (groupId) => {
 		const groupDoc = await getDoc(doc(db, "groups", groupId));
+		const groupData = groupDoc.data();
+		if (!groupData) return null;
+
 		return {
 			id: groupId,
-			...groupDoc.data(),
+			...(groupData as Omit<Group, "id">),
 		};
 	});
 
-	return await Promise.all(groupPromises);
+	const groups = await Promise.all(groupPromises);
+	return groups.filter((g): g is Group => g !== null);
 };

@@ -5,6 +5,7 @@ import {
 	Routes,
 } from "react-router-dom";
 import FloatingButton from "./components/FloatingButton";
+import CreateGroup from "./pages/CreateGroup";
 import Dashboard from "./pages/Dashboard";
 import EmailLogin from "./pages/EmailLogin";
 import JoinEmail from "./pages/JoinEmail";
@@ -30,6 +31,7 @@ export default function App() {
 				<Route path="/dashboard" element={<Dashboard />} />
 				<Route path="/floatingbutton" element={<FloatingButton />} />
 				<Route path="/mypage" element={<MyPage />} />
+				<Route path="/group/create" element={<CreateGroup />} />
 				<Route path="/pinconfirm" element={<PinConfirm />} />
 				<Route path="/withdraw" element={<Withdraw />} />
 				<Route path="*" element={<div>404 - 페이지를 찾을 수 없습니다</div>} />
