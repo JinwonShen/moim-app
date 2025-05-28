@@ -16,7 +16,7 @@ export default function Header() {
 	return (
 		<>
 			{user && (
-				<div className="fixed w-full flex items-start pl-[237px] pt-[36px] pb-[12px] bg-white">
+				<div className="fixed w-full flex items-start pt-[36px] pb-[12px] bg-white z-50">
 					<div>
 						<img
 							src={user?.profileImage || "/default-image.png"}

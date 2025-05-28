@@ -24,7 +24,7 @@ export default function Sidebar() {
 	};
 
 	return (
-		<header className="w-[225px] h-[100vh] fixed pt-[36px] pl-[24px] border-r-[1px] border-secondary-200 z-50">
+		<header className="w-full max-w-[225px] h-[100vh] fixed pt-[36px] pl-[24px] bg-white border-r-[1px] border-secondary-200 z-50">
 			{/* 모바일용 햄버거 버튼 */}
 			<button
 				type="button"
