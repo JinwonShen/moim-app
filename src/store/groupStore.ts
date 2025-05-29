@@ -1,7 +1,7 @@
 // src/store/groupStore.ts
 
 import { create } from "zustand";
-import { fetchJoinedGroups, fetchMyGroups } from "../lib/api/groups";
+import { fetchJoinedGroups, fetchMyGroups } from "../lib/api/groupsApi";
 import type { Group } from "../types/group";
 
 type GroupStore = {

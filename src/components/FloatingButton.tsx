@@ -12,7 +12,7 @@ export default function FloatingButton() {
 		<button
 			type="button"
 			onClick={() => navigate("/group/create")}
-			className="fixed bottom-6 right-6 w-[60px] h-[60px] rounded-full shadow-lg bg-primary text-white hover:opacity-[50%] transition-all duration-300"
+			className="fixed bottom-6 right-6 w-[60px] h-[60px] rounded-full shadow-lg border border-white bg-primary text-white transition-all duration-300 hover:border-primary hover:bg-white hover:text-primary"
 		>
 			<FiPlus className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-3xl" />
 		</button>

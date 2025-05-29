@@ -5,6 +5,11 @@ export type Group = {
 	groupName: string;
 	description: string;
 	creatorId: string;
-	createdAt: Timestamp; // or Timestamp
-	participants?: string[]; // optional
+	createdAt: Timestamp;
+	participants: string[];
+	paidParticipants: string[]; // ← 추가됨
+	startDate: string;
+	endDate: string;
+	totalBudget: number;
+	balance: number;
 };

@@ -28,12 +28,19 @@ export default function CreateGroup() {
 
 		if (!uid || !groupName.trim()) return;
 
+		const fullParticipants = [nickname, ...participants];
+
 		const newGroup = {
 			groupName,
 			description,
 			creatorId: uid,
 			createdAt: serverTimestamp(),
-			participants, // string[] 형태
+			participants: fullParticipants,
+			paidParticipants: [],
+			startDate,
+			endDate,
+			totalBudget,
+			balance: totalBudget,
 		};
 
 		try {
@@ -60,6 +67,12 @@ export default function CreateGroup() {
 		updated[index] = value;
 		setParticipants(updated);
 	};
+
+	const totalMembers = [nickname, ...participants].length;
+	const eachFee =
+		totalMembers > 0 && totalBudget > 0
+			? `${Math.floor(totalBudget / totalMembers).toLocaleString()} 원`
+			: "";
 
 	return (
 		<div className="flex">
@@ -103,7 +116,6 @@ export default function CreateGroup() {
 							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
 							<label className="flex flex-col">
 								<span className="text-[14px]">모임 참여자</span>
-
 								{participants.map((p, idx) => (
 									<div
 										key={`participant-${idx - 0}`}
@@ -129,7 +141,6 @@ export default function CreateGroup() {
 										)}
 									</div>
 								))}
-
 								<button
 									type="button"
 									onClick={handleAddParticipant}
@@ -144,21 +155,19 @@ export default function CreateGroup() {
 								<span className="text-[14px]">총 예산</span>
 								<input
 									type="number"
-									placeholder="예산 금액 설정"
-									value={totalBudget}
+									placeholder="예산 금액 설정 ex) 4000000"
+									value={totalBudget || ""}
 									onChange={(e) => setTotalBudget(Number(e.target.value))}
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
+									className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px] appearance-none"
+									inputMode="numeric"
+									pattern="[0-9]*"
 								/>
 							</label>
 							<label className="flex flex-col">
 								<span className="text-[14px]">인당 금액</span>
 								<input
 									type="text"
-									value={
-										participants.length > 0 && totalBudget > 0
-											? `${Math.floor(totalBudget / participants.length).toLocaleString()} 원`
-											: ""
-									}
+									value={eachFee}
 									readOnly
 									className="border px-[8px] py-[4px] mt-[4px] text-[14px] bg-gray-100 text-gray-500 rounded-[4px]"
 								/>
