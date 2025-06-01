@@ -10,6 +10,7 @@ export type Group = {
 	paidParticipants: string[]; // ← 추가됨
 	startDate: string;
 	endDate: string;
+	dueDate: string;
 	totalBudget: number;
 	balance: number;
 };

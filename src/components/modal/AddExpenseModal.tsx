@@ -1,0 +1,63 @@
+"use client";
+
+import { DialogContent, DialogOverlay } from "@radix-ui/react-dialog";
+import { addDoc, collection } from "firebase/firestore";
+import { FiX } from "react-icons/fi";
+import { db } from "../../lib/firebase";
+import ExpenseForm from "../ExpenseForm";
+
+interface Props {
+	groupId: string;
+	uid: string;
+	categories: string[];
+	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
+	fetchExpenses: () => Promise<void>;
+	onClose: () => void;
+}
+
+export default function AddExpenseModal({
+	groupId,
+	uid,
+	categories,
+	setCategories,
+	fetchExpenses,
+	onClose,
+}: Props) {
+	return (
+		<DialogOverlay className="fixed inset-0 bg-black/30 z-50">
+			<DialogContent
+				className="fixed top-1/2 left-1/2 
+          -translate-x-1/2 -translate-y-1/2 
+          w-[90vw] max-w-[500px] max-h-[90vh] 
+          bg-white p-6 rounded-lg shadow-lg 
+          z-50 overflow-y-auto"
+			>
+				<button
+					type="button"
+					onClick={onClose}
+					className="absolute top-4 right-4 text-gray-500 hover:text-black"
+				>
+					<FiX />
+				</button>
+				<h2 className="text-xl font-bold mb-4">지출 등록</h2>
+				<ExpenseForm
+					onSubmit={async ({ date, amount, category, memo }) => {
+						const expensesRef = collection(db, "groups", groupId, "expenses");
+						await addDoc(expensesRef, {
+							date,
+							amount,
+							category,
+							memo,
+							author: uid,
+							createdAt: new Date(),
+						});
+						await fetchExpenses();
+					}}
+					onSuccess={onClose}
+					categories={categories}
+					setCategories={setCategories}
+				/>
+			</DialogContent>
+		</DialogOverlay>
+	);
+}

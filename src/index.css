@@ -30,10 +30,10 @@ input[placeholder] {
 
 /* 버튼 공통 */
 .button {
-	padding: 12px 24px;
 	background: #f7f7f7;
 	border-radius: 8px;
 	transition: all 0.3s;
+	border: 1px solid #ededed;
 }
 .button:hover {
 	background: #ff8d8d;

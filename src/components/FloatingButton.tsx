@@ -1,20 +1,44 @@
+import * as Dialog from "@radix-ui/react-dialog";
+import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
-import { useLocation, useNavigate } from "react-router-dom";
+import AddExpenseModal from "./modal/AddExpenseModal";
 
-export default function FloatingButton() {
-	const navigate = useNavigate();
-	const location = useLocation();
+type FloatingButtonProps = {
+	groupId: string;
+	uid: string;
+	categories: string[];
+	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
+	fetchExpenses: () => Promise<void>;
+};
 
-	const excludedPaths = ["/mypage", "/support", "/contact"];
-	if (excludedPaths.includes(location.pathname)) return null;
+export default function FloatingButton({
+	groupId,
+	uid,
+	categories,
+	setCategories,
+	fetchExpenses,
+}: FloatingButtonProps) {
+	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<button
-			type="button"
-			onClick={() => navigate("/group/create")}
-			className="fixed bottom-6 right-6 w-[60px] h-[60px] rounded-full shadow-lg border border-white bg-primary text-white transition-all duration-300 hover:border-primary hover:bg-white hover:text-primary"
-		>
-			<FiPlus className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-3xl" />
-		</button>
+		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+			<Dialog.Trigger asChild>
+				<button
+					type="button"
+					className="fixed bottom-[24px] right-[24px] w-[56px] h-[56px] rounded-full bg-primary text-white shadow-md flex items-center justify-center"
+				>
+					<FiPlus size={24} />
+				</button>
+			</Dialog.Trigger>
+
+			<AddExpenseModal
+				groupId={groupId}
+				uid={uid}
+				categories={categories}
+				setCategories={setCategories}
+				fetchExpenses={fetchExpenses}
+				onClose={() => setIsOpen(false)}
+			/>
+		</Dialog.Root>
 	);
 }

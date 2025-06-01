@@ -1,15 +1,46 @@
-import { useEffect } from "react";
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FloatingButton from "../components/FloatingButton";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
+import { useExpenseStore } from "../store/expenseStore";
 import { useGroupStore } from "../store/groupStore";
 
 export default function Dashboard() {
+	const navigate = useNavigate();
 	const uid = useAuthStore((state) => state.user?.uid);
 	const { myGroups, joinedGroups, fetchGroups, loading } = useGroupStore();
-	const navigate = useNavigate();
+	const [categories, setCategories] = useState<string[]>([
+		"식비",
+		"커피",
+		"교통비",
+		"숙박비",
+		"엑티비티",
+		"기타",
+	]);
+	const { recentExpenses, setRecentExpenses } = useExpenseStore();
+
+	const fetchExpenses = async () => {
+		const expensesRef = collection(db, "groups", myGroups[0].id, "expenses");
+		const q = query(expensesRef, orderBy("createdAt", "desc"), limit(5));
+		const snapshot = await getDocs(q);
+		const items = snapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				id: doc.id,
+				author: data.author,
+				description: data.memo ?? "",
+				category: data.category ?? "",
+				amount: Number(data.amount ?? 0),
+				createdAt: data.createdAt,
+			};
+		});
+
+		setRecentExpenses(items);
+	};
 
 	useEffect(() => {
 		// 대시보드 진입 시 항상 PIN 인증 상태 제거
@@ -37,7 +68,7 @@ export default function Dashboard() {
 									<p className="font-bold">아직 생성된 모임이 없어요! 👍</p>
 									<button
 										type="button"
-										className="button w-full mt-[24px]"
+										className="button w-full mt-[24px] px-[24px] py-[8px]"
 										onClick={() => navigate("/group/create")}
 									>
 										새 모임 만들기
@@ -106,8 +137,9 @@ export default function Dashboard() {
 											<button
 												type="button"
 												className="py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+												onClick={() => navigate(`/group/${group.id}`)}
 											>
-												자세히 보기
+												모임 상세보기
 											</button>
 										</div>
 									);
@@ -162,7 +194,15 @@ export default function Dashboard() {
 					</section>
 				</main>
 
-				<FloatingButton />
+				{uid && myGroups.length > 0 && (
+					<FloatingButton
+						groupId={myGroups[0].id}
+						uid={uid}
+						categories={categories}
+						setCategories={setCategories}
+						fetchExpenses={fetchExpenses}
+					/>
+				)}
 			</div>
 		</div>
 	);

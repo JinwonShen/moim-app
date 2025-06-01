@@ -110,7 +110,9 @@ export default function Sidebar() {
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
 					>
-						새 모임 만들기
+						<button type="button" onClick={() => navigate("/group/create")}>
+							새 모임 만들기
+						</button>
 					</li>
 				</ul>
 			</div>

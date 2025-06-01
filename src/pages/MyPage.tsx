@@ -170,11 +170,11 @@ export default function MyPage() {
 	};
 
 	return (
-		<div className="flex w-full">
+		<div className="flex">
 			<Sidebar />
-			<div className="w-full">
+			<div className="w-[100vw] pl-[237px] pb-[24px]">
 				<Header />
-				<section className="h-full flex flex-col mt-[148px] pl-[237px] pr-[12px]">
+				<section className="h-auto flex flex-col mt-[148px] pr-[12px]">
 					<h1 className="font-bold">마이페이지</h1>
 					<main className="mt-[8px] w-full border">
 						<div className="p-[48px] pb-0">
@@ -200,14 +200,14 @@ export default function MyPage() {
 											<>
 												<button
 													type="button"
-													className="button"
+													className="button px-[24px] py-[8px]"
 													onClick={handleNicknameSave}
 												>
 													저장
 												</button>
 												<button
 													type="button"
-													className="button ml-[12px]"
+													className="button px-[24px] py-[8px] ml-[12px]"
 													onClick={handleNicknameCancel}
 												>
 													취소
@@ -216,7 +216,7 @@ export default function MyPage() {
 										) : (
 											<button
 												type="button"
-												className="button"
+												className="button px-[24px] py-[8px]"
 												onClick={() => setEditingNickname(true)}
 											>
 												닉네임 변경
@@ -265,14 +265,14 @@ export default function MyPage() {
 											<>
 												<button
 													type="button"
-													className="button"
+													className="button px-[24px] py-[8px]"
 													onClick={handlePasswordSave}
 												>
 													저장
 												</button>
 												<button
 													type="button"
-													className="button ml-[12px]"
+													className="button px-[24px] py-[8px] ml-[12px]"
 													onClick={() => setEditingPassword(false)}
 												>
 													취소
@@ -281,7 +281,7 @@ export default function MyPage() {
 										) : (
 											<button
 												type="button"
-												className="button"
+												className="button px-[24px] py-[8px]"
 												onClick={handlePasswordEditClick}
 											>
 												비밀번호 변경
@@ -337,14 +337,14 @@ export default function MyPage() {
 											<span className="flex-[1.5]">
 												<button
 													type="button"
-													className="button"
+													className="button px-[24px] py-[8px]"
 													onClick={handleAccountSave}
 												>
 													저장
 												</button>
 												<button
 													type="button"
-													className="button ml-[12px]"
+													className="button px-[24px] py-[8px] ml-[12px]"
 													onClick={() => setEditingAccount(false)}
 												>
 													취소
@@ -360,7 +360,7 @@ export default function MyPage() {
 											<span className="flex-[1.5]">
 												<button
 													type="button"
-													className="button"
+													className="button px-[24px] py-[8px]"
 													onClick={() => {
 														setEditingAccount(true);
 														setBank(user?.account?.bank || "");
@@ -390,7 +390,7 @@ export default function MyPage() {
 											<span className="flex-[1.5]">
 												<button
 													type="button"
-													className="button"
+													className="button px-[24px] py-[8px]"
 													onClick={() => setEditingAccount(true)}
 												>
 													계좌 등록하기
@@ -450,7 +450,7 @@ export default function MyPage() {
 									<span className="flex-[1.5]">
 										<button
 											type="button"
-											className="button"
+											className="button px-[24px] py-[8px]"
 											onClick={handlePinChange}
 										>
 											PIN번호 변경
@@ -463,7 +463,7 @@ export default function MyPage() {
 									<span className="flex-[1.5]">
 										<button
 											type="button"
-											className="button"
+											className="button px-[24px] py-[8px]"
 											onClick={handleWithdrawClick}
 										>
 											회원 탈퇴

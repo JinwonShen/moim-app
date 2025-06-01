@@ -39,6 +39,7 @@ export default function CreateGroup() {
 			paidParticipants: [],
 			startDate,
 			endDate,
+			dueDate,
 			totalBudget,
 			balance: totalBudget,
 		};
@@ -66,6 +67,17 @@ export default function CreateGroup() {
 		const updated = [...participants];
 		updated[index] = value;
 		setParticipants(updated);
+	};
+
+	const handleReset = () => {
+		setGroupName("");
+		setDescription("");
+		setTotalBudget(0);
+		setParticipants([""]);
+		setStartDate("");
+		setEndDate("");
+		setDueDate("");
+		setAgreeTerms(false);
 	};
 
 	const totalMembers = [nickname, ...participants].length;
@@ -216,7 +228,11 @@ export default function CreateGroup() {
 							</label>
 						</div>
 						<div className="w-full flex justify-between gap-[24px]">
-							<button type="button" className="button w-[calc(25%-18px)]">
+							<button
+								type="button"
+								className="button w-[calc(25%-18px)] py-[12px]"
+								onClick={handleReset}
+							>
 								초기화
 							</button>
 							<button type="button" className="button w-[calc(25%-18px)]">
