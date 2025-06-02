@@ -21,7 +21,7 @@ export default function Dashboard() {
 		"엑티비티",
 		"기타",
 	]);
-	const { recentExpenses, setRecentExpenses } = useExpenseStore();
+	const { setRecentExpenses } = useExpenseStore();
 
 	const fetchExpenses = async () => {
 		const expensesRef = collection(db, "groups", myGroups[0].id, "expenses");
@@ -43,7 +43,6 @@ export default function Dashboard() {
 	};
 
 	useEffect(() => {
-		// 대시보드 진입 시 항상 PIN 인증 상태 제거
 		sessionStorage.removeItem("pin_verified");
 	}, []);
 
@@ -68,7 +67,7 @@ export default function Dashboard() {
 									<p className="font-bold">아직 생성된 모임이 없어요! 👍</p>
 									<button
 										type="button"
-										className="button w-full mt-[24px] px-[24px] py-[8px]"
+										className="button w-full mt-[24px] px-[24px] py-[8px] text-[14px]"
 										onClick={() => navigate("/group/create")}
 									>
 										새 모임 만들기
@@ -81,7 +80,7 @@ export default function Dashboard() {
 									const isUpcoming = start > now;
 									const status = isUpcoming ? "모집중" : "진행중";
 
-									const participantCount = group.participants?.length ?? 0;
+									const participantCount = group.participantCount ?? 0;
 									const paidCount = group.paidParticipants?.length ?? 0;
 									const paidPercent = participantCount
 										? Math.floor((paidCount / participantCount) * 100)
@@ -110,15 +109,12 @@ export default function Dashboard() {
 													{status}
 												</span>
 											</div>
-
 											<p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
 												{group.startDate} ~ {group.endDate}
 											</p>
-
 											<p className="text-[14px] py-[8px]">
 												참여자: {participantCount}명 중 {paidCount}명 입금 완료
 											</p>
-
 											<div className="h-[12px] bg-gray-200 rounded-full">
 												<div
 													className="h-full bg-primary rounded-full"
@@ -127,13 +123,11 @@ export default function Dashboard() {
 													}}
 												/>
 											</div>
-
 											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
 												{isUpcoming
 													? `예산: ${group.totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
 													: `예산: ${group.totalBudget.toLocaleString()}원 / 잔액: ${group.balance.toLocaleString()}원`}
 											</p>
-
 											<button
 												type="button"
 												className="py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
@@ -149,7 +143,7 @@ export default function Dashboard() {
 					</section>
 
 					{/* 참여 중인 모임 */}
-					<section className="w-[calc(50%-12px)] min-h-[150px] max-h-[250px] p-[24px] border border-secondary-200 rounded-[8px]">
+					<section className="w-[calc(50%-12px)] min-h-[150px] p-[24px] border border-secondary-200 rounded-[8px]">
 						<h2 className="text-[14px] mb-[12px]">참여 중인 모임</h2>
 						<div>
 							{joinedGroups.length === 0 ? (
@@ -162,9 +156,60 @@ export default function Dashboard() {
 									</p>
 								</>
 							) : (
-								joinedGroups.map((group) => (
-									<div key={group.id}>{group.groupName}</div>
-								))
+								joinedGroups.map((group) => {
+									const now = new Date();
+									const start = new Date(group.startDate);
+									const isOngoing = start <= now;
+									const status = isOngoing ? "진행중" : "대기중";
+
+									const participantCount = group.participantCount ?? 0;
+									const paidCount = group.paidParticipants?.length ?? 0;
+									const paidPercent = participantCount
+										? Math.floor((paidCount / participantCount) * 100)
+										: 0;
+									const budgetUsed = group.totalBudget - group.balance;
+									const usedPercent = Math.floor(
+										(budgetUsed / group.totalBudget) * 100 || 0,
+									);
+
+									return (
+										<div key={group.id} className="flex flex-col">
+											<div className="flex justify-between items-center mb-[8px]">
+												<h3 className="text-[16px] font-bold">
+													{group.groupName}
+												</h3>
+												<span
+													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${status === "대기중" ? "text-primary bg-white border border-primary" : "text-white bg-primary"}`}
+												>
+													{status}
+												</span>
+											</div>
+											<p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
+												{group.startDate} ~ {group.endDate}
+											</p>
+											<p className="text-[14px] py-[8px]">
+												참여자: {participantCount}명 중 {paidCount}명 입금 완료
+											</p>
+											<div className="h-[12px] bg-gray-200 rounded-full">
+												<div
+													className="h-full bg-primary rounded-full"
+													style={{ width: `${isOngoing ? paidPercent : 0}%` }}
+												/>
+											</div>
+											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
+												예산: {group.totalBudget.toLocaleString()}원 / 잔액:{" "}
+												{group.balance.toLocaleString()}원
+											</p>
+											<button
+												type="button"
+												className="py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+												onClick={() => navigate(`/group/${group.id}`)}
+											>
+												모임 상세보기
+											</button>
+										</div>
+									);
+								})
 							)}
 						</div>
 					</section>

@@ -36,8 +36,7 @@ export async function loginWithGoogle(): Promise<User> {
 		if (!userSnap.exists()) {
 			await setDoc(userRef, {
 				uid: user.uid,
-				name: user.displayName ?? "",
-				nickname: user.displayName ?? "",
+				nickname: user.displayName ?? "사용자", // 기본 닉네임
 				email: user.email ?? "",
 				createdAt: serverTimestamp(),
 				pinHash: null,
@@ -78,8 +77,7 @@ export const handleLoginSuccess = async (
 		useAuthStore.getState().setUser({
 			uid: user.uid,
 			email: user.email ?? "",
-			nickname: data.nickname ?? "",
-			name: data.name ?? user.displayName ?? "",
+			nickname: data.nickname ?? user.displayName ?? "",
 			profileImage: data.profileImage ?? "",
 			providerId: user.providerData?.[0]?.providerId ?? "unknown",
 			account: data.account || undefined,

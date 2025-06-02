@@ -32,14 +32,16 @@ export default function AddExpenseModal({
           bg-white p-6 rounded-lg shadow-lg 
           z-50 overflow-y-auto"
 			>
-				<button
-					type="button"
-					onClick={onClose}
-					className="absolute top-4 right-4 text-gray-500 hover:text-black"
-				>
-					<FiX />
-				</button>
-				<h2 className="text-xl font-bold mb-4">지출 등록</h2>
+				<div className="flex justify-between items-center mb-[12px]">
+					<h2 className="text-xl font-bold">지출 등록</h2>
+					<button
+						type="button"
+						onClick={onClose}
+						className="p-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+					>
+						<FiX />
+					</button>
+				</div>
 				<ExpenseForm
 					onSubmit={async ({ date, amount, category, memo }) => {
 						const expensesRef = collection(db, "groups", groupId, "expenses");
@@ -53,6 +55,7 @@ export default function AddExpenseModal({
 						});
 						await fetchExpenses();
 					}}
+					showHeader={false}
 					onSuccess={onClose}
 					categories={categories}
 					setCategories={setCategories}

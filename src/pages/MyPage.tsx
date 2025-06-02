@@ -192,7 +192,7 @@ export default function MyPage() {
 												className="border px-[8px] py-[4px] focus:outline-primary"
 											/>
 										) : (
-											user?.nickname || user?.name
+											user?.nickname || "사용자"
 										)}
 									</span>
 									<span className="flex-[1.5]">

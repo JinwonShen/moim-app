@@ -52,7 +52,11 @@ export default function Withdraw() {
 				<p className="mb-6">
 					정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.
 				</p>
-				<button type="button" onClick={handleWithdraw} className="button">
+				<button
+					type="button"
+					onClick={handleWithdraw}
+					className="px-[24px] py-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+				>
 					탈퇴하기
 				</button>
 			</div>

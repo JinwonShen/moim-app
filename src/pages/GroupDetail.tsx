@@ -13,10 +13,11 @@ import {
 	writeBatch,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ExpenseForm from "../components/ExpenseForm";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import InviteModal from "../components/modal/InviteModal";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
 import type { Group } from "../types/group";
@@ -24,11 +25,21 @@ import type { Group } from "../types/group";
 export default function GroupDetail() {
 	const { id: groupId } = useParams() as { id: string };
 	const navigate = useNavigate();
-	const uid = useAuthStore((state) => state.user?.uid);
+	const location = useLocation();
+	const user = useAuthStore((state) => state.user);
+	const uid = user?.uid;
+	// const hasPaid = paidParticipants.includes(user?.uid);
+	const [isInviteOpen, setIsInviteOpen] = useState(false);
 	const [groupData, setGroupData] = useState<Group | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [editedTitle, setEditedTitle] = useState("");
 	const [editedContent, setEditedContent] = useState("");
+	const [ownerNickname, setOwnerNickname] = useState("");
+	useEffect(() => {
+		if (location.state?.openInviteModal) {
+			setIsInviteOpen(true);
+		}
+	}, [location.state]);
 
 	const [noticeTitle, setNoticeTitle] = useState("");
 	const [noticeContent, setNoticeContent] = useState("");
@@ -313,6 +324,19 @@ export default function GroupDetail() {
 		fetchGroup();
 	}, [groupId]);
 
+	useEffect(() => {
+		const fetchOwner = async () => {
+			const ref = collection(db, "groups", groupId, "participants");
+			const snapshot = await getDocs(ref);
+			const ownerDoc = snapshot.docs.find((doc) => doc.data().isOwner === true);
+			if (ownerDoc) {
+				setOwnerNickname(ownerDoc.data().nickname);
+			}
+		};
+
+		fetchOwner();
+	}, [groupId]);
+
 	const handleEditToggle = () => setIsEditing(true);
 	const handleCancelEdit = () => setIsEditing(false);
 
@@ -348,7 +372,7 @@ export default function GroupDetail() {
 	const start = new Date(groupData.startDate);
 	const isUpcoming = start > now;
 
-	const participantCount = groupData.participants?.length ?? 0;
+	const participantCount = groupData.participantCount ?? 0;
 	const paidCount = groupData.paidParticipants?.length ?? 0;
 	const paidPercent = participantCount
 		? Math.floor((paidCount / participantCount) * 100)
@@ -370,44 +394,69 @@ export default function GroupDetail() {
 			<div className="w-[100vw] pl-[237px] pb-[24px]">
 				<Header />
 				<section className="flex flex-col mt-[148px] mr-[12px] p-[24px] border rounded-[8px] text-[14px]">
-					<div className="flex justify-between items-center mb-[12px]">
+					<div className="flex justify-between items-center mb-[24px]">
 						<h2 className="font-bold text-[20px]">모임 상세보기</h2>
-						{/* 모임 상세보기 타이틀, 수정/삭제 btn */}
 						<div className="flex gap-[12px]">
-							{!isEditing ? (
-								<div className="flex gap-[12px]">
+							{/* ✅ 모두에게 보이는 입금 버튼 */}
+							{/* {!hasPaid && (
+						)} */}
+							<button
+								type="button"
+								className="button px-[24px] py-[4px]"
+								// onClick={handleDeposit}
+							>
+								입금하기
+							</button>
+
+							{/* 🔐 모임장만 보이는 버튼들 */}
+							{groupData.creatorId === uid && (
+								<>
+									{/* 참여자 관리 */}
 									<button
 										type="button"
-										className="flex-[1] button px-[24px] py-[4px]"
-										onClick={handleEditToggle}
+										className="button px-[24px] py-[4px]"
+										onClick={() => setIsInviteOpen(true)}
 									>
-										수정
+										참여자 관리
 									</button>
-									<button
-										type="button"
-										className="flex-[1] button px-[24px] py-[4px]"
-										onClick={handleDelete}
-									>
-										삭제
-									</button>
-								</div>
-							) : (
-								<div className="flex gap-[12px]">
-									<button
-										type="button"
-										className="button flex-[1] px-[24px] py-[4px]"
-										onClick={handleSave}
-									>
-										저장
-									</button>
-									<button
-										type="button"
-										className="button flex-[1] px-[24px] py-[4px]"
-										onClick={handleCancelEdit}
-									>
-										취소
-									</button>
-								</div>
+
+									{/* 수정 / 삭제 or 저장 / 취소 */}
+									{!isEditing ? (
+										<>
+											<button
+												type="button"
+												className="button px-[24px] py-[4px]"
+												onClick={handleEditToggle}
+											>
+												수정
+											</button>
+											<button
+												type="button"
+												className="button px-[24px] py-[4px]"
+												onClick={handleDelete}
+											>
+												삭제
+											</button>
+										</>
+									) : (
+										<>
+											<button
+												type="button"
+												className="button px-[24px] py-[4px]"
+												onClick={handleSave}
+											>
+												저장
+											</button>
+											<button
+												type="button"
+												className="button px-[24px] py-[4px]"
+												onClick={handleCancelEdit}
+											>
+												취소
+											</button>
+										</>
+									)}
+								</>
 							)}
 						</div>
 					</div>
@@ -451,9 +500,7 @@ export default function GroupDetail() {
 							</div>
 							<div className="flex gap-[12px]">
 								<span className="flex-[1] font-semibold">모임 장</span>
-								<span className="flex-[4]">
-									{groupData.creatorId === uid ? "나" : groupData.creatorId}
-								</span>
+								<span className="flex-[4]">{ownerNickname}</span>
 							</div>
 							<div className="flex gap-[12px]">
 								<span className="flex-[1] font-semibold">총 예산</span>
@@ -560,7 +607,7 @@ export default function GroupDetail() {
 					{/* 최근 지출 내역 */}
 					<div className="flex flex-wrap gap-[24px]">
 						<div className="flex-[2]">
-							<div className="flex justify-between items-center mb-[12px]">
+							<div className="flex justify-between items-center mb-[24px]">
 								<h2 className="font-bold text-[20px]">최근 지출 내역</h2>
 								{groupData?.creatorId === uid && (
 									<div className="flex items-center gap-[8px]">
@@ -593,7 +640,7 @@ export default function GroupDetail() {
 									최근 지출 내역이 없습니다.
 								</p>
 							) : (
-								<ul className="flex flex-col gap-[4px] text-[14px]">
+								<ul className="flex flex-col gap-[12px] text-[14px]">
 									{recentExpenses.map((item) => {
 										const isEditing = editingExpenseId === item.id;
 										const isSelected = selectedExpenseIds.includes(item.id);
@@ -601,7 +648,7 @@ export default function GroupDetail() {
 										return (
 											<li
 												key={item.id}
-												className="flex justify-between items-start gap-[8px] pb-[12px] border-b"
+												className="flex justify-between items-start gap-[4px] pb-[12px] border-b"
 											>
 												{/* 체크박스: 편집모드일 때만 표시 */}
 												{editMode && (
@@ -682,7 +729,7 @@ export default function GroupDetail() {
 												</div>
 
 												{/* 금액 + 버튼 */}
-												<div className="flex-[2] text-right flex flex-col items-end gap-[4px]">
+												<div className="flex-[2] text-right flex flex-col items-end ">
 													{isEditing ? (
 														<input
 															type="number"
@@ -738,12 +785,6 @@ export default function GroupDetail() {
 							{/* 지출 등록 폼 */}
 							{groupData.creatorId === uid && (
 								<div className="mt-[24px] mb-[24px]">
-									<div className="flex justify-between items-center mb-[12px]">
-										<h3 className="font-semibold text-[16px]">지출 등록</h3>
-										<button type="button" className="button px-[24px] py-[4px]">
-											지출 등록하기
-										</button>
-									</div>
 									<ExpenseForm
 										onSubmit={async ({ date, amount, category, memo }) => {
 											const expensesRef = collection(
@@ -765,6 +806,7 @@ export default function GroupDetail() {
 										}}
 										categories={categories}
 										setCategories={setCategories}
+										showBottom={false}
 									/>
 								</div>
 							)}
@@ -772,10 +814,10 @@ export default function GroupDetail() {
 
 						{/* 공지사항 */}
 						<div className="flex-[3]">
-							<div className="flex justify-between items-center mb-[12px]">
+							<div className="flex justify-between items-center mb-[24px]">
 								<h2 className="font-bold text-[20px]">공지사항</h2>
 								{groupData.creatorId === uid && (
-									<div className="flex items-center gap-[8px]">
+									<div className="flex items-center gap-[4px]">
 										{editNoticeMode && selectedNotices.length > 0 && (
 											<button
 												type="button"
@@ -945,6 +987,13 @@ export default function GroupDetail() {
 							)}
 						</div>
 					</div>
+					{isInviteOpen && (
+						<InviteModal
+							open={isInviteOpen}
+							onClose={() => setIsInviteOpen(false)}
+							groupId={groupId}
+						/>
+					)}
 				</section>
 			</div>
 		</div>

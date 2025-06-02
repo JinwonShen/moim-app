@@ -26,7 +26,7 @@ export default function Header() {
 					</div>
 					<div className="pl-[24px]">
 						<h1 className="text-[24px] font-bold">
-							{user.nickname || user.name || "사용자"}님, 안녕하세요 !
+							{user.nickname || "사용자"}님, 안녕하세요 !
 						</h1>
 						<p>
 							계좌 잔액:{" "}

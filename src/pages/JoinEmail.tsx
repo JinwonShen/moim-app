@@ -170,7 +170,6 @@ export default function JoinEmail() {
 				uid: userCredential.user.uid,
 				email: email,
 				nickname: nickname,
-				name: "",
 				profileImage: "/default-image.png",
 				providerId: "password",
 				account: undefined,

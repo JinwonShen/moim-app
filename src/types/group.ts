@@ -8,6 +8,7 @@ export type Group = {
 	createdAt: Timestamp;
 	participants: string[];
 	paidParticipants: string[]; // ← 추가됨
+	participantCount: number;
 	startDate: string;
 	endDate: string;
 	dueDate: string;

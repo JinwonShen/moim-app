@@ -9,7 +9,6 @@ interface Account {
 
 interface User {
 	uid: string;
-	name: string;
 	email: string;
 	nickname: string;
 	profileImage: string;

@@ -25,7 +25,7 @@ export default function FloatingButton({
 			<Dialog.Trigger asChild>
 				<button
 					type="button"
-					className="fixed bottom-[24px] right-[24px] w-[56px] h-[56px] rounded-full bg-primary text-white shadow-md flex items-center justify-center"
+					className="fixed bottom-[24px] right-[24px] w-[56px] h-[56px] rounded-full bg-primary text-white border border-primary shadow-md flex items-center justify-center transition-all duration-300 hover:bg-white hover:text-primary"
 				>
 					<FiPlus size={24} />
 				</button>

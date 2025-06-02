@@ -1,7 +1,6 @@
-// src/store/groupStore.ts
-
+import { collection, getDocs } from "firebase/firestore";
 import { create } from "zustand";
-import { fetchJoinedGroups, fetchMyGroups } from "../lib/api/groupsApi";
+import { db } from "../lib/firebase";
 import type { Group } from "../types/group";
 
 type GroupStore = {
@@ -20,14 +19,44 @@ export const useGroupStore = create<GroupStore>((set) => ({
 		set({ loading: true });
 
 		try {
-			const [myGroups, joinedGroups]: [Group[], Group[]] = await Promise.all([
-				fetchMyGroups(uid),
-				fetchJoinedGroups(uid),
-			]);
+			const groupSnapshot = await getDocs(collection(db, "groups"));
+
+			const myGroups: Group[] = [];
+			const joinedGroups: Group[] = [];
+
+			for (const docSnap of groupSnapshot.docs) {
+				const raw = docSnap.data();
+				const groupId = docSnap.id;
+
+				const groupData: Group = {
+					...(raw as Omit<Group, "id">),
+					id: groupId,
+				};
+
+				// 내가 만든 모임
+				if (groupData.creatorId === uid) {
+					myGroups.push(groupData);
+				} else {
+					const participantsRef = collection(
+						db,
+						"groups",
+						groupId,
+						"participants",
+					);
+					const participantSnap = await getDocs(participantsRef);
+
+					const matched = participantSnap.docs.find(
+						(p) => p.data().uid === uid,
+					);
+					if (matched) {
+						joinedGroups.push(groupData);
+					}
+				}
+			}
 
 			set({ myGroups, joinedGroups });
 		} catch (error) {
-			console.error("그룹 데이터 로딩 실패: ", error);
+			console.error("❌ 그룹 데이터 로딩 실패:", error);
 		} finally {
 			set({ loading: false });
 		}

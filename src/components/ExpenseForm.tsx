@@ -11,6 +11,8 @@ interface ExpenseFormProps {
 	categories: string[];
 	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
 	submitLabel?: string;
+	showHeader?: boolean;
+	showBottom?: boolean;
 }
 
 export default function ExpenseForm({
@@ -19,6 +21,8 @@ export default function ExpenseForm({
 	categories,
 	setCategories,
 	submitLabel = "지출 등록하기",
+	showHeader = true,
+	showBottom = true,
 }: ExpenseFormProps) {
 	const [date, setDate] = useState("");
 	const [amount, setAmount] = useState("");
@@ -56,6 +60,14 @@ export default function ExpenseForm({
 			onSubmit={handleSubmit}
 			className="flex flex-col gap-[12px] text-[14px]"
 		>
+			{showHeader && (
+				<div className="flex justify-between items-center">
+					<h2 className="text-[16px]">지출 등록</h2>
+					<button type="button" className="button px-[24px] py-[4px]">
+						{submitLabel}
+					</button>
+				</div>
+			)}
 			<input
 				type="date"
 				value={date}
@@ -106,12 +118,14 @@ export default function ExpenseForm({
 				rows={2}
 				className="border px-2 py-1 rounded resize-none"
 			/>
-			<button
-				type="submit"
-				className="w-full py-[12px] bg-primary border border-primary rounded-[8px] text-white transition-all duration-300 hover:bg-white hover:text-primary"
-			>
-				{submitLabel}
-			</button>
+			{showBottom && (
+				<button
+					type="submit"
+					className="w-full py-[12px] bg-primary border border-primary rounded-[8px] text-white transition-all duration-300 hover:bg-white hover:text-primary"
+				>
+					{submitLabel}
+				</button>
+			)}
 		</form>
 	);
 }

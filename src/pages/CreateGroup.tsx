@@ -1,4 +1,10 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+	addDoc,
+	collection,
+	doc,
+	serverTimestamp,
+	setDoc,
+} from "firebase/firestore";
 import { useState } from "react";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -23,33 +29,54 @@ export default function CreateGroup() {
 	const [dueDate, setDueDate] = useState("");
 	const [agreeTerms, setAgreeTerms] = useState(false);
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-
+	const handleSubmit = async (type: "start" | "share") => {
 		if (!uid || !groupName.trim()) return;
 
 		const fullParticipants = [nickname, ...participants];
-
 		const newGroup = {
 			groupName,
 			description,
 			creatorId: uid,
 			createdAt: serverTimestamp(),
-			participants: fullParticipants,
-			paidParticipants: [],
 			startDate,
 			endDate,
 			dueDate,
 			totalBudget,
 			balance: totalBudget,
+			participantCount: fullParticipants.length,
+			paidParticipants: [],
 		};
 
 		try {
-			await addDoc(collection(db, "groups"), newGroup);
+			// 1️⃣ 그룹 문서 생성
+			const groupRef = await addDoc(collection(db, "groups"), newGroup);
+			const groupId = groupRef.id;
+
+			// 2️⃣ 참가자 서브컬렉션 저장
+			const participantsRef = collection(db, "groups", groupId, "participants");
+
+			await Promise.all(
+				fullParticipants.map((name, index) => {
+					const participantDoc = doc(participantsRef);
+					return setDoc(participantDoc, {
+						nickname: name,
+						uid: index === 0 ? uid : null,
+						isOwner: index === 0,
+					});
+				}),
+			);
+
+			// 3️⃣ 그룹 목록 갱신 후 이동
 			await fetchGroups(uid);
-			navigate("/dashboard");
+
+			if (type === "start") {
+				navigate("/dashboard");
+			} else {
+				// ✅ 공유하기 → 참가자 초대/관리 페이지 (모임 상세)
+				navigate(`/group/${groupId}`, { state: { openInviteModal: true } });
+			}
 		} catch (error) {
-			console.error("모임 생성 실패: ", error);
+			console.error("모임 생성 실패:", error);
 		}
 	};
 
@@ -235,13 +262,17 @@ export default function CreateGroup() {
 							>
 								초기화
 							</button>
-							<button type="button" className="button w-[calc(25%-18px)]">
+							<button
+								type="button"
+								className="button w-[calc(25%-18px)]"
+								onClick={() => handleSubmit("share")}
+							>
 								공유하기
 							</button>
 							<button
 								type="button"
 								className="button w-[calc(50%-12px)]"
-								onClick={handleSubmit}
+								onClick={() => handleSubmit("start")}
 							>
 								모임 시작하기
 							</button>
