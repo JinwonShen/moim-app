@@ -1,6 +1,11 @@
 "use client";
 
-import { DialogContent, DialogOverlay } from "@radix-ui/react-dialog";
+import {
+	DialogContent,
+	DialogDescription,
+	DialogOverlay,
+	DialogTitle,
+} from "@radix-ui/react-dialog";
 import { addDoc, collection } from "firebase/firestore";
 import { FiX } from "react-icons/fi";
 import { db } from "../../lib/firebase";
@@ -33,14 +38,23 @@ export default function AddExpenseModal({
           z-50 overflow-y-auto"
 			>
 				<div className="flex justify-between items-center mb-[12px]">
-					<h2 className="text-xl font-bold">지출 등록</h2>
-					<button
-						type="button"
-						onClick={onClose}
-						className="p-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
-					>
-						<FiX />
-					</button>
+					<div className="flex items-end">
+						<DialogTitle className="text-[20px] font-bold">
+							지출 등록
+						</DialogTitle>
+						<DialogDescription className="ml-[12px] pb-[4px] text-[14px]">
+							모임 지출 등록
+						</DialogDescription>
+					</div>
+					<div className="flex justify-between items-center">
+						<button
+							type="button"
+							onClick={onClose}
+							className="p-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+						>
+							<FiX />
+						</button>
+					</div>
 				</div>
 				<ExpenseForm
 					onSubmit={async ({ date, amount, category, memo }) => {

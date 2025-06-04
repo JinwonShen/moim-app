@@ -17,6 +17,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ExpenseForm from "../components/ExpenseForm";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import DepositModal from "../components/modal/DepositModal";
 import InviteModal from "../components/modal/InviteModal";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
@@ -30,6 +31,7 @@ export default function GroupDetail() {
 	const uid = user?.uid;
 	// const hasPaid = paidParticipants.includes(user?.uid);
 	const [isInviteOpen, setIsInviteOpen] = useState(false);
+	const [isDepositOpen, setIsDepositOpen] = useState(false);
 	const [groupData, setGroupData] = useState<Group | null>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [editedTitle, setEditedTitle] = useState("");
@@ -40,6 +42,27 @@ export default function GroupDetail() {
 			setIsInviteOpen(true);
 		}
 	}, [location.state]);
+
+	const [hasPaid, setHasPaid] = useState(false);
+
+	useEffect(() => {
+		if (groupId) return;
+
+		const fetchGroupData = async () => {
+			const groupRef = doc(db, "groups", groupId);
+			const snap = await getDoc(groupRef);
+			if (snap.exists()) {
+				const data = snap.data() as Group;
+				setGroupData(data);
+
+				if (user && Array.isArray(data.paidParticipants)) {
+					setHasPaid(data.paidParticipants.includes(user.uid));
+				}
+			}
+		};
+
+		fetchGroupData();
+	}, [groupId, user]);
 
 	const [noticeTitle, setNoticeTitle] = useState("");
 	const [noticeContent, setNoticeContent] = useState("");
@@ -302,27 +325,27 @@ export default function GroupDetail() {
 		}
 	};
 
+	const fetchGroup = useCallback(async () => {
+		if (!groupId) return;
+		try {
+			const docRef = doc(db, "groups", groupId);
+			const docSnap = await getDoc(docRef);
+
+			if (docSnap.exists()) {
+				const data = docSnap.data() as Omit<Group, "id">;
+				setGroupData({ id: docSnap.id, ...data });
+			} else {
+				console.error("해당 모임이 존재하지 않습니다.");
+			}
+		} catch (error) {
+			console.error("모임 불러오기 실패:", error);
+		}
+	}, [groupId]);
+
 	// 모임 상세 보기
 	useEffect(() => {
-		const fetchGroup = async () => {
-			if (!groupId) return;
-			try {
-				const docRef = doc(db, "groups", groupId);
-				const docSnap = await getDoc(docRef);
-
-				if (docSnap.exists()) {
-					const data = docSnap.data() as Omit<Group, "id">;
-					setGroupData({ id: docSnap.id, ...data });
-				} else {
-					console.error("해당 모임이 존재하지 않습니다.");
-				}
-			} catch (error) {
-				console.error("모임 불러오기 실패:", error);
-			}
-		};
-
 		fetchGroup();
-	}, [groupId]);
+	}, [fetchGroup]);
 
 	useEffect(() => {
 		const fetchOwner = async () => {
@@ -366,6 +389,30 @@ export default function GroupDetail() {
 		}
 	};
 
+	// 입금하기 로직
+	// const handleDeposit = async () => {
+	// 	if (!groupId || !user || !groupData) return;
+
+	// 	const amount = Math.floor(
+	// 		groupData.totalBudget / groupData.participantCount,
+	// 	);
+
+	// 	try {
+	// 		await depositToGroup(groupId, user.uid, amount);
+	// 		setHasPaid(true);
+
+	// 		// 그룹 데이터 재조회 (groupData 갱신)
+	// 		const docSnap = await getDoc(doc(db, "groups", groupId));
+	// 		if (docSnap.exists()) {
+	// 			const data = docSnap.data() as Omit<Group, "id">;
+	// 			setGroupData({ id: docSnap.id, ...data });
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("입금 실패:", error);
+	// 		alert("입금 중 문제가 발생했습니다.");
+	// 	}
+	// };
+
 	if (!groupData) return <p>로딩중 ..</p>;
 
 	const now = new Date();
@@ -402,10 +449,11 @@ export default function GroupDetail() {
 						)} */}
 							<button
 								type="button"
-								className="button px-[24px] py-[4px]"
-								// onClick={handleDeposit}
+								onClick={() => setIsDepositOpen(true)}
+								className={`button px-[24px] py-[4px] ${hasPaid ? "bg-gray-300 text-gray-500 cursor-not-allowed" : ""}`}
+								disabled={hasPaid}
 							>
-								입금하기
+								{hasPaid ? "입금 완료" : "입금하기"}
 							</button>
 
 							{/* 🔐 모임장만 보이는 버튼들 */}
@@ -992,6 +1040,15 @@ export default function GroupDetail() {
 							open={isInviteOpen}
 							onClose={() => setIsInviteOpen(false)}
 							groupId={groupId}
+						/>
+					)}
+					{uid && (
+						<DepositModal
+							open={isDepositOpen}
+							onClose={() => setIsDepositOpen(false)}
+							groupId={groupId}
+							uid={uid}
+							onSuccess={fetchGroup}
 						/>
 					)}
 				</section>

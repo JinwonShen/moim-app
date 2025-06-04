@@ -42,7 +42,7 @@ export default function CreateGroup() {
 			endDate,
 			dueDate,
 			totalBudget,
-			balance: totalBudget,
+			balance: 0,
 			participantCount: fullParticipants.length,
 			paidParticipants: [],
 		};
@@ -51,6 +51,22 @@ export default function CreateGroup() {
 			// 1️⃣ 그룹 문서 생성
 			const groupRef = await addDoc(collection(db, "groups"), newGroup);
 			const groupId = groupRef.id;
+			const walletsRef = collection(db, "groups", groupId, "wallets");
+
+			await Promise.all(
+				fullParticipants.map((_name, index) => {
+					if (index === 0 && uid) {
+						// 모임장
+						const walletDoc = doc(walletsRef, uid);
+						return setDoc(walletDoc, {
+							uid,
+							balance: 0, // 임의로 초기 잔액 부여 (마이페이지 등과 연동 가능)
+							updatedAt: serverTimestamp(),
+						});
+					}
+					return Promise.resolve(); // uid 없는 참여자는 생성하지 않음
+				}),
+			);
 
 			// 2️⃣ 참가자 서브컬렉션 저장
 			const participantsRef = collection(db, "groups", groupId, "participants");

@@ -3,6 +3,7 @@ import {
 	doc,
 	getDoc,
 	getDocs,
+	setDoc,
 	updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -101,6 +102,13 @@ export default function JoinGroup() {
 			uid: user.uid,
 		});
 
+		const walletRef = doc(db, "groups", groupId, "wallets", user.uid);
+		await setDoc(walletRef, {
+			uid: user.uid,
+			balance: 0,
+			updatedAt: new Date(),
+		});
+
 		alert("참가가 완료되었습니다!");
 		navigate(`/group/${groupId}`);
 	};
@@ -132,7 +140,7 @@ export default function JoinGroup() {
 								onChange={() => setSelected(p.id)}
 							/>
 							<span>
-								{p.nickname} {p.uid && "(모임 장)"}
+								{p.nickname} {p.isOwner && "(모임 장)"}
 							</span>
 						</label>
 					</li>

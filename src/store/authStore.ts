@@ -5,6 +5,7 @@ interface Account {
 	bank: string;
 	number: string;
 	balance: number;
+	updatedAt: Date;
 }
 
 interface User {

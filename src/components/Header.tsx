@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchAccountBalance } from "../lib/api/walletApi";
 import { useAuthStore } from "../store/authStore";
+import { useWalletStore } from "../store/walletStore";
 
 export default function Header() {
 	const user = useAuthStore((state) => state.user);
+	const wallet = useWalletStore((state) => state.wallet);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -12,6 +15,12 @@ export default function Header() {
 			navigate("/login");
 		}
 	}, [user, navigate]);
+
+	useEffect(() => {
+		if (user?.uid) {
+			fetchAccountBalance(user.uid);
+		}
+	}, [user?.uid]);
 
 	return (
 		<>
@@ -31,7 +40,7 @@ export default function Header() {
 						<p>
 							계좌 잔액:{" "}
 							{user.account?.balance !== undefined
-								? `${user.account.balance.toLocaleString()} 원`
+								? `${wallet?.balance.toLocaleString()} 원`
 								: "등록되지 않음"}
 						</p>
 					</div>

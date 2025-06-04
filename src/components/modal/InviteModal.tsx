@@ -28,9 +28,14 @@ export default function InviteModal({ open, onClose, groupId }: Props) {
 		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent className="max-w-md w-[90vw] p-[24px] bg-white rounded-[8px] border shadow-md fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
 				<div className="flex justify-between items-center mb-[12px]">
-					<DialogTitle className="text-[20px] font-bold">
-						참여자 초대
-					</DialogTitle>
+					<div className="flex items-end">
+						<DialogTitle className="text-[20px] font-bold">
+							참여자 초대
+						</DialogTitle>
+						<DialogDescription className="ml-[12px] pb-[4px]">
+							참여자에게 초대 링크를 전달해요.
+						</DialogDescription>
+					</div>
 					<button
 						type="button"
 						onClick={onClose}
@@ -39,9 +44,7 @@ export default function InviteModal({ open, onClose, groupId }: Props) {
 						<FiX />
 					</button>
 				</div>
-				<DialogDescription className="mb-2 text-sm">
-					모임 초대 링크
-				</DialogDescription>
+				<h2 className="mb-[8px] text-sm">모임 초대 링크</h2>
 				<div className="flex items-center gap-2 mb-4">
 					<input
 						type="text"

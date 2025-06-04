@@ -11,6 +11,7 @@ import {
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import type { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useWalletStore } from "../store/walletStore";
 import { auth, db } from "./firebase";
 
 export const loginWithEmail = async (email: string, password: string) => {
@@ -36,13 +37,16 @@ export async function loginWithGoogle(): Promise<User> {
 		if (!userSnap.exists()) {
 			await setDoc(userRef, {
 				uid: user.uid,
-				nickname: user.displayName ?? "사용자", // 기본 닉네임
+				nickname: user.displayName ?? "사용자",
 				email: user.email ?? "",
 				createdAt: serverTimestamp(),
 				pinHash: null,
-				account: null,
+				account: {
+					balance: 5_000_000,
+					createdAt: new Date(),
+				},
 			});
-			console.log("📌 Firestore에 사용자 정보 저장 완료");
+			console.log("📌 Firestore에 사용자 정보 및 계좌 저장 완료");
 		} else {
 			console.log("🔁 기존 사용자: Firestore에 이미 존재함");
 		}
@@ -80,8 +84,17 @@ export const handleLoginSuccess = async (
 			nickname: data.nickname ?? user.displayName ?? "",
 			profileImage: data.profileImage ?? "",
 			providerId: user.providerData?.[0]?.providerId ?? "unknown",
-			account: data.account || undefined,
+			account: data.account,
 		});
+
+		// ✅ 개인 account.balance 상태 반영
+		if (data.account) {
+			useWalletStore.getState().setWallet({
+				uid: user.uid,
+				balance: data.account.balance,
+				updatedAt: data.account.updatedAt?.toDate?.() ?? new Date(),
+			});
+		}
 
 		if (hasPin) {
 			navigate("/PinConfirm");
@@ -99,6 +112,7 @@ export const logout = async (navigate: ReturnType<typeof useNavigate>) => {
 		await signOut(auth);
 		useAuthStore.getState().setUser(null);
 		useAuthStore.getState().setVerified(false);
+		useWalletStore.getState().clearWallet();
 		sessionStorage.removeItem("pin_verified");
 		navigate("/login");
 	} catch (error) {

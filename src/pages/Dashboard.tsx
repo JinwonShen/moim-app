@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import FloatingButton from "../components/FloatingButton";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import DepositModal from "../components/modal/DepositModal";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
 import { useExpenseStore } from "../store/expenseStore";
@@ -22,9 +23,18 @@ export default function Dashboard() {
 		"기타",
 	]);
 	const { setRecentExpenses } = useExpenseStore();
+	const [isDepositOpen, setDepositOpen] = useState(false);
+	const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+	const user = useAuthStore((state) => state.user);
 
 	const fetchExpenses = async () => {
-		const expensesRef = collection(db, "groups", myGroups[0].id, "expenses");
+		if (!myGroups.length) return; // 또는 if (!myGroups[0]) return;
+
+		const groupId = myGroups[0].id;
+		if (!groupId) return; // 혹시라도 id가 undefined인 경우 방지
+
+		const expensesRef = collection(db, "groups", groupId, "expenses");
+
 		const q = query(expensesRef, orderBy("createdAt", "desc"), limit(5));
 		const snapshot = await getDocs(q);
 		const items = snapshot.docs.map((doc) => {
@@ -128,13 +138,27 @@ export default function Dashboard() {
 													? `예산: ${group.totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
 													: `예산: ${group.totalBudget.toLocaleString()}원 / 잔액: ${group.balance.toLocaleString()}원`}
 											</p>
-											<button
-												type="button"
-												className="py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
-												onClick={() => navigate(`/group/${group.id}`)}
-											>
-												모임 상세보기
-											</button>
+											<div className="flex gap-[8px]">
+												<button
+													type="button"
+													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+													onClick={() => {
+														setDepositOpen(true);
+														if (group.id) {
+															setSelectedGroupId(group.id);
+														}
+													}}
+												>
+													입금하기
+												</button>
+												<button
+													type="button"
+													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+													onClick={() => navigate(`/group/${group.id}`)}
+												>
+													모임 상세보기
+												</button>
+											</div>
 										</div>
 									);
 								})
@@ -159,18 +183,29 @@ export default function Dashboard() {
 								joinedGroups.map((group) => {
 									const now = new Date();
 									const start = new Date(group.startDate);
-									const isOngoing = start <= now;
-									const status = isOngoing ? "진행중" : "대기중";
+									const isUpcoming = start > now;
+									const status = isUpcoming ? "모집중" : "진행중";
 
 									const participantCount = group.participantCount ?? 0;
 									const paidCount = group.paidParticipants?.length ?? 0;
-									const paidPercent = participantCount
-										? Math.floor((paidCount / participantCount) * 100)
-										: 0;
-									const budgetUsed = group.totalBudget - group.balance;
-									const usedPercent = Math.floor(
-										(budgetUsed / group.totalBudget) * 100 || 0,
-									);
+									const paidPercent =
+										participantCount > 0
+											? Math.floor((paidCount / participantCount) * 100)
+											: 0;
+
+									const totalBudget = group.totalBudget ?? 0;
+									const balance = group.balance ?? 0;
+									const budgetUsed = totalBudget - balance;
+									const usedPercent =
+										totalBudget > 0
+											? Math.floor((budgetUsed / totalBudget) * 100)
+											: 0;
+
+									const eachFee =
+										participantCount > 0
+											? Math.floor(totalBudget / participantCount)
+											: 0;
+									const paidTotal = eachFee * paidCount;
 
 									return (
 										<div key={group.id} className="flex flex-col">
@@ -179,7 +214,11 @@ export default function Dashboard() {
 													{group.groupName}
 												</h3>
 												<span
-													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${status === "대기중" ? "text-primary bg-white border border-primary" : "text-white bg-primary"}`}
+													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${
+														status === "모집중"
+															? "text-primary bg-white border border-primary"
+															: "text-white bg-primary"
+													}`}
 												>
 													{status}
 												</span>
@@ -193,20 +232,35 @@ export default function Dashboard() {
 											<div className="h-[12px] bg-gray-200 rounded-full">
 												<div
 													className="h-full bg-primary rounded-full"
-													style={{ width: `${isOngoing ? paidPercent : 0}%` }}
+													style={{
+														width: `${isUpcoming ? paidPercent : usedPercent}%`,
+													}}
 												/>
 											</div>
 											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												예산: {group.totalBudget.toLocaleString()}원 / 잔액:{" "}
-												{group.balance.toLocaleString()}원
+												{isUpcoming
+													? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
+													: `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
 											</p>
-											<button
-												type="button"
-												className="py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
-												onClick={() => navigate(`/group/${group.id}`)}
-											>
-												모임 상세보기
-											</button>
+											<div className="flex gap-[8px]">
+												<button
+													type="button"
+													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+													onClick={() => {
+														setDepositOpen(true);
+														if (group.id) setSelectedGroupId(group.id);
+													}}
+												>
+													입금하기
+												</button>
+												<button
+													type="button"
+													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+													onClick={() => navigate(`/group/${group.id}`)}
+												>
+													모임 상세보기
+												</button>
+											</div>
 										</div>
 									);
 								})
@@ -239,13 +293,21 @@ export default function Dashboard() {
 					</section>
 				</main>
 
-				{uid && myGroups.length > 0 && (
+				{uid && myGroups[0]?.id && (
 					<FloatingButton
 						groupId={myGroups[0].id}
 						uid={uid}
 						categories={categories}
 						setCategories={setCategories}
 						fetchExpenses={fetchExpenses}
+					/>
+				)}
+				{isDepositOpen && selectedGroupId && user?.uid && (
+					<DepositModal
+						open={isDepositOpen}
+						onClose={() => setDepositOpen(false)}
+						groupId={selectedGroupId}
+						uid={user.uid}
 					/>
 				)}
 			</div>
