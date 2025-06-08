@@ -11,6 +11,13 @@ import {
 import type { Group } from "../../types/group";
 import { db } from "../firebase";
 
+export const getGroupById = async (groupId: string) => {
+	const docRef = doc(db, "groups", groupId);
+	const snapshot = await getDoc(docRef);
+	if (!snapshot.exists()) throw new Error("모임 정보를 찾을 수 없습니다.");
+	return snapshot.data(); // creatorId 포함
+};
+
 export const fetchMyGroups = async (uid: string): Promise<Group[]> => {
 	const q = query(collection(db, "groups"), where("creatorId", "==", uid));
 	const snapshot = await getDocs(q);

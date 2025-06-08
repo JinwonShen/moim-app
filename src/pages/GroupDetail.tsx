@@ -15,8 +15,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ExpenseForm from "../components/ExpenseForm";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
 import DepositModal from "../components/modal/DepositModal";
 import InviteModal from "../components/modal/InviteModal";
 import { db } from "../lib/firebase";
@@ -436,623 +434,611 @@ export default function GroupDetail() {
 	const paidTotal = eachFee * paidCount;
 
 	return (
-		<div className="flex">
-			<Sidebar />
-			<div className="w-[100vw] pl-[237px] pb-[24px]">
-				<Header />
-				<section className="flex flex-col mt-[148px] mr-[12px] p-[24px] border rounded-[8px] text-[14px]">
-					<div className="flex justify-between items-center mb-[24px]">
-						<h2 className="font-bold text-[20px]">모임 상세보기</h2>
-						<div className="flex gap-[12px]">
-							{/* ✅ 모두에게 보이는 입금 버튼 */}
-							{/* {!hasPaid && (
+		<div>
+			<section className="flex flex-col mt-[148px] mr-[12px] p-[24px] border rounded-[8px] text-[14px]">
+				<div className="flex justify-between items-center mb-[24px]">
+					<h2 className="font-bold text-[20px]">모임 상세보기</h2>
+					<div className="flex gap-[12px]">
+						{/* ✅ 모두에게 보이는 입금 버튼 */}
+						{/* {!hasPaid && (
 						)} */}
-							<button
-								type="button"
-								onClick={() => setIsDepositOpen(true)}
-								className={`button px-[24px] py-[4px] ${hasPaid ? "bg-gray-300 text-gray-500 cursor-not-allowed" : ""}`}
-								disabled={hasPaid}
-							>
-								{hasPaid ? "입금 완료" : "입금하기"}
-							</button>
+						<button
+							type="button"
+							onClick={() => setIsDepositOpen(true)}
+							className={`button px-[24px] py-[4px] ${hasPaid ? "bg-gray-300 text-gray-500 cursor-not-allowed" : ""}`}
+							disabled={hasPaid}
+						>
+							{hasPaid ? "입금 완료" : "입금하기"}
+						</button>
 
-							{/* 🔐 모임장만 보이는 버튼들 */}
-							{groupData.creatorId === uid && (
-								<>
-									{/* 참여자 관리 */}
-									<button
-										type="button"
-										className="button px-[24px] py-[4px]"
-										onClick={() => setIsInviteOpen(true)}
-									>
-										참여자 관리
-									</button>
+						{/* 🔐 모임장만 보이는 버튼들 */}
+						{groupData.creatorId === uid && (
+							<>
+								{/* 참여자 관리 */}
+								<button
+									type="button"
+									className="button px-[24px] py-[4px]"
+									onClick={() => setIsInviteOpen(true)}
+								>
+									참여자 관리
+								</button>
 
-									{/* 수정 / 삭제 or 저장 / 취소 */}
-									{!isEditing ? (
-										<>
-											<button
-												type="button"
-												className="button px-[24px] py-[4px]"
-												onClick={handleEditToggle}
-											>
-												수정
-											</button>
-											<button
-												type="button"
-												className="button px-[24px] py-[4px]"
-												onClick={handleDelete}
-											>
-												삭제
-											</button>
-										</>
-									) : (
-										<>
-											<button
-												type="button"
-												className="button px-[24px] py-[4px]"
-												onClick={handleSave}
-											>
-												저장
-											</button>
-											<button
-												type="button"
-												className="button px-[24px] py-[4px]"
-												onClick={handleCancelEdit}
-											>
-												취소
-											</button>
-										</>
-									)}
-								</>
+								{/* 수정 / 삭제 or 저장 / 취소 */}
+								{!isEditing ? (
+									<>
+										<button
+											type="button"
+											className="button px-[24px] py-[4px]"
+											onClick={handleEditToggle}
+										>
+											수정
+										</button>
+										<button
+											type="button"
+											className="button px-[24px] py-[4px]"
+											onClick={handleDelete}
+										>
+											삭제
+										</button>
+									</>
+								) : (
+									<>
+										<button
+											type="button"
+											className="button px-[24px] py-[4px]"
+											onClick={handleSave}
+										>
+											저장
+										</button>
+										<button
+											type="button"
+											className="button px-[24px] py-[4px]"
+											onClick={handleCancelEdit}
+										>
+											취소
+										</button>
+									</>
+								)}
+							</>
+						)}
+					</div>
+				</div>
+				{/* 모임 상세보기 */}
+				<div className="flex flex-wrap gap-[24px] mb-[48px]">
+					{/* 좌측(모임 이름, 설명, 모임 장, 예산) */}
+					<div className="flex-[2] flex flex-col gap-[24px]">
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">모임 이름</span>
+							{isEditing ? (
+								<input
+									type="text"
+									value={groupData.groupName}
+									onChange={(e) =>
+										setGroupData((prev) =>
+											prev ? { ...prev, groupName: e.target.value } : prev,
+										)
+									}
+									className="flex-[4] border px-2 py-1 rounded"
+								/>
+							) : (
+								<span className="flex-[4]">{groupData.groupName}</span>
+							)}
+						</div>
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">모임 설명</span>
+							{isEditing ? (
+								<input
+									type="text"
+									value={groupData.description}
+									onChange={(e) =>
+										setGroupData((prev) =>
+											prev ? { ...prev, description: e.target.value } : prev,
+										)
+									}
+									className="flex-[4] border px-2 py-1 rounded"
+								/>
+							) : (
+								<span className="flex-[4]">{groupData.description}</span>
+							)}
+						</div>
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">모임 장</span>
+							<span className="flex-[4]">{ownerNickname}</span>
+						</div>
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">총 예산</span>
+							{isEditing ? (
+								<input
+									type="number"
+									value={groupData.totalBudget}
+									onChange={(e) =>
+										setGroupData((prev) =>
+											prev
+												? { ...prev, totalBudget: Number(e.target.value) }
+												: prev,
+										)
+									}
+									className="flex-[4] border px-2 py-1 rounded"
+								/>
+							) : (
+								<span className="flex-[4]">
+									{groupData.totalBudget.toLocaleString()} 원
+								</span>
 							)}
 						</div>
 					</div>
-					{/* 모임 상세보기 */}
-					<div className="flex flex-wrap gap-[24px] mb-[48px]">
-						{/* 좌측(모임 이름, 설명, 모임 장, 예산) */}
-						<div className="flex-[2] flex flex-col gap-[24px]">
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">모임 이름</span>
-								{isEditing ? (
-									<input
-										type="text"
-										value={groupData.groupName}
-										onChange={(e) =>
-											setGroupData((prev) =>
-												prev ? { ...prev, groupName: e.target.value } : prev,
-											)
-										}
-										className="flex-[4] border px-2 py-1 rounded"
-									/>
-								) : (
-									<span className="flex-[4]">{groupData.groupName}</span>
-								)}
-							</div>
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">모임 설명</span>
-								{isEditing ? (
-									<input
-										type="text"
-										value={groupData.description}
-										onChange={(e) =>
-											setGroupData((prev) =>
-												prev ? { ...prev, description: e.target.value } : prev,
-											)
-										}
-										className="flex-[4] border px-2 py-1 rounded"
-									/>
-								) : (
-									<span className="flex-[4]">{groupData.description}</span>
-								)}
-							</div>
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">모임 장</span>
-								<span className="flex-[4]">{ownerNickname}</span>
-							</div>
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">총 예산</span>
-								{isEditing ? (
-									<input
-										type="number"
-										value={groupData.totalBudget}
-										onChange={(e) =>
-											setGroupData((prev) =>
-												prev
-													? { ...prev, totalBudget: Number(e.target.value) }
-													: prev,
-											)
-										}
-										className="flex-[4] border px-2 py-1 rounded"
-									/>
-								) : (
-									<span className="flex-[4]">
-										{groupData.totalBudget.toLocaleString()} 원
-									</span>
-								)}
-							</div>
-						</div>
 
-						{/* 우측(모임 기간, 입금 마감일, 참여자, 예산 그래프) */}
-						<div className="flex flex-col flex-[3] gap-[24px]">
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">모임 기간</span>
-								{isEditing ? (
-									<div className="flex-[4]">
-										<span className="flex gap-[8px]">
-											<input
-												type="date"
-												value={groupData.startDate}
-												onChange={(e) =>
-													setGroupData((prev) =>
-														prev
-															? { ...prev, startDate: e.target.value }
-															: prev,
-													)
-												}
-												className="border px-2 py-1 rounded"
-											/>
-											<input
-												type="date"
-												value={groupData.endDate}
-												onChange={(e) =>
-													setGroupData((prev) =>
-														prev ? { ...prev, endDate: e.target.value } : prev,
-													)
-												}
-												className="border px-2 py-1 rounded"
-											/>
-										</span>
-									</div>
-								) : (
-									<span className="flex-[4]">
-										{groupData.startDate} ~ {groupData.endDate}
+					{/* 우측(모임 기간, 입금 마감일, 참여자, 예산 그래프) */}
+					<div className="flex flex-col flex-[3] gap-[24px]">
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">모임 기간</span>
+							{isEditing ? (
+								<div className="flex-[4]">
+									<span className="flex gap-[8px]">
+										<input
+											type="date"
+											value={groupData.startDate}
+											onChange={(e) =>
+												setGroupData((prev) =>
+													prev ? { ...prev, startDate: e.target.value } : prev,
+												)
+											}
+											className="border px-2 py-1 rounded"
+										/>
+										<input
+											type="date"
+											value={groupData.endDate}
+											onChange={(e) =>
+												setGroupData((prev) =>
+													prev ? { ...prev, endDate: e.target.value } : prev,
+												)
+											}
+											className="border px-2 py-1 rounded"
+										/>
 									</span>
-								)}
-							</div>
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">입금 마감일</span>
-								{isEditing ? (
-									<input
-										type="date"
-										value={groupData.dueDate}
-										onChange={(e) =>
-											setGroupData((prev) =>
-												prev ? { ...prev, dueDate: e.target.value } : prev,
-											)
-										}
-										className="flex-[4] border px-2 py-1 rounded"
-									/>
-								) : (
-									<span className="flex-[4]">{groupData.dueDate}</span>
-								)}
-							</div>
-							<div className="flex gap-[12px]">
-								<span className="flex-[1] font-semibold">모임 참여자</span>
-								<span className="flex-[4]">
-									{participantCount}명 중 {paidCount}명 입금 완료
-								</span>
-							</div>
-							<div className="flex flex-col">
-								<span className="font-semibold">입금/예산</span>
-								<div className="h-[12px] bg-gray-200 rounded-full mt-[4px] mb-[4px]">
-									<div
-										className="h-full bg-primary rounded-full"
-										style={{
-											width: `${isUpcoming ? paidPercent : usedPercent}%`,
-										}}
-									/>
 								</div>
-								<p className="text-[12px] text-gray-600">
-									{isUpcoming
-										? `예산: ${groupData.totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
-										: `예산: ${groupData.totalBudget.toLocaleString()}원 / 잔액: ${groupData.balance.toLocaleString()}원`}
-								</p>
+							) : (
+								<span className="flex-[4]">
+									{groupData.startDate} ~ {groupData.endDate}
+								</span>
+							)}
+						</div>
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">입금 마감일</span>
+							{isEditing ? (
+								<input
+									type="date"
+									value={groupData.dueDate}
+									onChange={(e) =>
+										setGroupData((prev) =>
+											prev ? { ...prev, dueDate: e.target.value } : prev,
+										)
+									}
+									className="flex-[4] border px-2 py-1 rounded"
+								/>
+							) : (
+								<span className="flex-[4]">{groupData.dueDate}</span>
+							)}
+						</div>
+						<div className="flex gap-[12px]">
+							<span className="flex-[1] font-semibold">모임 참여자</span>
+							<span className="flex-[4]">
+								{participantCount}명 중 {paidCount}명 입금 완료
+							</span>
+						</div>
+						<div className="flex flex-col">
+							<span className="font-semibold">입금/예산</span>
+							<div className="h-[12px] bg-gray-200 rounded-full mt-[4px] mb-[4px]">
+								<div
+									className="h-full bg-primary rounded-full"
+									style={{
+										width: `${isUpcoming ? paidPercent : usedPercent > 0 ? usedPercent : paidPercent}%`,
+									}}
+								/>
 							</div>
+							<p className="text-[12px] text-gray-600">
+								{isUpcoming
+									? `예산: ${groupData.totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
+									: `예산: ${groupData.totalBudget.toLocaleString()}원 / 잔액: ${groupData.balance.toLocaleString()}원`}
+							</p>
 						</div>
 					</div>
+				</div>
 
-					{/* 최근 지출 내역 */}
-					<div className="flex flex-wrap gap-[24px]">
-						<div className="flex-[2]">
-							<div className="flex justify-between items-center mb-[24px]">
-								<h2 className="font-bold text-[20px]">최근 지출 내역</h2>
-								{groupData?.creatorId === uid && (
-									<div className="flex items-center gap-[8px]">
-										{/* 선택 삭제 버튼 */}
-										{editMode && selectedExpenseIds.length > 0 && (
-											<button
-												type="button"
-												onClick={handleBulkDelete}
-												className="text-[12px] text-primary"
-											>
-												선택 삭제
-											</button>
-										)}
+				{/* 최근 지출 내역 */}
+				<div className="flex flex-wrap gap-[24px]">
+					<div className="flex-[2]">
+						<div className="flex justify-between items-center mb-[24px]">
+							<h2 className="font-bold text-[20px]">최근 지출 내역</h2>
+							{groupData?.creatorId === uid && (
+								<div className="flex items-center gap-[8px]">
+									{/* 선택 삭제 버튼 */}
+									{editMode && selectedExpenseIds.length > 0 && (
 										<button
 											type="button"
-											onClick={() => {
-												setEditMode(!editMode);
-												setEditingExpenseId(null);
-												setSelectedExpenseIds([]);
-											}}
-											className="button px-[24px] py-[4px]"
+											onClick={handleBulkDelete}
+											className="text-[12px] text-primary"
 										>
-											{editMode ? "완료" : "편집"}
+											선택 삭제
 										</button>
-									</div>
-								)}
-							</div>
-							{recentExpenses.length === 0 ? (
-								<p className="text-gray-500 text-sm">
-									최근 지출 내역이 없습니다.
-								</p>
-							) : (
-								<ul className="flex flex-col gap-[12px] text-[14px]">
-									{recentExpenses.map((item) => {
-										const isEditing = editingExpenseId === item.id;
-										const isSelected = selectedExpenseIds.includes(item.id);
+									)}
+									<button
+										type="button"
+										onClick={() => {
+											setEditMode(!editMode);
+											setEditingExpenseId(null);
+											setSelectedExpenseIds([]);
+										}}
+										className="button px-[24px] py-[4px]"
+									>
+										{editMode ? "완료" : "편집"}
+									</button>
+								</div>
+							)}
+						</div>
+						{recentExpenses.length === 0 ? (
+							<p className="text-gray-500 text-sm">
+								최근 지출 내역이 없습니다.
+							</p>
+						) : (
+							<ul className="flex flex-col gap-[12px] text-[14px]">
+								{recentExpenses.map((item) => {
+									const isEditing = editingExpenseId === item.id;
+									const isSelected = selectedExpenseIds.includes(item.id);
 
-										return (
-											<li
-												key={item.id}
-												className="flex justify-between items-start gap-[4px] pb-[12px] border-b"
-											>
-												{/* 체크박스: 편집모드일 때만 표시 */}
-												{editMode && (
-													<input
-														type="checkbox"
-														checked={isSelected}
-														onChange={() => toggleExpenseSelection(item.id)}
-														className="mt-[2.5px]"
-													/>
-												)}
+									return (
+										<li
+											key={item.id}
+											className="flex justify-between items-start gap-[4px] pb-[12px] border-b"
+										>
+											{/* 체크박스: 편집모드일 때만 표시 */}
+											{editMode && (
+												<input
+													type="checkbox"
+													checked={isSelected}
+													onChange={() => toggleExpenseSelection(item.id)}
+													className="mt-[2.5px]"
+												/>
+											)}
 
-												{/* 날짜 */}
-												<span className="flex-[2] text-gray-500">
-													{item.createdAt
-														?.toDate?.()
-														.toLocaleDateString("ko-KR") ?? "-"}
-												</span>
+											{/* 날짜 */}
+											<span className="flex-[2] text-gray-500">
+												{item.createdAt
+													?.toDate?.()
+													.toLocaleDateString("ko-KR") ?? "-"}
+											</span>
 
-												{/* 카테고리 + 메모 */}
-												<div className="flex-[3] flex flex-col">
-													{isEditing ? (
-														<>
-															<select
-																value={editedExpense.category}
-																onChange={(e) =>
-																	setEditedExpense((prev) => ({
-																		...prev,
-																		category: e.target.value,
-																	}))
-																}
-																className="border px-2 py-1 rounded"
-															>
-																<option value="">분류 선택</option>
-																{categories.map((cat) => (
-																	<option key={cat} value={cat}>
-																		{cat}
-																	</option>
-																))}
-															</select>
-															<textarea
-																value={editedExpense.memo}
-																onChange={(e) =>
-																	setEditedExpense((prev) => ({
-																		...prev,
-																		memo: e.target.value,
-																	}))
-																}
-																rows={2}
-																className="border px-2 py-1 mt-[4px] rounded resize-none"
-															/>
-															<div className="flex gap-[6px] text-[12px] mt-[4px]">
-																<button
-																	type="button"
-																	className="text-primary"
-																	onClick={() => handleSaveEditExpense(item.id)}
-																>
-																	저장
-																</button>
-																<button
-																	type="button"
-																	className="text-secondary-300"
-																	onClick={() => setEditingExpenseId(null)}
-																>
-																	취소
-																</button>
-															</div>
-														</>
-													) : (
-														<>
-															<span className="font-semibold">
-																{item.category || "분류 없음"}
-															</span>
-															<span className="text-[12px] text-gray-600">
-																{item.description || "메모 없음"}
-															</span>
-														</>
-													)}
-												</div>
-
-												{/* 금액 + 버튼 */}
-												<div className="flex-[2] text-right flex flex-col items-end ">
-													{isEditing ? (
-														<input
-															type="number"
-															value={editedExpense.amount}
+											{/* 카테고리 + 메모 */}
+											<div className="flex-[3] flex flex-col">
+												{isEditing ? (
+													<>
+														<select
+															value={editedExpense.category}
 															onChange={(e) =>
 																setEditedExpense((prev) => ({
 																	...prev,
-																	amount: e.target.value,
+																	category: e.target.value,
 																}))
 															}
-															className="border px-2 py-1 rounded w-full text-right"
+															className="border px-2 py-1 rounded"
+														>
+															<option value="">분류 선택</option>
+															{categories.map((cat) => (
+																<option key={cat} value={cat}>
+																	{cat}
+																</option>
+															))}
+														</select>
+														<textarea
+															value={editedExpense.memo}
+															onChange={(e) =>
+																setEditedExpense((prev) => ({
+																	...prev,
+																	memo: e.target.value,
+																}))
+															}
+															rows={2}
+															className="border px-2 py-1 mt-[4px] rounded resize-none"
 														/>
-													) : (
-														<span>
-															{typeof item.amount === "number"
-																? item.amount.toLocaleString()
-																: "0"}
-															원
-														</span>
-													)}
-
-													{/* 수정 버튼 (편집 모드 + 수정 중 아님) */}
-													{editMode && !isEditing && (
-														<div className="flex gap-[6px] text-[12px]">
+														<div className="flex gap-[6px] text-[12px] mt-[4px]">
 															<button
 																type="button"
 																className="text-primary"
-																onClick={() => {
-																	setEditingExpenseId(item.id);
-																	setEditedExpense({
-																		category: item.category,
-																		memo: item.description,
-																		amount: String(item.amount),
-																		date:
-																			item.createdAt
-																				?.toDate?.()
-																				?.toISOString()
-																				?.split("T")[0] ?? "",
-																	});
-																}}
+																onClick={() => handleSaveEditExpense(item.id)}
 															>
-																수정
+																저장
+															</button>
+															<button
+																type="button"
+																className="text-secondary-300"
+																onClick={() => setEditingExpenseId(null)}
+															>
+																취소
 															</button>
 														</div>
-													)}
-												</div>
-											</li>
-										);
-									})}
-								</ul>
-							)}
+													</>
+												) : (
+													<>
+														<span className="font-semibold">
+															{item.category || "분류 없음"}
+														</span>
+														<span className="text-[12px] text-gray-600">
+															{item.description || "메모 없음"}
+														</span>
+													</>
+												)}
+											</div>
 
-							{/* 지출 등록 폼 */}
-							{groupData.creatorId === uid && (
-								<div className="mt-[24px] mb-[24px]">
-									<ExpenseForm
-										onSubmit={async ({ date, amount, category, memo }) => {
-											const expensesRef = collection(
-												db,
-												"groups",
-												// biome-ignore lint/style/noNonNullAssertion: <explanation>
-												groupId!,
-												"expenses",
-											);
-											await addDoc(expensesRef, {
-												date,
-												amount,
-												category,
-												memo,
-												author: uid,
-												createdAt: new Date(),
-											});
-											await fetchExpenses();
-										}}
-										categories={categories}
-										setCategories={setCategories}
-										showBottom={false}
-									/>
-								</div>
-							)}
-						</div>
-
-						{/* 공지사항 */}
-						<div className="flex-[3]">
-							<div className="flex justify-between items-center mb-[24px]">
-								<h2 className="font-bold text-[20px]">공지사항</h2>
-								{groupData.creatorId === uid && (
-									<div className="flex items-center gap-[4px]">
-										{editNoticeMode && selectedNotices.length > 0 && (
-											<button
-												type="button"
-												className="text-[12px] text-primary"
-												onClick={handleDeleteSelectedNotices}
-											>
-												선택 삭제
-											</button>
-										)}
-										<button
-											type="button"
-											className="button px-[24px] py-[4px]"
-											onClick={() => {
-												setEditNoticeMode(!editNoticeMode);
-												setSelectedNotices([]);
-												setEditingNoticeId(null);
-											}}
-										>
-											{editNoticeMode ? "완료" : "편집"}
-										</button>
-									</div>
-								)}
-							</div>
-
-							{recentNotices.length === 0 ? (
-								<p className="text-gray-500 text-sm">등록된 공지가 없습니다.</p>
-							) : (
-								<ul className="flex flex-col gap-[12px] text-[14px]">
-									{recentNotices.map((notice) => {
-										const isEditing = editingNoticeId === notice.id;
-										const isSelected = selectedNotices.includes(notice.id);
-
-										return (
-											<li
-												key={notice.id}
-												className="flex justify-between items-start gap-[8px] pb-[12px] border-b"
-											>
-												{/* 체크박스 (편집 모드일 때만) */}
-												{editNoticeMode && (
+											{/* 금액 + 버튼 */}
+											<div className="flex-[2] text-right flex flex-col items-end ">
+												{isEditing ? (
 													<input
-														type="checkbox"
-														checked={isSelected}
-														onChange={() => {
-															setSelectedNotices((prev) =>
-																isSelected
-																	? prev.filter((id) => id !== notice.id)
-																	: [...prev, notice.id],
-															);
-														}}
-														className="mt-1"
+														type="number"
+														value={editedExpense.amount}
+														onChange={(e) =>
+															setEditedExpense((prev) => ({
+																...prev,
+																amount: e.target.value,
+															}))
+														}
+														className="border px-2 py-1 rounded w-full text-right"
 													/>
+												) : (
+													<span>
+														{typeof item.amount === "number"
+															? item.amount.toLocaleString()
+															: "0"}
+														원
+													</span>
 												)}
 
-												{/* 날짜 */}
-												<span className="flex-[1] text-gray-500">
-													{notice.createdAt
-														.toDate()
-														.toLocaleDateString("ko-KR")}
-												</span>
-
-												{/* 제목 및 내용 */}
-												<div className="flex-[3] flex flex-col">
-													{isEditing ? (
-														<>
-															<input
-																value={editedTitle}
-																onChange={(e) => setEditedTitle(e.target.value)}
-																className="border px-2 py-1 mb-1 rounded"
-															/>
-															<textarea
-																value={editedContent}
-																onChange={(e) =>
-																	setEditedContent(e.target.value)
-																}
-																rows={2}
-																className="border px-2 py-1 resize-none rounded"
-															/>
-															<div className="flex gap-[8px] mt-[4px] text-[12px]">
-																<button
-																	type="button"
-																	className="text-primary"
-																	onClick={() =>
-																		handleSaveEditNotice(notice.id)
-																	}
-																>
-																	저장
-																</button>
-																<button
-																	type="button"
-																	className="text-secondary-300"
-																	onClick={() => setEditingNoticeId(null)}
-																>
-																	취소
-																</button>
-															</div>
-														</>
-													) : (
-														<>
-															<span className="font-semibold">
-																{notice.title}
-															</span>
-															<span className="text-[12px] text-gray-600">
-																{notice.content}
-															</span>
-														</>
-													)}
-												</div>
-
-												{/* 작성자 + 수정 버튼 */}
-												<div className="flex flex-col flex-[1] text-right text-gray-400 items-end">
-													<span>
-														{authorNames[notice.author] ?? notice.author}
-													</span>
-													{editNoticeMode && !isEditing && (
+												{/* 수정 버튼 (편집 모드 + 수정 중 아님) */}
+												{editMode && !isEditing && (
+													<div className="flex gap-[6px] text-[12px]">
 														<button
 															type="button"
-															className="text-primary text-[12px] mt-[4px]"
+															className="text-primary"
 															onClick={() => {
-																if (selectedNotices.length <= 1) {
-																	setEditingNoticeId(notice.id);
-																	setEditedTitle(notice.title);
-																	setEditedContent(notice.content);
-																}
+																setEditingExpenseId(item.id);
+																setEditedExpense({
+																	category: item.category,
+																	memo: item.description,
+																	amount: String(item.amount),
+																	date:
+																		item.createdAt
+																			?.toDate?.()
+																			?.toISOString()
+																			?.split("T")[0] ?? "",
+																});
 															}}
-															disabled={selectedNotices.length > 1}
 														>
 															수정
 														</button>
-													)}
-												</div>
-											</li>
-										);
-									})}
-								</ul>
-							)}
+													</div>
+												)}
+											</div>
+										</li>
+									);
+								})}
+							</ul>
+						)}
 
-							{/* 공지사항 등록 폼 */}
+						{/* 지출 등록 폼 */}
+						{groupData.creatorId === uid && (
+							<div className="mt-[24px] mb-[24px]">
+								<ExpenseForm
+									onSubmit={async ({ date, amount, category, memo }) => {
+										const expensesRef = collection(
+											db,
+											"groups",
+											// biome-ignore lint/style/noNonNullAssertion: <explanation>
+											groupId!,
+											"expenses",
+										);
+										await addDoc(expensesRef, {
+											date,
+											amount,
+											category,
+											memo,
+											author: uid,
+											createdAt: new Date(),
+										});
+										await fetchExpenses();
+									}}
+									categories={categories}
+									setCategories={setCategories}
+									showBottom={false}
+								/>
+							</div>
+						)}
+					</div>
+
+					{/* 공지사항 */}
+					<div className="flex-[3]">
+						<div className="flex justify-between items-center mb-[24px]">
+							<h2 className="font-bold text-[20px]">공지사항</h2>
 							{groupData.creatorId === uid && (
-								<div className="mt-[24px] mb-[24px]">
-									<div className="flex justify-between items-center mb-[12px]">
-										<h3 className="font-semibold text-[16px]">공지사항 등록</h3>
+								<div className="flex items-center gap-[4px]">
+									{editNoticeMode && selectedNotices.length > 0 && (
 										<button
 											type="button"
-											className="button px-[24px] py-[4px]"
-											onClick={handleAddNotice}
+											className="text-[12px] text-primary"
+											onClick={handleDeleteSelectedNotices}
 										>
-											등록하기
+											선택 삭제
 										</button>
-									</div>
-									<div className="flex flex-col gap-[8px] mb-[12px]">
-										<input
-											type="text"
-											placeholder="공지 제목"
-											value={noticeTitle}
-											onChange={(e) => setNoticeTitle(e.target.value)}
-											className="border px-2 py-1 rounded"
-										/>
-										<textarea
-											placeholder="공지 내용"
-											value={noticeContent}
-											onChange={(e) => setNoticeContent(e.target.value)}
-											className="border px-2 py-1 rounded resize-none"
-											rows={3}
-										/>
-									</div>
+									)}
+									<button
+										type="button"
+										className="button px-[24px] py-[4px]"
+										onClick={() => {
+											setEditNoticeMode(!editNoticeMode);
+											setSelectedNotices([]);
+											setEditingNoticeId(null);
+										}}
+									>
+										{editNoticeMode ? "완료" : "편집"}
+									</button>
 								</div>
 							)}
 						</div>
+
+						{recentNotices.length === 0 ? (
+							<p className="text-gray-500 text-sm">등록된 공지가 없습니다.</p>
+						) : (
+							<ul className="flex flex-col gap-[12px] text-[14px]">
+								{recentNotices.map((notice) => {
+									const isEditing = editingNoticeId === notice.id;
+									const isSelected = selectedNotices.includes(notice.id);
+
+									return (
+										<li
+											key={notice.id}
+											className="flex justify-between items-start gap-[8px] pb-[12px] border-b"
+										>
+											{/* 체크박스 (편집 모드일 때만) */}
+											{editNoticeMode && (
+												<input
+													type="checkbox"
+													checked={isSelected}
+													onChange={() => {
+														setSelectedNotices((prev) =>
+															isSelected
+																? prev.filter((id) => id !== notice.id)
+																: [...prev, notice.id],
+														);
+													}}
+													className="mt-1"
+												/>
+											)}
+
+											{/* 날짜 */}
+											<span className="flex-[1] text-gray-500">
+												{notice.createdAt.toDate().toLocaleDateString("ko-KR")}
+											</span>
+
+											{/* 제목 및 내용 */}
+											<div className="flex-[3] flex flex-col">
+												{isEditing ? (
+													<>
+														<input
+															value={editedTitle}
+															onChange={(e) => setEditedTitle(e.target.value)}
+															className="border px-2 py-1 mb-1 rounded"
+														/>
+														<textarea
+															value={editedContent}
+															onChange={(e) => setEditedContent(e.target.value)}
+															rows={2}
+															className="border px-2 py-1 resize-none rounded"
+														/>
+														<div className="flex gap-[8px] mt-[4px] text-[12px]">
+															<button
+																type="button"
+																className="text-primary"
+																onClick={() => handleSaveEditNotice(notice.id)}
+															>
+																저장
+															</button>
+															<button
+																type="button"
+																className="text-secondary-300"
+																onClick={() => setEditingNoticeId(null)}
+															>
+																취소
+															</button>
+														</div>
+													</>
+												) : (
+													<>
+														<span className="font-semibold">
+															{notice.title}
+														</span>
+														<span className="text-[12px] text-gray-600">
+															{notice.content}
+														</span>
+													</>
+												)}
+											</div>
+
+											{/* 작성자 + 수정 버튼 */}
+											<div className="flex flex-col flex-[1] text-right text-gray-400 items-end">
+												<span>
+													{authorNames[notice.author] ?? notice.author}
+												</span>
+												{editNoticeMode && !isEditing && (
+													<button
+														type="button"
+														className="text-primary text-[12px] mt-[4px]"
+														onClick={() => {
+															if (selectedNotices.length <= 1) {
+																setEditingNoticeId(notice.id);
+																setEditedTitle(notice.title);
+																setEditedContent(notice.content);
+															}
+														}}
+														disabled={selectedNotices.length > 1}
+													>
+														수정
+													</button>
+												)}
+											</div>
+										</li>
+									);
+								})}
+							</ul>
+						)}
+
+						{/* 공지사항 등록 폼 */}
+						{groupData.creatorId === uid && (
+							<div className="mt-[24px] mb-[24px]">
+								<div className="flex justify-between items-center mb-[12px]">
+									<h3 className="font-semibold text-[16px]">공지사항 등록</h3>
+									<button
+										type="button"
+										className="button px-[24px] py-[4px]"
+										onClick={handleAddNotice}
+									>
+										등록하기
+									</button>
+								</div>
+								<div className="flex flex-col gap-[8px] mb-[12px]">
+									<input
+										type="text"
+										placeholder="공지 제목"
+										value={noticeTitle}
+										onChange={(e) => setNoticeTitle(e.target.value)}
+										className="border px-2 py-1 rounded"
+									/>
+									<textarea
+										placeholder="공지 내용"
+										value={noticeContent}
+										onChange={(e) => setNoticeContent(e.target.value)}
+										className="border px-2 py-1 rounded resize-none"
+										rows={3}
+									/>
+								</div>
+							</div>
+						)}
 					</div>
-					{isInviteOpen && (
-						<InviteModal
-							open={isInviteOpen}
-							onClose={() => setIsInviteOpen(false)}
-							groupId={groupId}
-						/>
-					)}
-					{uid && (
-						<DepositModal
-							open={isDepositOpen}
-							onClose={() => setIsDepositOpen(false)}
-							groupId={groupId}
-							uid={uid}
-							onSuccess={fetchGroup}
-						/>
-					)}
-				</section>
-			</div>
+				</div>
+				{isInviteOpen && (
+					<InviteModal
+						open={isInviteOpen}
+						onClose={() => setIsInviteOpen(false)}
+						groupId={groupId}
+					/>
+				)}
+				{uid && (
+					<DepositModal
+						open={isDepositOpen}
+						onClose={() => setIsDepositOpen(false)}
+						groupId={groupId}
+						uid={uid}
+						onSuccess={fetchGroup}
+					/>
+				)}
+			</section>
 		</div>
 	);
 }

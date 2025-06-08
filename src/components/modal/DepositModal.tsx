@@ -5,6 +5,7 @@ import {
 	DialogTitle,
 } from "@radix-ui/react-dialog";
 import { useState } from "react";
+import { sendGroupNotification } from "../../lib/api/notificationApi"; // 🔹 알림 함수 import
 import { depositToGroup } from "../../lib/api/walletApi";
 import { useWalletStore } from "../../store/walletStore";
 
@@ -12,6 +13,8 @@ interface DepositModalProps {
 	open: boolean;
 	onClose: () => void;
 	groupId: string;
+	creatorId: string; // 🔹 모임장 UID 추가
+	groupName: string; // 🔹 알림 메시지용 그룹명 추가
 	uid: string;
 	onSuccess?: () => void;
 }
@@ -20,6 +23,7 @@ export default function DepositModal({
 	open,
 	onClose,
 	groupId,
+	groupName,
 	uid,
 	onSuccess,
 }: DepositModalProps) {
@@ -40,7 +44,17 @@ export default function DepositModal({
 
 		try {
 			setLoading(true);
+
 			await depositToGroup(groupId, uid, amount);
+
+			// 🔹 알림 전송
+			await sendGroupNotification(
+				groupId,
+				"deposit",
+				groupName,
+				"참가자가 입금했습니다.",
+			);
+
 			onClose();
 			onSuccess?.();
 		} catch (error) {

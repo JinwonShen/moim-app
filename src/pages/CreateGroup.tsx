@@ -8,8 +8,6 @@ import {
 import { useState } from "react";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
 import { useGroupStore } from "../store/groupStore";
@@ -130,172 +128,168 @@ export default function CreateGroup() {
 			: "";
 
 	return (
-		<div className="flex">
-			<Sidebar />
-			<div className="w-[100vw] pl-[237px] pb-[24px]">
-				<Header />
-				<section className="pr-[12px] mt-[148px] pb-[24px]">
-					<h2 className="font-bold mb-[12px]">새 모임 만들기</h2>
-					<form className="flex gap-[24px] flex-wrap h-auto p-[48px] border">
-						<div className="flex flex-col flex-1 gap-[24px]">
-							<label className="flex flex-col">
-								<span className="text-[14px]">모임 이름</span>
-								<input
-									type="text"
-									placeholder="모임의 이름을 입력해주세요."
-									value={groupName}
-									onChange={(e) => setGroupName(e.target.value)}
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
-								/>
-							</label>
-							<label className="flex flex-col">
-								<span className="text-[14px]">모임 설명</span>
-								<input
-									type="text"
-									placeholder="모임의 설명을입력해주세요."
-									value={description}
-									onChange={(e) => setDescription(e.target.value)}
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
-								/>
-							</label>
-							<label className="flex flex-col">
-								<span className="text-[14px]">모임 장</span>
-								<input
-									type="text"
-									value={nickname}
-									readOnly
-									disabled
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] text-gray-500 rounded-[4px]"
-								/>
-							</label>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="flex flex-col">
-								<span className="text-[14px]">모임 참여자</span>
-								{participants.map((p, idx) => (
-									<div
-										key={`participant-${idx - 0}`}
-										className="flex items-center gap-[12px] mb-[4px]"
-									>
-										<input
-											type="text"
-											value={p}
-											onChange={(e) =>
-												handleChangeParticipant(idx, e.target.value)
-											}
-											placeholder={`참여자 ${idx + 1}`}
-											className="flex-1 border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
-										/>
-										{participants.length > 1 && (
-											<button
-												type="button"
-												onClick={() => handleRemoveParticipant(idx)}
-												className="text-red-500 text-[12px]"
-											>
-												<FiMinus />
-											</button>
-										)}
-									</div>
-								))}
-								<button
-									type="button"
-									onClick={handleAddParticipant}
-									className="mt-[8px]"
+		<div>
+			<section className="pr-[12px] mt-[148px] pb-[24px]">
+				<h2 className="font-bold mb-[12px]">새 모임 만들기</h2>
+				<form className="flex gap-[24px] flex-wrap h-auto p-[48px] border">
+					<div className="flex flex-col flex-1 gap-[24px]">
+						<label className="flex flex-col">
+							<span className="text-[14px]">모임 이름</span>
+							<input
+								type="text"
+								placeholder="모임의 이름을 입력해주세요."
+								value={groupName}
+								onChange={(e) => setGroupName(e.target.value)}
+								className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
+							/>
+						</label>
+						<label className="flex flex-col">
+							<span className="text-[14px]">모임 설명</span>
+							<input
+								type="text"
+								placeholder="모임의 설명을입력해주세요."
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
+							/>
+						</label>
+						<label className="flex flex-col">
+							<span className="text-[14px]">모임 장</span>
+							<input
+								type="text"
+								value={nickname}
+								readOnly
+								disabled
+								className="border px-[8px] py-[4px] mt-[4px] text-[14px] text-gray-500 rounded-[4px]"
+							/>
+						</label>
+						{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
+						<label className="flex flex-col">
+							<span className="text-[14px]">모임 참여자</span>
+							{participants.map((p, idx) => (
+								<div
+									key={`participant-${idx - 0}`}
+									className="flex items-center gap-[12px] mb-[4px]"
 								>
-									<FiPlus className="text-secondary-300 text-[20px] border-secondary-300 border-[1px] rounded-full hover:text-blue-500 hover:border-blue-500 transition-all duration-300 m-auto" />
-								</button>
-							</label>
-						</div>
-						<div className="flex flex-col flex-1 gap-[24px]">
-							<label className="flex flex-col">
-								<span className="text-[14px]">총 예산</span>
-								<input
-									type="number"
-									placeholder="예산 금액 설정 ex) 4000000"
-									value={totalBudget || ""}
-									onChange={(e) => setTotalBudget(Number(e.target.value))}
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px] appearance-none"
-									inputMode="numeric"
-									pattern="[0-9]*"
-								/>
-							</label>
-							<label className="flex flex-col">
-								<span className="text-[14px]">인당 금액</span>
-								<input
-									type="text"
-									value={eachFee}
-									readOnly
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] bg-gray-100 text-gray-500 rounded-[4px]"
-								/>
-							</label>
-							<label className="flex flex-col">
-								<span className="text-[14px]">모임 기간</span>
-								<span className="flex gap-[12px]">
 									<input
-										type="date"
-										value={startDate}
-										onChange={(e) => setStartDate(e.target.value)}
+										type="text"
+										value={p}
+										onChange={(e) =>
+											handleChangeParticipant(idx, e.target.value)
+										}
+										placeholder={`참여자 ${idx + 1}`}
 										className="flex-1 border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
 									/>
-									<input
-										type="date"
-										value={endDate}
-										onChange={(e) => setEndDate(e.target.value)}
-										className="flex-1 border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
-									/>
-								</span>
-							</label>
-							<label className="flex flex-col">
-								<span className="text-[14px]">임금 마감일</span>
+									{participants.length > 1 && (
+										<button
+											type="button"
+											onClick={() => handleRemoveParticipant(idx)}
+											className="text-red-500 text-[12px]"
+										>
+											<FiMinus />
+										</button>
+									)}
+								</div>
+							))}
+							<button
+								type="button"
+								onClick={handleAddParticipant}
+								className="mt-[8px]"
+							>
+								<FiPlus className="text-secondary-300 text-[20px] border-secondary-300 border-[1px] rounded-full hover:text-blue-500 hover:border-blue-500 transition-all duration-300 m-auto" />
+							</button>
+						</label>
+					</div>
+					<div className="flex flex-col flex-1 gap-[24px]">
+						<label className="flex flex-col">
+							<span className="text-[14px]">총 예산</span>
+							<input
+								type="number"
+								placeholder="예산 금액 설정 ex) 4000000"
+								value={totalBudget || ""}
+								onChange={(e) => setTotalBudget(Number(e.target.value))}
+								className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px] appearance-none"
+								inputMode="numeric"
+								pattern="[0-9]*"
+							/>
+						</label>
+						<label className="flex flex-col">
+							<span className="text-[14px]">인당 금액</span>
+							<input
+								type="text"
+								value={eachFee}
+								readOnly
+								className="border px-[8px] py-[4px] mt-[4px] text-[14px] bg-gray-100 text-gray-500 rounded-[4px]"
+							/>
+						</label>
+						<label className="flex flex-col">
+							<span className="text-[14px]">모임 기간</span>
+							<span className="flex gap-[12px]">
 								<input
 									type="date"
-									value={dueDate}
-									onChange={(e) => setDueDate(e.target.value)}
-									className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
+									value={startDate}
+									onChange={(e) => setStartDate(e.target.value)}
+									className="flex-1 border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
 								/>
-							</label>
-							<label className="flex flex-col mt-[36px]">
-								<span className="text-[14px]">약관 동의</span>
-								<textarea className="h-[124px] p-[12px] mt-[4px] border text-[14px] rounded-[4px]">
-									약관 내용
-								</textarea>
-								<span className="flex mt-[4px]">
-									<input
-										type="checkbox"
-										checked={agreeTerms}
-										onChange={(e) => setAgreeTerms(e.target.checked)}
-									/>
-									<span className="ml-[4px] text-[14px]">
-										개인정보 수집 및 이용에 동의합니다.
-									</span>
+								<input
+									type="date"
+									value={endDate}
+									onChange={(e) => setEndDate(e.target.value)}
+									className="flex-1 border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
+								/>
+							</span>
+						</label>
+						<label className="flex flex-col">
+							<span className="text-[14px]">임금 마감일</span>
+							<input
+								type="date"
+								value={dueDate}
+								onChange={(e) => setDueDate(e.target.value)}
+								className="border px-[8px] py-[4px] mt-[4px] text-[14px] rounded-[4px]"
+							/>
+						</label>
+						<label className="flex flex-col mt-[36px]">
+							<span className="text-[14px]">약관 동의</span>
+							<textarea className="h-[124px] p-[12px] mt-[4px] border text-[14px] rounded-[4px]">
+								약관 내용
+							</textarea>
+							<span className="flex mt-[4px]">
+								<input
+									type="checkbox"
+									checked={agreeTerms}
+									onChange={(e) => setAgreeTerms(e.target.checked)}
+								/>
+								<span className="ml-[4px] text-[14px]">
+									개인정보 수집 및 이용에 동의합니다.
 								</span>
-							</label>
-						</div>
-						<div className="w-full flex justify-between gap-[24px]">
-							<button
-								type="button"
-								className="button w-[calc(25%-18px)] py-[12px]"
-								onClick={handleReset}
-							>
-								초기화
-							</button>
-							<button
-								type="button"
-								className="button w-[calc(25%-18px)]"
-								onClick={() => handleSubmit("share")}
-							>
-								공유하기
-							</button>
-							<button
-								type="button"
-								className="button w-[calc(50%-12px)]"
-								onClick={() => handleSubmit("start")}
-							>
-								모임 시작하기
-							</button>
-						</div>
-					</form>
-				</section>
-			</div>
+							</span>
+						</label>
+					</div>
+					<div className="w-full flex justify-between gap-[24px]">
+						<button
+							type="button"
+							className="button w-[calc(25%-18px)] py-[12px]"
+							onClick={handleReset}
+						>
+							초기화
+						</button>
+						<button
+							type="button"
+							className="button w-[calc(25%-18px)]"
+							onClick={() => handleSubmit("share")}
+						>
+							공유하기
+						</button>
+						<button
+							type="button"
+							className="button w-[calc(50%-12px)]"
+							onClick={() => handleSubmit("start")}
+						>
+							모임 시작하기
+						</button>
+					</div>
+				</form>
+			</section>
 		</div>
 	);
 }

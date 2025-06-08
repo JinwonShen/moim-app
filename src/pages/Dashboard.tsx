@@ -2,8 +2,6 @@ import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FloatingButton from "../components/FloatingButton";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
 import DepositModal from "../components/modal/DepositModal";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
@@ -26,6 +24,9 @@ export default function Dashboard() {
 	const [isDepositOpen, setDepositOpen] = useState(false);
 	const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 	const user = useAuthStore((state) => state.user);
+	const selectedGroup =
+		myGroups.find((group) => group.id === selectedGroupId) ||
+		joinedGroups.find((group) => group.id === selectedGroupId);
 
 	const fetchExpenses = async () => {
 		if (!myGroups.length) return; // 또는 if (!myGroups[0]) return;
@@ -63,11 +64,11 @@ export default function Dashboard() {
 	if (loading) return <p>로딩중...</p>;
 
 	return (
-		<div className="flex">
-			<Sidebar />
-			<div className="w-[100vw] pl-[237px] pb-[24px]">
-				<Header />
-				<main className="flex flex-col flex-wrap flex-1 gap-6 max-h-[900px] pr-[12px] mt-[148px] pb-[24px]">
+		<div>
+			{/* <Sidebar /> */}
+			<div>
+				{/* <Header /> */}
+				<main className="flex flex-col flex-wrap flex-1 gap-[24px] max-h-[900px]">
 					{/* 내가 만든 모임 */}
 					<section className="w-[calc(50%-12px)] min-h-[150px] max-h-[300px] h-full p-[24px] border border-secondary-200 rounded-[8px]">
 						<h2 className="text-[14px] mb-[12px]">내가 만든 모임</h2>
@@ -114,7 +115,11 @@ export default function Dashboard() {
 													{group.groupName}
 												</h3>
 												<span
-													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${status === "모집중" ? "text-primary bg-white border border-primary" : "text-white bg-primary"}`}
+													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${
+														status === "모집중"
+															? "text-primary bg-white border border-primary"
+															: "text-white bg-primary"
+													}`}
 												>
 													{status}
 												</span>
@@ -125,19 +130,25 @@ export default function Dashboard() {
 											<p className="text-[14px] py-[8px]">
 												참여자: {participantCount}명 중 {paidCount}명 입금 완료
 											</p>
-											<div className="h-[12px] bg-gray-200 rounded-full">
+
+											{/* ✅ 진행 상태에 따라 입금률 / 지출률로 표현 */}
+											<div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
 												<div
 													className="h-full bg-primary rounded-full"
 													style={{
-														width: `${isUpcoming ? paidPercent : usedPercent}%`,
+														width: `${isUpcoming ? paidPercent : usedPercent > 0 ? usedPercent : paidPercent}%`,
 													}}
 												/>
 											</div>
+
+											{/* ✅ 예산 표시: 상태에 따라 입금액 또는 잔액 */}
 											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												{isUpcoming
+												{isUpcoming || usedPercent === 0
 													? `예산: ${group.totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
 													: `예산: ${group.totalBudget.toLocaleString()}원 / 잔액: ${group.balance.toLocaleString()}원`}
 											</p>
+
+											{/* 버튼 영역 */}
 											<div className="flex gap-[8px]">
 												<button
 													type="button"
@@ -223,25 +234,39 @@ export default function Dashboard() {
 													{status}
 												</span>
 											</div>
+
 											<p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
 												{group.startDate} ~ {group.endDate}
 											</p>
+
 											<p className="text-[14px] py-[8px]">
 												참여자: {participantCount}명 중 {paidCount}명 입금 완료
 											</p>
-											<div className="h-[12px] bg-gray-200 rounded-full">
+
+											{/* ✅ 진행 상태에 따라 입금률 / 지출률로 표현 */}
+											<div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
 												<div
 													className="h-full bg-primary rounded-full"
 													style={{
-														width: `${isUpcoming ? paidPercent : usedPercent}%`,
+														width: `${
+															isUpcoming
+																? paidPercent
+																: usedPercent > 0
+																	? usedPercent
+																	: paidPercent
+														}%`,
 													}}
 												/>
 											</div>
+
+											{/* ✅ 텍스트도 입금액 → 잔액으로 변경 */}
 											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												{isUpcoming
+												{isUpcoming || usedPercent === 0
 													? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
 													: `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
 											</p>
+
+											{/* ✅ 버튼 */}
 											<div className="flex gap-[8px]">
 												<button
 													type="button"
@@ -302,12 +327,17 @@ export default function Dashboard() {
 						fetchExpenses={fetchExpenses}
 					/>
 				)}
-				{isDepositOpen && selectedGroupId && user?.uid && (
+				{isDepositOpen && selectedGroupId && user?.uid && selectedGroup && (
 					<DepositModal
 						open={isDepositOpen}
 						onClose={() => setDepositOpen(false)}
 						groupId={selectedGroupId}
 						uid={user.uid}
+						creatorId={selectedGroup.creatorId}
+						groupName={selectedGroup.groupName}
+						onSuccess={() => {
+							// 입금 후 새로고침 등 처리
+						}}
 					/>
 				)}
 			</div>

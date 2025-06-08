@@ -87,7 +87,7 @@ export default function Sidebar() {
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("/mypage") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
 					>
-						<button type="button" onClick={() => navigate("/MyPage")}>
+						<button type="button" onClick={() => navigate("/mypage")}>
 							마이페이지
 						</button>
 					</li>
@@ -102,12 +102,16 @@ export default function Sidebar() {
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
 					>
-						내가 만든 모임
+						<button type="button" onClick={() => navigate("/mygroup")}>
+							내가 만든 모임
+						</button>
 					</li>
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
 					>
-						참여 중인 모임
+						<button type="button" onClick={() => navigate("/joinedgroup")}>
+							참여 중인 모임
+						</button>
 					</li>
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}

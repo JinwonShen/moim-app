@@ -56,6 +56,7 @@ export default function AddExpenseModal({
 						</button>
 					</div>
 				</div>
+
 				<ExpenseForm
 					onSubmit={async ({ date, amount, category, memo }) => {
 						const expensesRef = collection(db, "groups", groupId, "expenses");
@@ -68,6 +69,7 @@ export default function AddExpenseModal({
 							createdAt: new Date(),
 						});
 						await fetchExpenses();
+						onClose(); // 등록 후 모달 닫기
 					}}
 					showHeader={false}
 					onSuccess={onClose}

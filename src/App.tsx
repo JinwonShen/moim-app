@@ -4,6 +4,7 @@ import {
 	BrowserRouter as Router,
 	Routes,
 } from "react-router-dom";
+import Layout from "./Layout";
 import CreateGroup from "./pages/CreateGroup";
 import Dashboard from "./pages/Dashboard";
 import EmailLogin from "./pages/EmailLogin";
@@ -12,7 +13,9 @@ import JoinEmail from "./pages/JoinEmail";
 import JoinGroup from "./pages/JoinGroup";
 import JoinPhone from "./pages/JoinPhone";
 import JoinTerms from "./pages/JoinTerms";
+import JoinedGroups from "./pages/JoinedGroups";
 import Login from "./pages/Login";
+import MyGroups from "./pages/MyGroups";
 import MyPage from "./pages/MyPage";
 import PinConfirm from "./pages/PinConfirm";
 import PinRegister from "./pages/PinRegister";
@@ -29,15 +32,23 @@ export default function App() {
 				<Route path="/joinphone" element={<JoinPhone />} />
 				<Route path="/joinemail" element={<JoinEmail />} />
 				<Route path="/pinregister" element={<PinRegister />} />
-				<Route path="/dashboard" element={<Dashboard />} />
-				{/* <Route path="/floatingbutton" element={<FloatingButton />} /> */}
-				<Route path="/mypage" element={<MyPage />} />
-				<Route path="/group/create" element={<CreateGroup />} />
-				<Route path="/group/:id" element={<GroupDetail />} />
 				<Route path="/pinconfirm" element={<PinConfirm />} />
-				<Route path="/joingroup" element={<JoinGroup />} />
-				<Route path="/withdraw" element={<Withdraw />} />
-				<Route path="*" element={<div>404 - 페이지를 찾을 수 없습니다</div>} />
+
+				<Route element={<Layout />}>
+					<Route path="/dashboard" element={<Dashboard />} />
+					{/* <Route path="/floatingbutton" element={<FloatingButton />} /> */}
+					<Route path="/mypage" element={<MyPage />} />
+					<Route path="/group/create" element={<CreateGroup />} />
+					<Route path="/group/:id" element={<GroupDetail />} />
+					<Route path="/mygroup" element={<MyGroups />} />
+					<Route path="/joinedgroup" element={<JoinedGroups />} />
+					<Route path="/joingroup" element={<JoinGroup />} />
+					<Route path="/withdraw" element={<Withdraw />} />
+					<Route
+						path="*"
+						element={<div>404 - 페이지를 찾을 수 없습니다</div>}
+					/>
+				</Route>
 			</Routes>
 		</Router>
 	);

@@ -6,8 +6,6 @@ import {
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
 import usePinGuard from "../hooks/usePinGuard";
 import { auth, db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
@@ -170,311 +168,299 @@ export default function MyPage() {
 	};
 
 	return (
-		<div className="flex">
-			<Sidebar />
-			<div className="w-[100vw] pl-[237px] pb-[24px]">
-				<Header />
-				<section className="h-auto flex flex-col mt-[148px] pr-[12px]">
-					<h1 className="font-bold">마이페이지</h1>
-					<main className="mt-[8px] w-full border">
-						<div className="p-[48px] pb-0">
-							<h2 className="font-bold">사용자 정보</h2>
-							<ul className="mt-[36px]">
-								{/* 닉네임 변경 */}
-								<li className="h-[48px] mb-[12px] flex justify-between items-center">
-									<span className="flex-[1]">닉네임</span>
-									<span className="flex-[2]">
-										{editingNickname ? (
+		<div>
+			<section className="h-auto flex flex-col">
+				<h1 className="font-bold">마이페이지</h1>
+				<main className="mt-[8px] w-full border">
+					<div className="p-[48px] pb-0">
+						<h2 className="font-bold">사용자 정보</h2>
+						<ul className="mt-[36px]">
+							{/* 닉네임 변경 */}
+							<li className="h-[48px] mb-[12px] flex justify-between items-center">
+								<span className="flex-[1]">닉네임</span>
+								<span className="flex-[2]">
+									{editingNickname ? (
+										<input
+											type="text"
+											value={newNickname}
+											onChange={(e) => setNewNickname(e.target.value)}
+											className="border px-[8px] py-[4px] focus:outline-primary"
+										/>
+									) : (
+										user?.nickname || "사용자"
+									)}
+								</span>
+								<span className="flex-[1.5]">
+									{editingNickname ? (
+										<>
+											<button
+												type="button"
+												className="button px-[24px] py-[8px]"
+												onClick={handleNicknameSave}
+											>
+												저장
+											</button>
+											<button
+												type="button"
+												className="button px-[24px] py-[8px] ml-[12px]"
+												onClick={handleNicknameCancel}
+											>
+												취소
+											</button>
+										</>
+									) : (
+										<button
+											type="button"
+											className="button px-[24px] py-[8px]"
+											onClick={() => setEditingNickname(true)}
+										>
+											닉네임 변경
+										</button>
+									)}
+								</span>
+							</li>
+
+							<li className="h-[48px] mb-[12px] flex justify-between items-center">
+								<span className="flex-[1]">이메일</span>
+								<span className="flex-[2]">email@email.com</span>
+								<span className="flex-[1.5]">{/* 그리드용 여백 */}</span>
+							</li>
+
+							{/* 패스워드 변경 */}
+							<li
+								className={`${editingPassword ? "h-[96px] mb-[12px] flex justify-between items-center" : "h-[48px] mb-[12px] flex justify-between items-center"}`}
+							>
+								<span className="flex-[1]">비밀번호</span>
+								<span className="flex-[2]">
+									{editingPassword ? (
+										<span className="max-w-[300px] flex flex-col gap-[12px] pr-[12px]">
 											<input
-												type="text"
-												value={newNickname}
-												onChange={(e) => setNewNickname(e.target.value)}
+												type="password"
+												placeholder="현재 비밀번호"
 												className="border px-[8px] py-[4px] focus:outline-primary"
+												onChange={(e) => setCurrentPassword(e.target.value)}
 											/>
-										) : (
-											user?.nickname || "사용자"
-										)}
-									</span>
-									<span className="flex-[1.5]">
-										{editingNickname ? (
-											<>
-												<button
-													type="button"
-													className="button px-[24px] py-[8px]"
-													onClick={handleNicknameSave}
-												>
-													저장
-												</button>
-												<button
-													type="button"
-													className="button px-[24px] py-[8px] ml-[12px]"
-													onClick={handleNicknameCancel}
-												>
-													취소
-												</button>
-											</>
-										) : (
+											<input
+												type="password"
+												placeholder="새 비밀번호"
+												className="border px-[8px] py-[4px] focus:outline-primary"
+												onChange={(e) => setNewPassword(e.target.value)}
+											/>
+											<input
+												type="password"
+												placeholder="비밀번호 확인"
+												className="border px-[8px] py-[4px] focus:outline-primary"
+												onChange={(e) => setConfirmPassword(e.target.value)}
+											/>
+										</span>
+									) : null}
+								</span>
+								<span className="flex-[1.5]">
+									{editingPassword ? (
+										<>
 											<button
 												type="button"
 												className="button px-[24px] py-[8px]"
-												onClick={() => setEditingNickname(true)}
+												onClick={handlePasswordSave}
 											>
-												닉네임 변경
+												저장
 											</button>
-										)}
-									</span>
-								</li>
+											<button
+												type="button"
+												className="button px-[24px] py-[8px] ml-[12px]"
+												onClick={() => setEditingPassword(false)}
+											>
+												취소
+											</button>
+										</>
+									) : (
+										<button
+											type="button"
+											className="button px-[24px] py-[8px]"
+											onClick={handlePasswordEditClick}
+										>
+											비밀번호 변경
+										</button>
+									)}
+								</span>
+							</li>
+						</ul>
+					</div>
 
-								<li className="h-[48px] mb-[12px] flex justify-between items-center">
-									<span className="flex-[1]">이메일</span>
-									<span className="flex-[2]">email@email.com</span>
-									<span className="flex-[1.5]">{/* 그리드용 여백 */}</span>
-								</li>
-
-								{/* 패스워드 변경 */}
-								<li
-									className={`${editingPassword ? "h-[96px] mb-[12px] flex justify-between items-center" : "h-[48px] mb-[12px] flex justify-between items-center"}`}
-								>
-									<span className="flex-[1]">비밀번호</span>
-									<span className="flex-[2]">
-										{editingPassword ? (
-											<span className="max-w-[300px] flex flex-col gap-[12px] pr-[12px]">
-												<input
-													type="password"
-													placeholder="현재 비밀번호"
-													className="border px-[8px] py-[4px] focus:outline-primary"
-													onChange={(e) => setCurrentPassword(e.target.value)}
-												/>
-												<input
-													type="password"
-													placeholder="새 비밀번호"
-													className="border px-[8px] py-[4px] focus:outline-primary"
-													onChange={(e) => setNewPassword(e.target.value)}
-												/>
-												<input
-													type="password"
-													placeholder="비밀번호 확인"
-													className="border px-[8px] py-[4px] focus:outline-primary"
-													onChange={(e) => setConfirmPassword(e.target.value)}
-												/>
-											</span>
-										) : null}
-									</span>
-									<span className="flex-[1.5]">
-										{editingPassword ? (
-											<>
-												<button
-													type="button"
-													className="button px-[24px] py-[8px]"
-													onClick={handlePasswordSave}
-												>
-													저장
-												</button>
-												<button
-													type="button"
-													className="button px-[24px] py-[8px] ml-[12px]"
-													onClick={() => setEditingPassword(false)}
-												>
-													취소
-												</button>
-											</>
-										) : (
+					<div className="p-[48px] pb-0">
+						<h2 className="font-bold">내 계좌 정보</h2>
+						<ul className="mt-[36px]">
+							{/* 계좌 정보 등록 및 수정 */}
+							{editingAccount ? (
+								<>
+									<li className="h-[48px] mb-[12px] flex justify-between items-center">
+										<span className="flex-[1]">은행명</span>
+										<input
+											type="text"
+											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2] "
+											placeholder="예: 우리은행"
+											value={bank}
+											onChange={(e) => setBank(e.target.value)}
+										/>
+										<span className="flex-[1.5]">{/*  */}</span>
+									</li>
+									<li className="h-[48px] mb-[12px] flex items-center">
+										<span className="flex-[1]">계좌번호</span>
+										<input
+											type="text"
+											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2]"
+											placeholder="123-456-789"
+											value={accountNumber}
+											onChange={(e) => setAccountNumber(e.target.value)}
+										/>
+										<span className="flex-[1.5]">{/*  */}</span>
+									</li>
+									<li className="h-[48px] mb-[12px] flex items-center">
+										<span className="flex-[1]">초기잔액</span>
+										<input
+											type="number"
+											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2]"
+											placeholder="예: 500000"
+											value={balance}
+											onChange={(e) => setBalance(e.target.value)}
+										/>
+										<span className="flex-[1.5]">{/*  */}</span>
+									</li>
+									<li className="h-[48px] mb-[12px] flex items-center">
+										<span className="flex-[1]">{/*  */}</span>
+										<span className="flex-[2]">{/*  */}</span>
+										<span className="flex-[1.5]">
 											<button
 												type="button"
 												className="button px-[24px] py-[8px]"
-												onClick={handlePasswordEditClick}
+												onClick={handleAccountSave}
 											>
-												비밀번호 변경
+												저장
 											</button>
-										)}
-									</span>
-								</li>
-							</ul>
-						</div>
+											<button
+												type="button"
+												className="button px-[24px] py-[8px] ml-[12px]"
+												onClick={() => setEditingAccount(false)}
+											>
+												취소
+											</button>
+										</span>
+									</li>
+								</>
+							) : user?.account ? (
+								<>
+									<li className="h-[48px] mb-[12px] flex justify-between items-center">
+										<span className="flex-[1]">은행</span>
+										<span className="flex-[2]">{user.account.bank}</span>
+										<span className="flex-[1.5]">
+											<button
+												type="button"
+												className="button px-[24px] py-[8px]"
+												onClick={() => {
+													setEditingAccount(true);
+													setBank(user?.account?.bank || "");
+													setAccountNumber(user?.account?.number || "");
+													setBalance(user?.account?.balance.toString() || "");
+												}}
+											>
+												계좌 수정
+											</button>
+										</span>
+									</li>
+									<li className="h-[48px] mb-[12px] flex justify-between items-center">
+										<span className="flex-[1]">잔액</span>
+										<span className="flex-[2]">
+											{user.account.balance.toLocaleString()} 원
+										</span>
+										<span className="flex-[1.5]">{/*  */}</span>
+									</li>
+								</>
+							) : (
+								<>
+									<li className="h-[48px] mb-[12px] flex justify-between items-center">
+										<span className="flex-[1]">은행</span>
+										<span className="flex-[2]">
+											등록된 계좌 정보가 없습니다.
+										</span>
+										<span className="flex-[1.5]">
+											<button
+												type="button"
+												className="button px-[24px] py-[8px]"
+												onClick={() => setEditingAccount(true)}
+											>
+												계좌 등록하기
+											</button>
+										</span>
+									</li>
+									<li className="h-[48px] mb-[12px] flex justify-between items-center">
+										<span className="flex-[1]">잔액</span>
+										<span className="flex-[2]">-</span>
+										<span className="flex-[1.5]">{/*  */}</span>
+									</li>
+								</>
+							)}
+						</ul>
+					</div>
 
-						<div className="p-[48px] pb-0">
-							<h2 className="font-bold">내 계좌 정보</h2>
-							<ul className="mt-[36px]">
-								{/* 계좌 정보 등록 및 수정 */}
-								{editingAccount ? (
-									<>
-										<li className="h-[48px] mb-[12px] flex justify-between items-center">
-											<span className="flex-[1]">은행명</span>
-											<input
-												type="text"
-												className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2] "
-												placeholder="예: 우리은행"
-												value={bank}
-												onChange={(e) => setBank(e.target.value)}
-											/>
-											<span className="flex-[1.5]">{/*  */}</span>
-										</li>
-										<li className="h-[48px] mb-[12px] flex items-center">
-											<span className="flex-[1]">계좌번호</span>
-											<input
-												type="text"
-												className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2]"
-												placeholder="123-456-789"
-												value={accountNumber}
-												onChange={(e) => setAccountNumber(e.target.value)}
-											/>
-											<span className="flex-[1.5]">{/*  */}</span>
-										</li>
-										<li className="h-[48px] mb-[12px] flex items-center">
-											<span className="flex-[1]">초기잔액</span>
-											<input
-												type="number"
-												className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2]"
-												placeholder="예: 500000"
-												value={balance}
-												onChange={(e) => setBalance(e.target.value)}
-											/>
-											<span className="flex-[1.5]">{/*  */}</span>
-										</li>
-										<li className="h-[48px] mb-[12px] flex items-center">
-											<span className="flex-[1]">{/*  */}</span>
-											<span className="flex-[2]">{/*  */}</span>
-											<span className="flex-[1.5]">
-												<button
-													type="button"
-													className="button px-[24px] py-[8px]"
-													onClick={handleAccountSave}
-												>
-													저장
-												</button>
-												<button
-													type="button"
-													className="button px-[24px] py-[8px] ml-[12px]"
-													onClick={() => setEditingAccount(false)}
-												>
-													취소
-												</button>
-											</span>
-										</li>
-									</>
-								) : user?.account ? (
-									<>
-										<li className="h-[48px] mb-[12px] flex justify-between items-center">
-											<span className="flex-[1]">은행</span>
-											<span className="flex-[2]">{user.account.bank}</span>
-											<span className="flex-[1.5]">
-												<button
-													type="button"
-													className="button px-[24px] py-[8px]"
-													onClick={() => {
-														setEditingAccount(true);
-														setBank(user?.account?.bank || "");
-														setAccountNumber(user?.account?.number || "");
-														setBalance(user?.account?.balance.toString() || "");
-													}}
-												>
-													계좌 수정
-												</button>
-											</span>
-										</li>
-										<li className="h-[48px] mb-[12px] flex justify-between items-center">
-											<span className="flex-[1]">잔액</span>
-											<span className="flex-[2]">
-												{user.account.balance.toLocaleString()} 원
-											</span>
-											<span className="flex-[1.5]">{/*  */}</span>
-										</li>
-									</>
-								) : (
-									<>
-										<li className="h-[48px] mb-[12px] flex justify-between items-center">
-											<span className="flex-[1]">은행</span>
-											<span className="flex-[2]">
-												등록된 계좌 정보가 없습니다.
-											</span>
-											<span className="flex-[1.5]">
-												<button
-													type="button"
-													className="button px-[24px] py-[8px]"
-													onClick={() => setEditingAccount(true)}
-												>
-													계좌 등록하기
-												</button>
-											</span>
-										</li>
-										<li className="h-[48px] mb-[12px] flex justify-between items-center">
-											<span className="flex-[1]">잔액</span>
-											<span className="flex-[2]">-</span>
-											<span className="flex-[1.5]">{/*  */}</span>
-										</li>
-									</>
-								)}
-							</ul>
-						</div>
+					<div className="p-[48px] pb-0">
+						<h2 className="font-bold">알림 설정</h2>
+						<ul className="mt-[36px]">
+							<li className="h-[48px] mb-[12px] flex justify-between items-center">
+								<span className="flex-[1]">입금 요청 알림</span>
+								<span className="flex-[2]">{/*  */}</span>
+								<span className="flex-[1.5]">
+									<input type="checkbox" className="switch" id="firstSwitch" />
+									<label htmlFor="firstSwitch" className="switchLabel">
+										<span className="switchButton">{/*  */}</span>
+									</label>
+								</span>
+							</li>
+							<li className="h-[48px] mb-[12px] flex justify-between items-center">
+								<span className="flex-[1]">공지사항 푸시 수신 여부 설정</span>
+								<span className="flex-[2]">{/*  */}</span>
+								<span className="flex-[1.5]">
+									<input type="checkbox" className="switch" id="secondSwitch" />
+									<label htmlFor="secondSwitch" className="switchLabel">
+										<span className="switchButton">{/*  */}</span>
+									</label>
+								</span>
+							</li>
+						</ul>
+					</div>
 
-						<div className="p-[48px] pb-0">
-							<h2 className="font-bold">알림 설정</h2>
-							<ul className="mt-[36px]">
-								<li className="h-[48px] mb-[12px] flex justify-between items-center">
-									<span className="flex-[1]">입금 요청 알림</span>
-									<span className="flex-[2]">{/*  */}</span>
-									<span className="flex-[1.5]">
-										<input
-											type="checkbox"
-											className="switch"
-											id="firstSwitch"
-										/>
-										<label htmlFor="firstSwitch" className="switchLabel">
-											<span className="switchButton">{/*  */}</span>
-										</label>
-									</span>
-								</li>
-								<li className="h-[48px] mb-[12px] flex justify-between items-center">
-									<span className="flex-[1]">공지사항 푸시 수신 여부 설정</span>
-									<span className="flex-[2]">{/*  */}</span>
-									<span className="flex-[1.5]">
-										<input
-											type="checkbox"
-											className="switch"
-											id="secondSwitch"
-										/>
-										<label htmlFor="secondSwitch" className="switchLabel">
-											<span className="switchButton">{/*  */}</span>
-										</label>
-									</span>
-								</li>
-							</ul>
-						</div>
-
-						<div className="p-[48px]">
-							<h2 className="font-bold">보안 설정</h2>
-							<ul className="mt-[36px]">
-								<li className="h-[48px] mb-[12px] flex justify-between items-center">
-									<span className="flex-[1]">6자리 PIN번호</span>
-									<span className="flex-[2]">{/*  */}</span>
-									<span className="flex-[1.5]">
-										<button
-											type="button"
-											className="button px-[24px] py-[8px]"
-											onClick={handlePinChange}
-										>
-											PIN번호 변경
-										</button>
-									</span>
-								</li>
-								<li className="h-[48px] mb-[12px] flex justify-between items-center">
-									<span className="flex-[1]">회원 탈퇴</span>
-									<span className="flex-[2]">{/*  */}</span>
-									<span className="flex-[1.5]">
-										<button
-											type="button"
-											className="button px-[24px] py-[8px]"
-											onClick={handleWithdrawClick}
-										>
-											회원 탈퇴
-										</button>
-									</span>
-								</li>
-							</ul>
-						</div>
-					</main>
-				</section>
-			</div>
+					<div className="p-[48px]">
+						<h2 className="font-bold">보안 설정</h2>
+						<ul className="mt-[36px]">
+							<li className="h-[48px] mb-[12px] flex justify-between items-center">
+								<span className="flex-[1]">6자리 PIN번호</span>
+								<span className="flex-[2]">{/*  */}</span>
+								<span className="flex-[1.5]">
+									<button
+										type="button"
+										className="button px-[24px] py-[8px]"
+										onClick={handlePinChange}
+									>
+										PIN번호 변경
+									</button>
+								</span>
+							</li>
+							<li className="h-[48px] mb-[12px] flex justify-between items-center">
+								<span className="flex-[1]">회원 탈퇴</span>
+								<span className="flex-[2]">{/*  */}</span>
+								<span className="flex-[1.5]">
+									<button
+										type="button"
+										className="button px-[24px] py-[8px]"
+										onClick={handleWithdrawClick}
+									>
+										회원 탈퇴
+									</button>
+								</span>
+							</li>
+						</ul>
+					</div>
+				</main>
+			</section>
 		</div>
 	);
 }

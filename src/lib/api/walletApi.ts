@@ -1,14 +1,18 @@
 import {
 	arrayUnion,
+	collection,
 	doc,
 	getDoc,
+	getDocs,
 	increment,
 	serverTimestamp,
 	updateDoc,
 } from "firebase/firestore";
 import { useAuthStore } from "../../store/authStore";
 import { useWalletStore } from "../../store/walletStore";
+import type { Participant } from "../../types/participant";
 import { db } from "../firebase";
+import { sendGroupNotification } from "./notificationApi";
 
 export const fetchWallet = async (groupId: string, uid: string) => {
 	try {
@@ -75,12 +79,37 @@ export const depositToGroup = async (
 			"account.balance": userData.account.balance - amount,
 		});
 
+		// 알림 전송 !
+		const participantsRef = collection(db, "groups", groupId, "participants");
+		const participantSnap = await getDocs(participantsRef);
+
+		const participants: Participant[] = participantSnap.docs.map((doc) => ({
+			...(doc.data() as Omit<Participant, "uid">),
+			uid: doc.id,
+		}));
+
+		const groupRef = doc(db, "groups", groupId);
+
+		const owner = participants.find((p) => p.isOwner);
+		const groupInfoSnap = await getDoc(groupRef);
+		const groupData = groupInfoSnap.data();
+		console.log("👑 찾은 모임장:", owner?.uid); // 👈 여기를 꼭 찍어봐!
+
+		if (owner && groupData?.groupName && userData?.nickname) {
+			console.log("✅ 알림 전송 시도");
+			await sendGroupNotification(
+				groupId,
+				"deposit",
+				groupData.groupName,
+				`${userData.nickname}님이 ${groupData.groupName}에 입금 완료했습니다`,
+			);
+		}
+
 		await updateDoc(groupWalletRef, {
 			balance: increment(amount),
 			updatedAt: serverTimestamp(),
 		});
 
-		const groupRef = doc(db, "groups", groupId);
 		await updateDoc(groupRef, {
 			paidParticipants: arrayUnion(uid),
 			balance: increment(amount),

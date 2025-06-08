@@ -1,7 +1,7 @@
 import type { Timestamp } from "firebase/firestore";
 
 export type Group = {
-	id?: string; // Firestore 문서 ID (자동 생성됨, 수동으로 삽입)
+	id: string; // Firestore 문서 ID (자동 생성됨, 수동으로 삽입)
 	groupName: string; // 모임 이름
 	description: string; // 모임 설명
 	creatorId: string; // 모임을 생성한 사용자의 uid
