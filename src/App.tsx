@@ -15,6 +15,7 @@ import JoinPhone from "./pages/JoinPhone";
 import JoinTerms from "./pages/JoinTerms";
 import JoinedGroups from "./pages/JoinedGroups";
 import Login from "./pages/Login";
+import MonthlyExpensePage from "./pages/MonthlyExpensePage";
 import MyGroups from "./pages/MyGroups";
 import MyPage from "./pages/MyPage";
 import PinConfirm from "./pages/PinConfirm";
@@ -43,6 +44,7 @@ export default function App() {
 					<Route path="/mygroup" element={<MyGroups />} />
 					<Route path="/joinedgroup" element={<JoinedGroups />} />
 					<Route path="/joingroup" element={<JoinGroup />} />
+					<Route path="/monthlyexpensepage" element={<MonthlyExpensePage />} />
 					<Route path="/withdraw" element={<Withdraw />} />
 					<Route
 						path="*"

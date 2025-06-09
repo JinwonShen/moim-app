@@ -131,12 +131,19 @@ export default function Sidebar() {
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
 					>
-						월별 지출 일지
+						<button
+							type="button"
+							onClick={() => navigate("/monthlyexpensepage")}
+						>
+							월별 지출 일지
+						</button>
 					</li>
 					<li
 						className={`ml-[20px] mr-[20px] p-[8px] transition-all rounded-[8px] cursor-pointer hover:bg-primary hover:pl-[16px] hover:text-[#FFFFFF] ${isActive("") ? "bg-primary pl-[16px] text-[#FFFFFF]" : ""}`}
 					>
-						월별 지출 그래프
+						<button type="button" onClick={() => navigate("/")}>
+							월별 지출 그래프
+						</button>
 					</li>
 				</ul>
 			</div>

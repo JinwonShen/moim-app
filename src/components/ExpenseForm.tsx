@@ -63,7 +63,7 @@ export default function ExpenseForm({
 			{showHeader && (
 				<div className="flex justify-between items-center">
 					<h2 className="text-[16px]">지출 등록</h2>
-					<button type="button" className="button px-[24px] py-[4px]">
+					<button type="submit" className="button px-[24px] py-[4px]">
 						{submitLabel}
 					</button>
 				</div>

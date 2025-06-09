@@ -6,7 +6,13 @@ import {
 	DialogOverlay,
 	DialogTitle,
 } from "@radix-ui/react-dialog";
-import { addDoc, collection } from "firebase/firestore";
+import {
+	addDoc,
+	collection,
+	doc,
+	increment,
+	updateDoc,
+} from "firebase/firestore";
 import { FiX } from "react-icons/fi";
 import { db } from "../../lib/firebase";
 import ExpenseForm from "../ExpenseForm";
@@ -59,17 +65,31 @@ export default function AddExpenseModal({
 
 				<ExpenseForm
 					onSubmit={async ({ date, amount, category, memo }) => {
-						const expensesRef = collection(db, "groups", groupId, "expenses");
-						await addDoc(expensesRef, {
-							date,
-							amount,
-							category,
-							memo,
-							author: uid,
-							createdAt: new Date(),
-						});
-						await fetchExpenses();
-						onClose(); // 등록 후 모달 닫기
+						try {
+							const expensesRef = collection(db, "groups", groupId, "expenses");
+
+							// 1. 지출 등록
+							await addDoc(expensesRef, {
+								date,
+								amount,
+								category,
+								memo,
+								author: uid,
+								createdAt: new Date(),
+							});
+
+							// 2. 잔액 차감
+							const groupRef = doc(db, "groups", groupId);
+							await updateDoc(groupRef, {
+								balance: increment(-amount),
+							});
+
+							// 3. 지출 새로고침 및 모달 닫기
+							await fetchExpenses();
+							onClose();
+						} catch (error) {
+							console.error("지출 등록 중 오류 발생:", error);
+						}
 					}}
 					showHeader={false}
 					onSuccess={onClose}

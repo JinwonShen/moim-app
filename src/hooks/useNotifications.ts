@@ -23,7 +23,6 @@ export const useNotifications = (uid: string | undefined) => {
 
 	useEffect(() => {
 		if (!uid) return; // ← uid 없으면 실행 자체를 안함
-		console.log("👤 현재 로그인된 유저 UID:", uid);
 
 		const ref = collection(db, "notifications", uid, "items");
 		const q = query(ref, orderBy("createdAt", "desc"));

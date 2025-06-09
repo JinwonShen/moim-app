@@ -91,21 +91,35 @@ export default function Dashboard() {
 									const isUpcoming = start > now;
 									const status = isUpcoming ? "모집중" : "진행중";
 
+									// 🔹 참여자 수
 									const participantCount = group.participantCount ?? 0;
+
+									// 🔹 입금 완료된 인원 수
 									const paidCount = group.paidParticipants?.length ?? 0;
-									const paidPercent = participantCount
-										? Math.floor((paidCount / participantCount) * 100)
-										: 0;
 
-									const budgetUsed = group.totalBudget - group.balance;
-									const usedPercent = Math.floor(
-										(budgetUsed / group.totalBudget) * 100 || 0,
-									);
+									// 🔹 입금 비율 (모임 시작 전에는 이걸로 표시)
+									const paidPercent =
+										participantCount > 0
+											? Math.floor((paidCount / participantCount) * 100)
+											: 0;
 
+									// 🔹 예산 및 잔액
+									const totalBudget = group.totalBudget ?? 0;
+									const balance = group.balance ?? 0;
+
+									// 🔹 잔액 비율 (모임 시작 후에는 이걸로 표시)
+									const balancePercent =
+										totalBudget > 0
+											? Math.floor((balance / totalBudget) * 100)
+											: 0;
+
+									// 🔹 인당 금액
 									const eachFee =
 										participantCount > 0
-											? Math.floor(group.totalBudget / participantCount)
+											? Math.floor(totalBudget / participantCount)
 											: 0;
+
+									// 🔹 총 입금액
 									const paidTotal = eachFee * paidCount;
 
 									return (
@@ -131,24 +145,24 @@ export default function Dashboard() {
 												참여자: {participantCount}명 중 {paidCount}명 입금 완료
 											</p>
 
-											{/* ✅ 진행 상태에 따라 입금률 / 지출률로 표현 */}
+											{/* ✅ 진행 상태에 따라 입금률 / 잔액률로 표시 */}
 											<div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
 												<div
 													className="h-full bg-primary rounded-full"
 													style={{
-														width: `${isUpcoming ? paidPercent : usedPercent > 0 ? usedPercent : paidPercent}%`,
+														width: `${isUpcoming ? paidPercent : balancePercent}%`,
 													}}
 												/>
 											</div>
 
-											{/* ✅ 예산 표시: 상태에 따라 입금액 또는 잔액 */}
+											{/* ✅ 텍스트도 입금액 또는 잔액 기준으로 조건 분기 */}
 											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												{isUpcoming || usedPercent === 0
-													? `예산: ${group.totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
-													: `예산: ${group.totalBudget.toLocaleString()}원 / 잔액: ${group.balance.toLocaleString()}원`}
+												{isUpcoming || balancePercent === 100
+													? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
+													: `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
 											</p>
 
-											{/* 버튼 영역 */}
+											{/* 버튼 */}
 											<div className="flex gap-[8px]">
 												<button
 													type="button"
@@ -197,25 +211,35 @@ export default function Dashboard() {
 									const isUpcoming = start > now;
 									const status = isUpcoming ? "모집중" : "진행중";
 
+									// 🔹 참여자 수
 									const participantCount = group.participantCount ?? 0;
+
+									// 🔹 입금 완료된 인원 수
 									const paidCount = group.paidParticipants?.length ?? 0;
+
+									// 🔹 입금 비율 (모임 시작 전에는 이걸로 퍼센트 표시)
 									const paidPercent =
 										participantCount > 0
 											? Math.floor((paidCount / participantCount) * 100)
 											: 0;
 
+									// 🔹 예산 및 잔액
 									const totalBudget = group.totalBudget ?? 0;
 									const balance = group.balance ?? 0;
-									const budgetUsed = totalBudget - balance;
-									const usedPercent =
+
+									// 🔹 잔액 비율 (진행 중인 모임에서는 이걸로 퍼센트 표시)
+									const balancePercent =
 										totalBudget > 0
-											? Math.floor((budgetUsed / totalBudget) * 100)
+											? Math.floor((balance / totalBudget) * 100)
 											: 0;
 
+									// 🔹 인당 금액 (총예산 / 참여자 수)
 									const eachFee =
 										participantCount > 0
 											? Math.floor(totalBudget / participantCount)
 											: 0;
+
+									// 🔹 총 입금된 금액
 									const paidTotal = eachFee * paidCount;
 
 									return (
@@ -243,25 +267,19 @@ export default function Dashboard() {
 												참여자: {participantCount}명 중 {paidCount}명 입금 완료
 											</p>
 
-											{/* ✅ 진행 상태에 따라 입금률 / 지출률로 표현 */}
+											{/* ✅ 진행 상태에 따라 입금률 또는 잔액률로 그래프 반영 */}
 											<div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
 												<div
 													className="h-full bg-primary rounded-full"
 													style={{
-														width: `${
-															isUpcoming
-																? paidPercent
-																: usedPercent > 0
-																	? usedPercent
-																	: paidPercent
-														}%`,
+														width: `${isUpcoming ? paidPercent : balancePercent}%`,
 													}}
 												/>
 											</div>
 
-											{/* ✅ 텍스트도 입금액 → 잔액으로 변경 */}
+											{/* ✅ 예산 표시도 입금액 또는 잔액으로 구분 */}
 											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												{isUpcoming || usedPercent === 0
+												{isUpcoming || balancePercent === 100
 													? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
 													: `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
 											</p>

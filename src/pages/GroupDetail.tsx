@@ -6,6 +6,7 @@ import {
 	doc,
 	getDoc,
 	getDocs,
+	increment,
 	limit,
 	orderBy,
 	query,
@@ -85,11 +86,7 @@ export default function GroupDetail() {
 		"엑티비티",
 		"기타",
 	]);
-	// const [newCategory, setNewCategory] = useState<string>("");
-	// const [expenseCategory, setExpenseCategory] = useState("");
-	// const [expenseAmount, setExpenseAmount] = useState("");
-	// const [expenseMemo, setExpenseMemo] = useState("");
-	// const [expenseDate, setExpenseDate] = useState("");
+
 	const [editMode, setEditMode] = useState(false);
 	const [selectedExpenseIds, setSelectedExpenseIds] = useState<string[]>([]);
 	const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
@@ -139,42 +136,6 @@ export default function GroupDetail() {
 		if (!groupId) return;
 		fetchExpenses();
 	}, [groupId, fetchExpenses]);
-
-	// const handleAddExpense = async () => {
-	// 	if (
-	// 		!groupId ||
-	// 		!uid ||
-	// 		!expenseDate ||
-	// 		!expenseAmount ||
-	// 		!expenseCategory ||
-	// 		!newCategory
-	// 	) {
-	// 		alert("모든 항목을 입력해주세요!");
-	// 		return;
-	// 	}
-
-	// 	try {
-	// 		const expensesRef = collection(db, "groups", groupId, "expenses");
-	// 		await addDoc(expensesRef, {
-	// 			date: expenseDate,
-	// 			amount: Number(expenseAmount),
-	// 			category: expenseCategory,
-	// 			memo: expenseMemo,
-	// 			author: uid,
-	// 			createdAt: new Date(),
-	// 		});
-
-	// 		alert("지출이 등록되었습니다.");
-	// 		setExpenseDate("");
-	// 		setExpenseAmount("");
-	// 		setExpenseCategory("");
-	// 		setExpenseMemo("");
-
-	// 		await fetchExpenses();
-	// 	} catch (error) {
-	// 		console.error("지출 등록 실패: ", error);
-	// 	}
-	// };
 
 	const toggleExpenseSelection = (id: string) => {
 		setSelectedExpenseIds((prev) =>
@@ -387,46 +348,30 @@ export default function GroupDetail() {
 		}
 	};
 
-	// 입금하기 로직
-	// const handleDeposit = async () => {
-	// 	if (!groupId || !user || !groupData) return;
-
-	// 	const amount = Math.floor(
-	// 		groupData.totalBudget / groupData.participantCount,
-	// 	);
-
-	// 	try {
-	// 		await depositToGroup(groupId, user.uid, amount);
-	// 		setHasPaid(true);
-
-	// 		// 그룹 데이터 재조회 (groupData 갱신)
-	// 		const docSnap = await getDoc(doc(db, "groups", groupId));
-	// 		if (docSnap.exists()) {
-	// 			const data = docSnap.data() as Omit<Group, "id">;
-	// 			setGroupData({ id: docSnap.id, ...data });
-	// 		}
-	// 	} catch (error) {
-	// 		console.error("입금 실패:", error);
-	// 		alert("입금 중 문제가 발생했습니다.");
-	// 	}
-	// };
-
 	if (!groupData) return <p>로딩중 ..</p>;
 
+	// 현재 시점 기준으로 모임 시작일 이전인지 여부 true면 모집중, false이면 진행중..
 	const now = new Date();
 	const start = new Date(groupData.startDate);
 	const isUpcoming = start > now;
 
+	// 전체 참여자 수, 입금 완료한 참여자 수
 	const participantCount = groupData.participantCount ?? 0;
 	const paidCount = groupData.paidParticipants?.length ?? 0;
+
+	// 입금한 인원 비율
 	const paidPercent = participantCount
 		? Math.floor((paidCount / participantCount) * 100)
 		: 0;
 
-	const budgetUsed = groupData.totalBudget - groupData.balance;
-	const usedPercent = Math.floor(
-		(budgetUsed / groupData.totalBudget) * 100 || 0,
-	);
+	// 지출한 금액/비율
+	const remainingPercent =
+		groupData.totalBudget > 0
+			? Math.floor((groupData.balance / groupData.totalBudget) * 100)
+			: 0;
+
+	const graphWidth = isUpcoming ? paidPercent : remainingPercent;
+
 	const eachFee =
 		participantCount > 0
 			? Math.floor(groupData.totalBudget / participantCount)
@@ -632,7 +577,7 @@ export default function GroupDetail() {
 								<div
 									className="h-full bg-primary rounded-full"
 									style={{
-										width: `${isUpcoming ? paidPercent : usedPercent > 0 ? usedPercent : paidPercent}%`,
+										width: `${graphWidth}%`,
 									}}
 								/>
 							</div>
@@ -831,8 +776,7 @@ export default function GroupDetail() {
 										const expensesRef = collection(
 											db,
 											"groups",
-											// biome-ignore lint/style/noNonNullAssertion: <explanation>
-											groupId!,
+											groupId,
 											"expenses",
 										);
 										await addDoc(expensesRef, {
@@ -843,7 +787,18 @@ export default function GroupDetail() {
 											author: uid,
 											createdAt: new Date(),
 										});
+
+										// 🔽 예산 잔액 차감 로직 추가
+										const groupRef = doc(db, "groups", groupId);
+										await updateDoc(groupRef, {
+											balance: increment(-amount), // Firestore 내장 함수로 차감
+										});
+
 										await fetchExpenses();
+										alert("지출이 등록되었습니다.");
+									}}
+									onSuccess={() => {
+										// 폼 초기화는 ExpenseForm 내부에서 reset() 호출됨
 									}}
 									categories={categories}
 									setCategories={setCategories}
