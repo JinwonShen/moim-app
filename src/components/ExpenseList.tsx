@@ -54,12 +54,18 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
   const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = sorted.slice(startIndex, startIndex + itemsPerPage);
+  const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-4">
+      <div className="flex justify-between items-center mt-[48px] mb-[12px]">
+				<h2 className="text-lg font-bold">
         {format(selectedMonth, "yyyy년 MM월")} 지출 내역
-      </h2>
+				</h2>
+				<div className="text-right text-[16px] font-bold">
+					총 지출: {totalAmount.toLocaleString()}원
+				</div>
+			</div>
 
       <ul className="w-full border rounded-[8px]">
         {/* 헤더 타이틀 */}

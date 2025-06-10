@@ -54,7 +54,7 @@ export default function MonthlyCalendar({
   const start = startOfMonth(selectedMonth);
   const end = endOfMonth(selectedMonth);
   const days = eachDayOfInterval({ start, end });
-  const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
+  // const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   const getExpenseTotal = (dateStr: string) =>
     expenses
@@ -145,9 +145,9 @@ export default function MonthlyCalendar({
       </div>
 
       {/* ✅ 하단 총 지출 표시 */}
-      <div className="text-right mt-[24px] text-[16px] font-bold">
+      {/* <div className="text-right mt-[24px] text-[16px] font-bold">
         총 지출: {totalAmount.toLocaleString()}원
-      </div>
+      </div> */}
     </div>
   );
 }

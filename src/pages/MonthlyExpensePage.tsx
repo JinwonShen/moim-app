@@ -87,6 +87,7 @@ export default function MonthlyExpensePage() {
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
           />
+          <div className="my-[24px]" />
           <ExpenseList
             groupId={selectedGroup.id}
             selectedMonth={selectedMonth}

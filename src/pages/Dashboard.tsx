@@ -1,8 +1,12 @@
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MonthSummary from "../components/DashboardSummary";
+import DepositReminder from "../components/DepositReminder";
 import FloatingButton from "../components/FloatingButton";
 import DepositModal from "../components/modal/DepositModal";
+import NoticeSummary from "../components/NoticeSummary";
+import RecentExpenses from "../components/RecentExpenses";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
 import { useExpenseStore } from "../store/expenseStore";
@@ -61,304 +65,334 @@ export default function Dashboard() {
 		if (uid) fetchGroups(uid);
 	}, [uid, fetchGroups]);
 
+	useEffect(() => {
+  const now = new Date();
+  const progressingGroups = [...myGroups, ...joinedGroups].filter((group) => {
+    const start = new Date(group.startDate);
+    const end = new Date(group.endDate);
+    return now >= start && now <= end;
+  });
+
+  if (progressingGroups.length > 0 && !selectedGroupId) {
+    const sorted = progressingGroups.sort(
+      (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    );
+    setSelectedGroupId(sorted[0].id);
+  }
+}, [myGroups, joinedGroups]);
+
 	if (loading) return <p>로딩중...</p>;
 
 	return (
-		<div>
-			{/* <Sidebar /> */}
-			<div>
-				{/* <Header /> */}
-				<main className="flex flex-col flex-wrap flex-1 gap-[24px] max-h-[900px]">
-					{/* 내가 만든 모임 */}
-					<section className="w-[calc(50%-12px)] min-h-[150px] max-h-[300px] h-full p-[24px] border border-secondary-200 rounded-[8px]">
-						<h2 className="text-[14px] mb-[12px]">내가 만든 모임</h2>
-						<div className="flex flex-col gap-[12px]">
-							{myGroups.length === 0 ? (
-								<>
-									<p className="font-bold">아직 생성된 모임이 없어요! 👍</p>
-									<button
-										type="button"
-										className="button w-full mt-[24px] px-[24px] py-[8px] text-[14px]"
-										onClick={() => navigate("/group/create")}
-									>
-										새 모임 만들기
-									</button>
-								</>
-							) : (
-								myGroups.map((group) => {
-									const now = new Date();
-									const start = new Date(group.startDate);
-									const isUpcoming = start > now;
-									const status = isUpcoming ? "모집중" : "진행중";
+    <div>
+      {/* <Sidebar /> */}
+      <div>
+        {/* <Header /> */}
+        <main className="flex flex-col flex-wrap flex-1 gap-[24px] max-h-[1000px]">
+          {/* 내가 만든 모임 */}
+          <section className="w-[calc(50%-12px)] min-h-[150px] max-h-[300px] h-full p-[24px] border border-secondary-200 rounded-[8px]">
+            <h2 className="text-[14px] mb-[12px]">내가 만든 모임</h2>
+            <div className="flex flex-col gap-[12px]">
+              {myGroups.length === 0 ? (
+                <>
+                  <p className="font-bold">아직 생성된 모임이 없어요! 👍</p>
+                  <button
+                    type="button"
+                    className="button w-full mt-[24px] px-[24px] py-[8px] text-[14px]"
+                    onClick={() => navigate("/group/create")}
+                  >
+                    새 모임 만들기
+                  </button>
+                </>
+              ) : (
+                myGroups.map((group) => {
+                  const now = new Date();
+                  const start = new Date(group.startDate);
+                  const isUpcoming = start > now;
+                  const status = isUpcoming ? "모집중" : "진행중";
 
-									// 🔹 참여자 수
-									const participantCount = group.participantCount ?? 0;
+                  // 🔹 참여자 수
+                  const participantCount = group.participantCount ?? 0;
 
-									// 🔹 입금 완료된 인원 수
-									const paidCount = group.paidParticipants?.length ?? 0;
+                  // 🔹 입금 완료된 인원 수
+                  const paidCount = group.paidParticipants?.length ?? 0;
 
-									// 🔹 입금 비율 (모임 시작 전에는 이걸로 표시)
-									const paidPercent =
-										participantCount > 0
-											? Math.floor((paidCount / participantCount) * 100)
-											: 0;
+                  // 🔹 입금 비율 (모임 시작 전에는 이걸로 표시)
+                  const paidPercent =
+                    participantCount > 0
+                      ? Math.floor((paidCount / participantCount) * 100)
+                      : 0;
 
-									// 🔹 예산 및 잔액
-									const totalBudget = group.totalBudget ?? 0;
-									const balance = group.balance ?? 0;
+                  // 🔹 예산 및 잔액
+                  const totalBudget = group.totalBudget ?? 0;
+                  const balance = group.balance ?? 0;
 
-									// 🔹 잔액 비율 (모임 시작 후에는 이걸로 표시)
-									const balancePercent =
-										totalBudget > 0
-											? Math.floor((balance / totalBudget) * 100)
-											: 0;
+                  // 🔹 잔액 비율 (모임 시작 후에는 이걸로 표시)
+                  const balancePercent =
+                    totalBudget > 0
+                      ? Math.floor((balance / totalBudget) * 100)
+                      : 0;
 
-									// 🔹 인당 금액
-									const eachFee =
-										participantCount > 0
-											? Math.floor(totalBudget / participantCount)
-											: 0;
+                  // 🔹 인당 금액
+                  const eachFee =
+                    participantCount > 0
+                      ? Math.floor(totalBudget / participantCount)
+                      : 0;
 
-									// 🔹 총 입금액
-									const paidTotal = eachFee * paidCount;
+                  // 🔹 총 입금액
+                  const paidTotal = eachFee * paidCount;
 
-									return (
-										<div key={group.id} className="flex flex-col">
-											<div className="flex justify-between items-center mb-[8px]">
-												<h3 className="text-[16px] font-bold">
-													{group.groupName}
-												</h3>
-												<span
-													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${
-														status === "모집중"
-															? "text-primary bg-white border border-primary"
-															: "text-white bg-primary"
-													}`}
-												>
-													{status}
-												</span>
-											</div>
-											<p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
-												{group.startDate} ~ {group.endDate}
-											</p>
-											<p className="text-[14px] py-[8px]">
-												참여자: {participantCount}명 중 {paidCount}명 입금 완료
-											</p>
+                  return (
+                    <div key={group.id} className="flex flex-col">
+                      <div className="flex justify-between items-center mb-[8px]">
+                        <h3 className="text-[16px] font-bold">
+                          {group.groupName}
+                        </h3>
+                        <span
+                          className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${
+                            status === "모집중"
+                              ? "text-primary bg-white border border-primary"
+                              : "text-white bg-primary"
+                          }`}
+                        >
+                          {status}
+                        </span>
+                      </div>
+                      <p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
+                        {group.startDate} ~ {group.endDate}
+                      </p>
+                      <p className="text-[14px] py-[8px]">
+                        참여자: {participantCount}명 중 {paidCount}명 입금 완료
+                      </p>
 
-											{/* ✅ 진행 상태에 따라 입금률 / 잔액률로 표시 */}
-											<div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
-												<div
-													className="h-full bg-primary rounded-full"
-													style={{
-														width: `${isUpcoming ? paidPercent : balancePercent}%`,
-													}}
-												/>
-											</div>
+                      {/* ✅ 진행 상태에 따라 입금률 / 잔액률로 표시 */}
+                      <div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full"
+                          style={{
+                            width: `${
+                              isUpcoming ? paidPercent : balancePercent
+                            }%`,
+                          }}
+                        />
+                      </div>
 
-											{/* ✅ 텍스트도 입금액 또는 잔액 기준으로 조건 분기 */}
-											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												{isUpcoming || balancePercent === 100
-													? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
-													: `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
-											</p>
+                      {/* ✅ 텍스트도 입금액 또는 잔액 기준으로 조건 분기 */}
+                      <p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
+                        {isUpcoming || balancePercent === 100
+                          ? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
+                          : `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
+                      </p>
 
-											{/* 버튼 */}
-											<div className="flex gap-[8px]">
-												<button
-													type="button"
-													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
-													onClick={() => {
-														setDepositOpen(true);
-														if (group.id) {
-															setSelectedGroupId(group.id);
-														}
-													}}
-												>
-													입금하기
-												</button>
-												<button
-													type="button"
-													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
-													onClick={() => navigate(`/group/${group.id}`)}
-												>
-													모임 상세보기
-												</button>
-											</div>
-										</div>
-									);
-								})
+                      {/* 버튼 */}
+                      <div className="flex gap-[8px]">
+                        <button
+                          type="button"
+                          className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+                          onClick={() => {
+                            setDepositOpen(true);
+                            if (group.id) {
+                              setSelectedGroupId(group.id);
+                            }
+                          }}
+                        >
+                          입금하기
+                        </button>
+                        <button
+                          type="button"
+                          className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+                          onClick={() => navigate(`/group/${group.id}`)}
+                        >
+                          모임 상세보기
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </section>
+
+          {/* 참여 중인 모임 */}
+          <section className="w-[calc(50%-12px)] min-h-[150px] p-[24px] border border-secondary-200 rounded-[8px]">
+            <h2 className="text-[14px] mb-[12px]">참여 중인 모임</h2>
+            <div>
+              {joinedGroups.length === 0 ? (
+                <>
+                  <p className="font-bold">아직 참여중인 모임이 없어요! 🙋🏻</p>
+                  <p className="mt-[36px] mb-[12px] text-center">
+                    <span className="text-primary">❝</span> 다른 모임에
+                    참여하려면 초대를 받아야 해요.{" "}
+                    <span className="text-primary">❞</span>
+                  </p>
+                </>
+              ) : (
+                joinedGroups.map((group) => {
+                  const now = new Date();
+                  const start = new Date(group.startDate);
+                  const isUpcoming = start > now;
+                  const status = isUpcoming ? "모집중" : "진행중";
+
+                  // 🔹 참여자 수
+                  const participantCount = group.participantCount ?? 0;
+
+                  // 🔹 입금 완료된 인원 수
+                  const paidCount = group.paidParticipants?.length ?? 0;
+
+                  // 🔹 입금 비율 (모임 시작 전에는 이걸로 퍼센트 표시)
+                  const paidPercent =
+                    participantCount > 0
+                      ? Math.floor((paidCount / participantCount) * 100)
+                      : 0;
+
+                  // 🔹 예산 및 잔액
+                  const totalBudget = group.totalBudget ?? 0;
+                  const balance = group.balance ?? 0;
+
+                  // 🔹 잔액 비율 (진행 중인 모임에서는 이걸로 퍼센트 표시)
+                  const balancePercent =
+                    totalBudget > 0
+                      ? Math.floor((balance / totalBudget) * 100)
+                      : 0;
+
+                  // 🔹 인당 금액 (총예산 / 참여자 수)
+                  const eachFee =
+                    participantCount > 0
+                      ? Math.floor(totalBudget / participantCount)
+                      : 0;
+
+                  // 🔹 총 입금된 금액
+                  const paidTotal = eachFee * paidCount;
+
+                  return (
+                    <div key={group.id} className="flex flex-col">
+                      <div className="flex justify-between items-center mb-[8px]">
+                        <h3 className="text-[16px] font-bold">
+                          {group.groupName}
+                        </h3>
+                        <span
+                          className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${
+                            status === "모집중"
+                              ? "text-primary bg-white border border-primary"
+                              : "text-white bg-primary"
+                          }`}
+                        >
+                          {status}
+                        </span>
+                      </div>
+
+                      <p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
+                        {group.startDate} ~ {group.endDate}
+                      </p>
+
+                      <p className="text-[14px] py-[8px]">
+                        참여자: {participantCount}명 중 {paidCount}명 입금 완료
+                      </p>
+
+                      {/* ✅ 진행 상태에 따라 입금률 또는 잔액률로 그래프 반영 */}
+                      <div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full"
+                          style={{
+                            width: `${
+                              isUpcoming ? paidPercent : balancePercent
+                            }%`,
+                          }}
+                        />
+                      </div>
+
+                      {/* ✅ 예산 표시도 입금액 또는 잔액으로 구분 */}
+                      <p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
+                        {isUpcoming || balancePercent === 100
+                          ? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
+                          : `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
+                      </p>
+
+                      {/* ✅ 버튼 */}
+                      <div className="flex gap-[8px]">
+                        <button
+                          type="button"
+                          className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+                          onClick={() => {
+                            setDepositOpen(true);
+                            if (group.id) setSelectedGroupId(group.id);
+                          }}
+                        >
+                          입금하기
+                        </button>
+                        <button
+                          type="button"
+                          className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
+                          onClick={() => navigate(`/group/${group.id}`)}
+                        >
+                          모임 상세보기
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </section>
+
+          {/* 입금 요청 예약 */}
+          <section className="w-[calc(50%-12px)] h-[200px] p-[24px] border border-secondary-200 rounded-[8px]">
+            <h2 className="text-[14px] mb-[12px]">입금 요청 예약</h2>
+            <div>
+							{selectedGroupId && <DepositReminder />}
+						</div>
+          </section>
+
+          {/* 이번 달 지출 */}
+          <section className="w-[calc(50%-12px)] p-[24px] border border-secondary-200 rounded-[8px]">
+            <h2 className="text-[14px] mb-[12px]">이번 달 지출</h2>
+            <div>
+              {selectedGroupId && <MonthSummary groupId={selectedGroupId} />}
+            </div>
+          </section>
+
+          {/* 최근 지출 내역 */}
+          <section className="w-[calc(50%-12px)] p-[24px] border border-secondary-200 rounded-[8px]">
+            <h2 className="text-[14px] mb-[12px]">최근 지출 내역</h2>
+            <div>
+              {selectedGroupId && <RecentExpenses groupId={selectedGroupId} />}
+            </div>
+          </section>
+
+          {/* 공지 알림 */}
+          <section className="w-[calc(50%-12px)] min-h-[200px] p-[24px] border border-secondary-200 rounded-[8px]">
+            <h2 className="text-[14px] mb-[12px]">공지사항</h2>
+            <div>
+							{selectedGroupId && (
+								<NoticeSummary />
 							)}
 						</div>
-					</section>
+          </section>
+        </main>
 
-					{/* 참여 중인 모임 */}
-					<section className="w-[calc(50%-12px)] min-h-[150px] p-[24px] border border-secondary-200 rounded-[8px]">
-						<h2 className="text-[14px] mb-[12px]">참여 중인 모임</h2>
-						<div>
-							{joinedGroups.length === 0 ? (
-								<>
-									<p className="font-bold">아직 참여중인 모임이 없어요! 🙋🏻</p>
-									<p className="mt-[36px] mb-[12px] text-center">
-										<span className="text-primary">❝</span> 다른 모임에
-										참여하려면 초대를 받아야 해요.{" "}
-										<span className="text-primary">❞</span>
-									</p>
-								</>
-							) : (
-								joinedGroups.map((group) => {
-									const now = new Date();
-									const start = new Date(group.startDate);
-									const isUpcoming = start > now;
-									const status = isUpcoming ? "모집중" : "진행중";
-
-									// 🔹 참여자 수
-									const participantCount = group.participantCount ?? 0;
-
-									// 🔹 입금 완료된 인원 수
-									const paidCount = group.paidParticipants?.length ?? 0;
-
-									// 🔹 입금 비율 (모임 시작 전에는 이걸로 퍼센트 표시)
-									const paidPercent =
-										participantCount > 0
-											? Math.floor((paidCount / participantCount) * 100)
-											: 0;
-
-									// 🔹 예산 및 잔액
-									const totalBudget = group.totalBudget ?? 0;
-									const balance = group.balance ?? 0;
-
-									// 🔹 잔액 비율 (진행 중인 모임에서는 이걸로 퍼센트 표시)
-									const balancePercent =
-										totalBudget > 0
-											? Math.floor((balance / totalBudget) * 100)
-											: 0;
-
-									// 🔹 인당 금액 (총예산 / 참여자 수)
-									const eachFee =
-										participantCount > 0
-											? Math.floor(totalBudget / participantCount)
-											: 0;
-
-									// 🔹 총 입금된 금액
-									const paidTotal = eachFee * paidCount;
-
-									return (
-										<div key={group.id} className="flex flex-col">
-											<div className="flex justify-between items-center mb-[8px]">
-												<h3 className="text-[16px] font-bold">
-													{group.groupName}
-												</h3>
-												<span
-													className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${
-														status === "모집중"
-															? "text-primary bg-white border border-primary"
-															: "text-white bg-primary"
-													}`}
-												>
-													{status}
-												</span>
-											</div>
-
-											<p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">
-												{group.startDate} ~ {group.endDate}
-											</p>
-
-											<p className="text-[14px] py-[8px]">
-												참여자: {participantCount}명 중 {paidCount}명 입금 완료
-											</p>
-
-											{/* ✅ 진행 상태에 따라 입금률 또는 잔액률로 그래프 반영 */}
-											<div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
-												<div
-													className="h-full bg-primary rounded-full"
-													style={{
-														width: `${isUpcoming ? paidPercent : balancePercent}%`,
-													}}
-												/>
-											</div>
-
-											{/* ✅ 예산 표시도 입금액 또는 잔액으로 구분 */}
-											<p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-												{isUpcoming || balancePercent === 100
-													? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원`
-													: `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
-											</p>
-
-											{/* ✅ 버튼 */}
-											<div className="flex gap-[8px]">
-												<button
-													type="button"
-													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
-													onClick={() => {
-														setDepositOpen(true);
-														if (group.id) setSelectedGroupId(group.id);
-													}}
-												>
-													입금하기
-												</button>
-												<button
-													type="button"
-													className="w-full py-[8px] border rounded-[8px] border-white bg-primary text-white text-[14px] hover:bg-white hover:text-primary hover:border-primary transition-all duration-300"
-													onClick={() => navigate(`/group/${group.id}`)}
-												>
-													모임 상세보기
-												</button>
-											</div>
-										</div>
-									);
-								})
-							)}
-						</div>
-					</section>
-
-					{/* 입금 요청 예약 */}
-					<section className="w-[calc(50%-12px)] h-[200px] p-[24px] border border-secondary-200 rounded-[8px]">
-						<h2 className="text-[14px] mb-[12px]">입금 요청 예약</h2>
-						<div>{/* 데이터 연동 예정 */}</div>
-					</section>
-
-					{/* 이번 달 지출 */}
-					<section className="w-[calc(50%-12px)] h-[250px] p-[24px] border border-secondary-200 rounded-[8px]">
-						<h2 className="text-[14px] mb-[12px]">이번 달 지출</h2>
-						<div>{/* 데이터 연동 예정 */}</div>
-					</section>
-
-					{/* 최근 지출 내역 */}
-					<section className="w-[calc(50%-12px)] h-[250px] p-[24px] border border-secondary-200 rounded-[8px]">
-						<h2 className="text-[14px] mb-[12px]">최근 지출 내역</h2>
-						<div>{/* 데이터 연동 예정 */}</div>
-					</section>
-
-					{/* 공지 알림 */}
-					<section className="w-[calc(50%-12px)] h-[250px] p-[24px] border border-secondary-200 rounded-[8px]">
-						<h2 className="text-[14px] mb-[12px]">공지 & 알림</h2>
-						<div>{/* 데이터 연동 예정 */}</div>
-					</section>
-				</main>
-
-				{uid && myGroups[0]?.id && (
-					<FloatingButton
-						groupId={myGroups[0].id}
-						uid={uid}
-						categories={categories}
-						setCategories={setCategories}
-						fetchExpenses={fetchExpenses}
-					/>
-				)}
-				{isDepositOpen && selectedGroupId && user?.uid && selectedGroup && (
-					<DepositModal
-						open={isDepositOpen}
-						onClose={() => setDepositOpen(false)}
-						groupId={selectedGroupId}
-						uid={user.uid}
-						creatorId={selectedGroup.creatorId}
-						groupName={selectedGroup.groupName}
-						onSuccess={() => {
-							// 입금 후 새로고침 등 처리
-						}}
-					/>
-				)}
-			</div>
-		</div>
-	);
+        {uid && myGroups[0]?.id && (
+          <FloatingButton
+            groupId={myGroups[0].id}
+            uid={uid}
+            categories={categories}
+            setCategories={setCategories}
+            fetchExpenses={fetchExpenses}
+          />
+        )}
+        {isDepositOpen && selectedGroupId && user?.uid && selectedGroup && (
+          <DepositModal
+            open={isDepositOpen}
+            onClose={() => setDepositOpen(false)}
+            groupId={selectedGroupId}
+            uid={user.uid}
+            creatorId={selectedGroup.creatorId}
+            groupName={selectedGroup.groupName}
+            onSuccess={() => {
+              // 입금 후 새로고침 등 처리
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
