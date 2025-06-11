@@ -6,13 +6,14 @@ import { useGroupStore } from "../store/groupStore";
 export default function DepositReminder() {
   const navigate = useNavigate();
   const { myGroups } = useGroupStore();
+
   const [targetGroup, setTargetGroup] = useState<null | (typeof myGroups)[0]>(null);
-  const [checked, setChecked] = useState(false); // 체크 완료 여부
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     const now = new Date();
 
-    const filtered = myGroups
+    const upcoming = myGroups
       .filter((group) => {
         if (!group.depositDeadline) return false;
 
@@ -22,23 +23,29 @@ export default function DepositReminder() {
         const dDay = differenceInCalendarDays(deadline, now);
         return dDay >= 0 && dDay <= 5;
       })
-      .sort((a, b) =>
-        new Date(a.depositDeadline!).getTime() - new Date(b.depositDeadline!).getTime()
+      .sort(
+        (a, b) =>
+          new Date(a.depositDeadline!).getTime() -
+          new Date(b.depositDeadline!).getTime()
       );
 
-    if (filtered.length > 0) {
-      setTargetGroup(filtered[0]);
+    if (upcoming.length > 0) {
+      setTargetGroup(upcoming[0]);
     }
 
-    setChecked(true); // 체크 완료됨
+    setChecked(true);
   }, [myGroups]);
 
-  if (!checked) return null; // 아직 검사 중이면 아무것도 표시하지 않음
+  // ✅ 로딩 중
+  if (!checked) return null;
 
+  // ✅ 입금 요청 대상 모임 없음
   if (!targetGroup || !targetGroup.depositDeadline) {
     return (
-      <div className="text-[14px]">
-        현재 입금 요청이 필요한 모임이 없습니다.
+      <div>
+        <p className="mt-[36px] mb-[12px] text-center text-gray-500">
+          📭 현재 입금 요청이 필요한 모임이 없습니다.
+        </p>
       </div>
     );
   }
@@ -50,18 +57,16 @@ export default function DepositReminder() {
 
   return (
     <div className="p-4 border rounded-lg shadow-sm bg-white">
-      <p className="text-[16px] font-bold text-primary mb-1">
+      <p className="text-base font-semibold text-primary mb-1">
         {targetGroup.groupName}
       </p>
-
-      <p className="text-[14px] text-gray-600 mb-1">
-        마감: D-{dDay} | 금액:{" "}
+      <p className="text-sm text-gray-600 mb-2">
+        마감일: D-{dDay} | 금액:{" "}
         {targetGroup.eachAmount
           ? `${targetGroup.eachAmount.toLocaleString()}원`
           : "미입력"}
       </p>
-
-      <div className="flex gap-2 mt-2">
+      <div className="flex gap-2">
         <button
           className="px-3 py-1 text-sm border border-primary text-primary rounded hover:bg-primary hover:text-white transition"
           onClick={() => {

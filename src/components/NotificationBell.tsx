@@ -16,7 +16,7 @@ export default function NotificationBell() {
 			<Popover.Trigger asChild>
 				<button
 					type="button"
-					className="relative rounded-[8px] p-2 hover:bg-secondary-100 transition"
+					className="relative rounded-[8px] p-2 hover:bg-gray-100 transition"
 					aria-label="알림 열기"
 				>
 					<FiBell className="w-[24px] h-[24px] font-bold text-gray-800" />

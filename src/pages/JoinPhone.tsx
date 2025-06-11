@@ -46,13 +46,13 @@ export default function JoinPhone() {
 					placeholder="휴대폰 번호 (- 없이)"
 					value={phone}
 					onChange={(e) => setPhone(e.target.value)}
-					className="w-[375px] h-[48px] mb-[8px] bg-secondary-100 pl-[24px] rounded-[8px]"
+					className="w-[375px] h-[48px] mb-[8px] bg-gray-100 pl-[24px] rounded-[8px]"
 				/>
 
 				<button
 					type="button"
 					onClick={handleSendCode}
-					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
+					className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 				>
 					인증번호 발송
 				</button>
@@ -64,12 +64,12 @@ export default function JoinPhone() {
 							placeholder="인증번호 입력"
 							value={inputCode}
 							onChange={(e) => setInputCode(e.target.value)}
-							className="w-[375px] h-[48px] mt-[8px] mb-[8px] bg-secondary-200 pl-[24px] rounded-[8px]"
+							className="w-[375px] h-[48px] mt-[8px] mb-[8px] bg-gray-200 pl-[24px] rounded-[8px]"
 						/>
 						<button
 							type="button"
 							onClick={handleVerify}
-							className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
+							className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 						>
 							인증하기
 						</button>

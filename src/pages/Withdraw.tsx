@@ -55,7 +55,7 @@ export default function Withdraw() {
 				<button
 					type="button"
 					onClick={handleWithdraw}
-					className="px-[24px] py-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+					className="px-[24px] py-[4px] border rounded-[4px] bg-gray-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
 				>
 					탈퇴하기
 				</button>

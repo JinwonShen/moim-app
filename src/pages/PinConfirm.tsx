@@ -132,7 +132,7 @@ export default function PinConfirm() {
 						disabled={pin.length !== 6}
 						className={`h-12 text-l rounded ${
 							pin.length === 6
-								? "bg-secondary-300 hover:bg-primary transition-all duration-300 hover:text-[#ffffff]"
+								? "bg-gray-300 hover:bg-primary transition-all duration-300 hover:text-[#ffffff]"
 								: "bg-gray-300 text-gray-400 cursor-not-allowed"
 						}`}
 					>

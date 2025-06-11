@@ -28,8 +28,11 @@ export default function JoinedGroups() {
 				{joinedGroups.map((group) => {
 					const now = new Date();
 					const start = new Date(group.startDate);
-					const isUpcoming = start > now;
-					const statusLabel = isUpcoming ? "모집중" : "진행중";
+					const end = new Date(group.endDate);
+					let statusLabel = "모임종료";
+					if (now < start) statusLabel = "모집중";
+					else if (now >= start && now <= end) statusLabel = "진행중";
+					const isClosed = statusLabel === "모임종료";
 
 					const participantCount = group.participantCount ?? 0;
 					const paidCount = group.paidParticipants?.length ?? 0;
@@ -80,22 +83,22 @@ export default function JoinedGroups() {
 									<span className="flex-[1]">{/*  */}</span>
 									<button
 										type="button"
-										onClick={() => navigate(`/group/${group.id}`)}
-										className="flex-[1] py-2 rounded-lg bg-secondary-100 text-sm transition-all duration-300 hover:bg-primary hover:text-white"
+										disabled={hasPaid || isClosed}
+										onClick={() => setSelectedGroupForDeposit(group)}
+										className={`flex-[1] py-2 rounded-lg text-sm transition-all duration-300 ${
+											hasPaid || isClosed
+												? "bg-gray-300 text-white cursor-not-allowed"
+												: "button"
+										}`}
 									>
-										상세보기
+										{hasPaid ? "입금완료" : isClosed ? "종료됨" : "입금하기"}
 									</button>
 									<button
 										type="button"
-										disabled={hasPaid}
-										onClick={() => setSelectedGroupForDeposit(group)}
-										className={`flex-[1] py-2 rounded-lg text-sm transition-all duration-300 ${
-											hasPaid
-												? "bg-gray-300 text-white cursor-not-allowed"
-												: "bg-secondary-100 hover:bg-primary hover:text-white"
-										}`}
+										onClick={() => navigate(`/group/${group.id}`)}
+										className="flex-[1] button text-[14px] transition-all duration-300"
 									>
-										{hasPaid ? "입금완료" : "입금하기"}
+										상세보기
 									</button>
 								</div>
 							</div>

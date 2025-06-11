@@ -69,7 +69,7 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
 
       <ul className="w-full border rounded-[8px]">
         {/* 헤더 타이틀 */}
-        <li className="grid grid-cols-4 px-[12px] py-[8px] text-[14px] font-semibold text-gray-700 border-b rounded-t-[8px] bg-secondary-100">
+        <li className="grid grid-cols-4 px-[12px] py-[8px] text-[14px] font-semibold text-gray-700 border-b rounded-t-[8px] bg-gray-100">
           <span>날짜</span>
           <span>분류</span>
           <span>내용</span>
@@ -118,7 +118,7 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
               onClick={() => setCurrentPage(i + 1)}
               className={`px-[12px] py-[4px] rounded ${
                 currentPage === i + 1
-                  ? "bg-secondary-100 border-primary"
+                  ? "bg-gray-100 border-primary"
                   : "hover:bg-primary"
               }`}
             >

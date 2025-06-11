@@ -26,7 +26,7 @@ export default function Header() {
 	return (
 		<header>
 			{user && (
-				<div className="w-[calc(100%-237px)] fixed flex justify-between pt-[36px] pb-[12px] bg-white z-50">
+				<div className="lg:w-[calc(100%-237px)] md:w-[calc(100%-70px)] fixed flex justify-between pt-[36px] pb-[12px] bg-white z-40">
 					<div className="flex">
 						<div>
 							<img

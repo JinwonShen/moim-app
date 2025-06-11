@@ -129,17 +129,21 @@ export default function MyPage() {
 
 		try {
 			const userRef = doc(db, "users", user.uid);
-			const accountData = {
-				bank,
-				number: accountNumber,
-				balance: parsedBalance,
-			};
-
-			await updateDoc(userRef, { account: accountData });
+			await updateDoc(userRef, {
+				account: {
+					bank,
+					number: accountNumber,
+					balance: parsedBalance,
+				},
+			});
 
 			useAuthStore.getState().setUser({
 				...user,
-				account: accountData,
+				account: {
+					bank,
+					number: accountNumber,
+					balance: parsedBalance,
+				},
 			});
 
 			setEditingAccount(false);
@@ -222,7 +226,7 @@ export default function MyPage() {
 
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
 								<span className="flex-[1]">이메일</span>
-								<span className="flex-[2]">email@email.com</span>
+								<span className="flex-[2]">{user?.email || "-"}</span>
 								<span className="flex-[1.5]">{/* 그리드용 여백 */}</span>
 							</li>
 

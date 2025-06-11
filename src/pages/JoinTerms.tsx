@@ -70,7 +70,7 @@ export default function JoinTerms() {
 			</div>
 			<button
 				type="button"
-				className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px] mt-[12px]"
+				className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px] mt-[12px]"
 				onClick={handleNext}
 			>
 				다음

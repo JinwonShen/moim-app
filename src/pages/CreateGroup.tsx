@@ -196,7 +196,7 @@ export default function CreateGroup() {
 								onClick={handleAddParticipant}
 								className="mt-[8px]"
 							>
-								<FiPlus className="text-secondary-300 text-[20px] border-secondary-300 border-[1px] rounded-full hover:text-blue-500 hover:border-blue-500 transition-all duration-300 m-auto" />
+								<FiPlus className="text-gray-300 text-[20px] border-gray-300 border-[1px] rounded-full hover:text-blue-500 hover:border-blue-500 transition-all duration-300 m-auto" />
 							</button>
 						</label>
 					</div>
@@ -250,9 +250,11 @@ export default function CreateGroup() {
 						</label>
 						<label className="flex flex-col mt-[36px]">
 							<span className="text-[14px]">약관 동의</span>
-							<textarea className="h-[124px] p-[12px] mt-[4px] border text-[14px] rounded-[4px]">
-								약관 내용
-							</textarea>
+							<textarea
+								className="h-[124px] p-[12px] mt-[4px] border text-[14px] rounded-[4px]"
+								defaultValue="약관 내용"
+								readOnly
+							/>
 							<span className="flex mt-[4px]">
 								<input
 									type="checkbox"

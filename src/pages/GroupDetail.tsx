@@ -1,17 +1,17 @@
 import {
-	type Timestamp,
-	addDoc,
-	collection,
-	deleteDoc,
-	doc,
-	getDoc,
-	getDocs,
-	increment,
-	limit,
-	orderBy,
-	query,
-	updateDoc,
-	writeBatch,
+  type Timestamp,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  increment,
+  limit,
+  orderBy,
+  query,
+  updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -697,7 +697,7 @@ export default function GroupDetail() {
                               </button>
                               <button
                                 type="button"
-                                className="text-secondary-300"
+                                className="text-gray-300"
                                 onClick={() => setEditingExpenseId(null)}
                               >
                                 취소
@@ -899,7 +899,7 @@ export default function GroupDetail() {
                               </button>
                               <button
                                 type="button"
-                                className="text-secondary-300"
+                                className="text-gray-300"
                                 onClick={() => setEditingNoticeId(null)}
                               >
                                 취소

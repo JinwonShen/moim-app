@@ -15,11 +15,17 @@ interface NoticeItem {
 export default function NoticeSummaryList() {
   const { myGroups, joinedGroups } = useGroupStore();
   const [notices, setNotices] = useState<NoticeItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllNotices = async () => {
       const allGroups = [...myGroups, ...joinedGroups];
+      if (allGroups.length === 0) {
+        setLoading(false);
+        return;
+      }
+
       const results: NoticeItem[] = [];
 
       await Promise.all(
@@ -45,35 +51,42 @@ export default function NoticeSummaryList() {
         b.createdAt.localeCompare(a.createdAt)
       );
       setNotices(sorted);
+      setLoading(false);
     };
 
     fetchAllNotices();
   }, [myGroups, joinedGroups]);
 
+  if (loading) return null;
+
+  if (notices.length === 0) {
+    return (
+      <div>
+        <p className="mt-[36px] mb-[12px] text-center text-gray-500">
+          등록된 공지사항이 없습니다.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {notices.length === 0 ? (
-        <p className="text-gray-500 text-sm">등록된 공지사항이 없습니다.</p>
-      ) : (
-        <ul className="text-sm space-y-2">
-          {notices.map((notice) => (
-            <li
-              key={notice.id}
-              onClick={() => navigate(`/group/${notice.groupId}`)}
-              className="cursor-pointer hover:bg-gray-50 px-[6px] py-[4px] rounded"
-            >
-              <span className="font-semibold text-primary mr-1">
-                [{notice.groupName}]
-              </span>
-              <span className="text-gray-700">
-                {notice.content.length > 40
-                  ? `${notice.content.slice(0, 40)}...`
-                  : notice.content}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <ul className="text-[14px]">
+      {notices.map((notice) => (
+        <li
+          key={notice.id}
+          onClick={() => navigate(`/group/${notice.groupId}`)}
+          className="cursor-pointer hover:bg-gray-50 px-[6px] py-[4px] rounded"
+        >
+          <span className="font-semibold text-primary mr-1">
+            [{notice.groupName}]
+          </span>
+          <span className="text-gray-700">
+            {notice.content.length > 40
+              ? `${notice.content.slice(0, 40)}...`
+              : notice.content}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }

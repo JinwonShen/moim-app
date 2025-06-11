@@ -13,6 +13,7 @@ import {
 	increment,
 	updateDoc,
 } from "firebase/firestore";
+import { useState } from "react";
 import { FiX } from "react-icons/fi";
 import { db } from "../../lib/firebase";
 import ExpenseForm from "../ExpenseForm";
@@ -24,6 +25,7 @@ interface Props {
 	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
 	fetchExpenses: () => Promise<void>;
 	onClose: () => void;
+	showGroupSelector?: boolean;
 }
 
 export default function AddExpenseModal({
@@ -33,7 +35,10 @@ export default function AddExpenseModal({
 	setCategories,
 	fetchExpenses,
 	onClose,
+	showGroupSelector,
 }: Props) {
+	const [selectedGroupId, setSelectedGroupId] = useState(groupId);
+
 	return (
 		<DialogOverlay className="fixed inset-0 bg-black/30 z-50">
 			<DialogContent
@@ -56,17 +61,31 @@ export default function AddExpenseModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="p-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+							className="p-[4px] border rounded-[4px] bg-gray-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
 						>
 							<FiX />
 						</button>
 					</div>
 				</div>
 
+				{showGroupSelector && (
+					<div className="mb-4">
+						<label className="block mb-1 text-sm font-medium">모임 선택</label>
+						<select
+							className="w-full border rounded px-3 py-2 text-sm"
+							onChange={(e) => setSelectedGroupId(e.target.value)}
+							defaultValue={groupId}
+						>
+							{/* Replace this with actual group list rendering if needed */}
+							<option value={groupId}>현재 모임</option>
+						</select>
+					</div>
+				)}
+
 				<ExpenseForm
 					onSubmit={async ({ date, amount, category, memo }) => {
 						try {
-							const expensesRef = collection(db, "groups", groupId, "expenses");
+							const expensesRef = collection(db, "groups", selectedGroupId, "expenses");
 
 							// 1. 지출 등록
 							await addDoc(expensesRef, {
@@ -79,7 +98,7 @@ export default function AddExpenseModal({
 							});
 
 							// 2. 잔액 차감
-							const groupRef = doc(db, "groups", groupId);
+							const groupRef = doc(db, "groups", selectedGroupId);
 							await updateDoc(groupRef, {
 								balance: increment(-amount),
 							});

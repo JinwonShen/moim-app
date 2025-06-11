@@ -9,6 +9,7 @@ type FloatingButtonProps = {
 	categories: string[];
 	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
 	fetchExpenses: () => Promise<void>;
+	showGroupSelector?: boolean;
 };
 
 export default function FloatingButton({
@@ -17,6 +18,7 @@ export default function FloatingButton({
 	categories,
 	setCategories,
 	fetchExpenses,
+	showGroupSelector,
 }: FloatingButtonProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -38,6 +40,7 @@ export default function FloatingButton({
 				setCategories={setCategories}
 				fetchExpenses={fetchExpenses}
 				onClose={() => setIsOpen(false)}
+				showGroupSelector={showGroupSelector}
 			/>
 		</Dialog.Root>
 	);

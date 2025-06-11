@@ -17,10 +17,11 @@ export default function GroupCard({
 }: GroupCardProps) {
 	const now = new Date();
 	const start = new Date(group.startDate);
-	// const end = new Date(group.endDate);
-
+	const end = new Date(group.endDate);
 	const isUpcoming = start > now;
-	const statusLabel = isUpcoming ? "모집중" : "진행중";
+	const isOngoing = now >= start && now <= end;
+	const isEnded = now > end;
+	const statusLabel = isUpcoming ? "모집중" : isOngoing ? "진행중" : "모임종료";
 
 	const participantCount = group.participantCount ?? 0;
 	const paidCount = group.paidParticipants?.length ?? 0;
@@ -31,7 +32,13 @@ export default function GroupCard({
 	return (
 		<div className="flex gap-6 p-6 border rounded-lg shadow-sm">
 			<div className="flex-shrink-0">
-				<span className="text-sm font-bold text-primary">{statusLabel}</span>
+				<span
+					className={`text-[14px] font-bold ${
+						isEnded ? "text-gray-500" : "text-primary"
+					}`}
+				>
+					{statusLabel}
+				</span>
 			</div>
 
 			<div className="w-full flex flex-col">
@@ -68,30 +75,40 @@ export default function GroupCard({
 				<div className="flex gap-3 mt-3 justify-between">
 					<button
 						type="button"
-						onClick={onClickDetail}
-						className="flex-1 py-2 rounded-lg bg-secondary-100 text-sm transition-all duration-300 hover:bg-primary hover:text-white"
-					>
-						상세보기
-					</button>
-					<button
-						type="button"
+						disabled={isEnded}
 						onClick={() => {
 							console.log("📦 지출추가 버튼 클릭됨:", group.groupName);
 							onClickAction();
 						}}
-						className="flex-1 py-2 rounded-lg bg-secondary-100 text-sm transition-all duration-300 hover:bg-primary hover:text-white"
+						className={`flex-1 py-2 rounded-lg text-sm transition-all duration-300 ${
+							isEnded
+								? "bg-gray-300 text-white cursor-not-allowed"
+								: "button"
+						}`}
 					>
 						지출추가
 					</button>
 					{isOwner && onClickManage && (
 						<button
 							type="button"
+							disabled={isEnded}
 							onClick={onClickManage}
-							className="flex-1 py-2 rounded-lg bg-secondary-100 text-sm transition-all duration-300 hover:bg-primary hover:text-white"
+							className={`flex-1 rounded-lg text-[14px] transition-all duration-300 ${
+								isEnded
+									? "bg-gray-300 text-white cursor-not-allowed"
+									: "button"
+							}`}
 						>
 							참여자 관리
 						</button>
 					)}
+					<button
+						type="button"
+						onClick={onClickDetail}
+						className="flex-1 py-2 button text-[14px] transition-all duration-300"
+					>
+						상세보기
+					</button>
 				</div>
 			</div>
 		</div>

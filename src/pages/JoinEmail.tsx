@@ -204,7 +204,7 @@ export default function JoinEmail() {
 						placeholder="이메일"
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
-						className="mb-[8px] h-[48px] bg-secondary-100 pl-[24px] rounded-[8px]"
+						className="mb-[8px] h-[48px] bg-gray-100 pl-[24px] rounded-[8px]"
 					/>
 				</label>
 
@@ -216,7 +216,7 @@ export default function JoinEmail() {
 						value={password}
 						onChange={handlePasswordChange}
 						onBlur={handlePasswordBlur}
-						className={`mb-[8px] h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px] ${
+						className={`mb-[8px] h-12 px-4 bg-gray-100 pl-[24px] rounded-[8px] ${
 							passwordTouched && passwordError ? "border border-red-500" : ""
 						} `}
 					/>
@@ -233,7 +233,7 @@ export default function JoinEmail() {
 						value={confirmPassword}
 						onChange={handleConfirmChange}
 						onBlur={handleConfirmBlur}
-						className={`mb-4 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px] ${
+						className={`mb-4 h-12 px-4 bg-gray-100 pl-[24px] rounded-[8px] ${
 							confirmTouched && confirmError ? "border border-red-500" : ""
 						}`}
 					/>
@@ -248,7 +248,7 @@ export default function JoinEmail() {
 						type="date"
 						value={birthdate}
 						onChange={(e) => setBirthdate(e.target.value)}
-						className="mb-4 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px]"
+						className="mb-4 h-12 px-4 bg-gray-100 pl-[24px] rounded-[8px]"
 					/>
 				</label>
 
@@ -260,13 +260,13 @@ export default function JoinEmail() {
 							placeholder="닉네임"
 							value={nickname}
 							onChange={handleNicknameChange}
-							className="flex-1 h-12 px-4 bg-secondary-100 pl-[24px] rounded-[8px]"
+							className="flex-1 h-12 px-4 bg-gray-100 pl-[24px] rounded-[8px]"
 						/>
 						<button
 							type="button"
 							onClick={handleCheckNickname}
 							disabled={isChecking}
-							className="px-[29px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
+							className="px-[29px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 						>
 							{isChecking ? "확인중..." : "중복확인"}
 						</button>
@@ -275,7 +275,7 @@ export default function JoinEmail() {
 
 				<button
 					type="submit"
-					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
+					className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 					onClick={handleSubmit}
 				>
 					회원가입 완료

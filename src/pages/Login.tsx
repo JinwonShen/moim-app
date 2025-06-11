@@ -64,20 +64,20 @@ export default function Login() {
 				</button>
 				<button
 					type="button"
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+					className="w-full h-[48px] mb-[8px] bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-all duration-300"
 				>
 					카카오로 시작하기
 				</button>
 				<button
 					type="button"
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-secondary-200 rounded-[8px] transition-all duration-300"
+					className="w-full h-[48px] mb-[8px] bg-gray-100 hover:bg-gray-200 rounded-[8px] transition-all duration-300"
 				>
 					네이버로 시작하기
 				</button>
 				<button
 					type="button"
 					onClick={handleGoogleLogin}
-					className="w-full h-[48px] mb-[8px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] rounded-[8px] transition-all duration-300"
+					className="w-full h-[48px] mb-[8px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] rounded-[8px] transition-all duration-300"
 				>
 					구글로 시작하기
 				</button>

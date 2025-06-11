@@ -63,19 +63,19 @@ export default function EmailLogin() {
 					placeholder="이메일을 입력해주세요."
 					value={email}
 					onChange={(e) => setEmail(e.target.value)}
-					className="w-[375px] h-[48px] mb-[8px] bg-secondary-100 pl-[24px]"
+					className="w-[375px] h-[48px] mb-[8px] bg-gray-100 pl-[24px]"
 				/>
 				<input
 					type="password"
 					placeholder="비밀번호를 입력해주세요."
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
-					className="w-[375px] h-[48px] mb-[8px] bg-secondary-100 pl-[24px]"
+					className="w-[375px] h-[48px] mb-[8px] bg-gray-100 pl-[24px]"
 				/>
 				<button
 					type="button"
 					onClick={handleLogin}
-					className="w-[375px] h-[48px] bg-secondary-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
+					className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 				>
 					로그인
 				</button>

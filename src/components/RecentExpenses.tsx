@@ -12,14 +12,22 @@ interface ExpenseItem {
 }
 
 interface RecentExpensesProps {
-  groupId: string;
+  groupId?: string; // ✅ 옵셔널로 변경
 }
 
 export default function RecentExpenses({ groupId }: RecentExpensesProps) {
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchExpenses = async () => {
+      setLoading(true);
+      if (!groupId) {
+        setExpenses([]);
+        setLoading(false);
+        return;
+      }
+
       const ref = collection(db, "groups", groupId, "expenses");
       const snapshot = await getDocs(ref);
 
@@ -40,37 +48,45 @@ export default function RecentExpenses({ groupId }: RecentExpensesProps) {
         .slice(0, 5);
 
       setExpenses(sorted);
+      setLoading(false);
     };
 
     fetchExpenses();
   }, [groupId]);
 
+  if (loading) return null;
+
+  // ✅ groupId가 없거나 내역이 없을 때
+  if (!groupId || expenses.length === 0) {
+    return (
+      <div>
+        <p className="mt-[36px] mb-[12px] text-center  text-gray-500">
+          💵 최근 지출 내역이 없습니다.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {expenses.length === 0 ? (
-        <p className="text-gray-500 text-sm">지출 내역이 없습니다.</p>
-      ) : (
-        <ul className="text-sm">
-          {expenses.map((e) => (
-            <li
-              key={e.id}
-              className="flex justify-between border-b last:border-b-0 py-[8px]"
-            >
-              <div className="flex flex-col">
-                <span className="text-gray-500 text-xs">
-                  {format(parseISO(e.date), "yyyy.MM.dd")}
-                </span>
-                <span>
-                  [{e.category}] {e.memo || "내용 없음"}
-                </span>
-              </div>
-              <div className="text-right font-semibold">
-                {e.amount.toLocaleString()}원
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <ul className="text-sm">
+      {expenses.map((e) => (
+        <li
+          key={e.id}
+          className="flex justify-between border-b last:border-b-0 py-[8px]"
+        >
+          <div className="flex flex-col">
+            <span className="text-gray-500 text-xs">
+              {format(parseISO(e.date), "yyyy.MM.dd")}
+            </span>
+            <span>
+              [{e.category}] {e.memo || "내용 없음"}
+            </span>
+          </div>
+          <div className="text-right font-semibold">
+            {e.amount.toLocaleString()}원
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }

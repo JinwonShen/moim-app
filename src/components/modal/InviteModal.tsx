@@ -39,7 +39,7 @@ export default function InviteModal({ open, onClose, groupId }: Props) {
 					<button
 						type="button"
 						onClick={onClose}
-						className="p-[4px] border rounded-[4px] bg-secondary-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+						className="p-[4px] border rounded-[4px] bg-gray-100 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
 					>
 						<FiX />
 					</button>
@@ -64,7 +64,7 @@ export default function InviteModal({ open, onClose, groupId }: Props) {
 				<button
 					type="button"
 					onClick={handleRequestPayment}
-					className="bg-secondary-300 text-white w-full py-2 rounded text-sm"
+					className="bg-gray-300 text-white w-full py-2 rounded text-sm"
 				>
 					입금 요청 알림 보내기
 				</button>
