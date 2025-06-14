@@ -26,7 +26,7 @@ export default function Header() {
 	return (
     <header>
       {user && (
-        <div className="w-full lg:w-[calc(100%-237px)] fixed flex justify-between pl-[40px] md:pl-[44px] pt-[36px] pb-[12px] bg-white z-40">
+        <div className="lg:max-w-[calc(1180px-237px)] w-full lg:w-[calc(100%-237px)] fixed flex justify-between pl-[40px] pr-[24px] md:pl-[44px] lg:pl-0 pt-[36px] pb-[12px] bg-white z-40">
           <div className="flex">
             <div>
               <img
@@ -47,7 +47,7 @@ export default function Header() {
               </p>
             </div>
           </div>
-          <div className="mr-[24px]">{user?.uid && <NotificationBell />}</div>
+          <div>{user?.uid && <NotificationBell />}</div>
         </div>
       )}
     </header>

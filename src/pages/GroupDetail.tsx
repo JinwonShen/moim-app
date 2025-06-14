@@ -380,7 +380,7 @@ export default function GroupDetail() {
 
 	return (
     <div>
-      <section className="flex flex-col mt-[148px] mr-[12px] p-[24px] border rounded-[8px] text-[14px]">
+      <section className="flex flex-col mt-[148px] p-[24px] border rounded-[8px] text-[14px]">
         <div className="flex flex-col md:flex-row justify-between items-center mb-[24px]">
           <h2 className="mb-[12px] md:mb-0 font-bold text-[20px]">모임 상세보기</h2>
           <div className="w-full flex flex-wrap gap-[12px]">
