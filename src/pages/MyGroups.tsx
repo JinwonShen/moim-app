@@ -35,10 +35,10 @@ export default function MyGroups() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold mb-[12px] pb-[12px] border-b-[1px]">
+			<h1 className="text-[16px] md:text-[20px] font-bold mb-[12px] pb-[12px] border-b-[1px]">
 				내가 만든 모임
 			</h1>
-			<p className="mb-[24px] text-gray-500">총 모임 {myGroups.length}건</p>
+			<p className="mb-[12px] md:mb-[24px] text-gray-500 text-[14px] md:text-[16px]">총 모임 {myGroups.length}건</p>
 
 			<div className="space-y-4">
 				{myGroups.map((group) => (

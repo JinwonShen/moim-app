@@ -60,7 +60,7 @@ export default function RecentExpenses({ groupId }: RecentExpensesProps) {
   if (!groupId || expenses.length === 0) {
     return (
       <div>
-        <p className="mt-[36px] mb-[12px] text-center  text-gray-500">
+        <p className="mt-[36px] mb-[12px] text-center  text-gray-500 text-[14px] md:text-[16px]">
           💵 최근 지출 내역이 없습니다.
         </p>
       </div>

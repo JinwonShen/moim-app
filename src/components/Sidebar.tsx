@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
-	FiBarChart2,
-	FiGrid,
-	FiInfo,
-	FiMenu,
-	FiUser,
-	FiUsers,
-	FiX
+  FiBarChart2,
+  FiGrid,
+  FiInfo,
+  FiMenu,
+  FiUser,
+  FiUsers,
+  FiX
 } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../lib/auth";
@@ -50,16 +50,16 @@ export default function Sidebar() {
 			{!open && (
 				<button
 					onClick={() => setOpen(true)}
-					className="fixed top-[36px] left-[16px] z-50 p-[8px] lg:hidden"
+					className="fixed top-[36px] left-[12px] z-50 p-[4px] lg:hidden"
 				>
 					<FiMenu size={24} />
 				</button>
 			)}
       <header
         ref={sidebarRef}
-        className={`max-w-[225px] w-full h-[100vh] overflow-y-auto fixed pt-[60px] pl-[24px] bg-white border-r-[1px] border-gray-200 z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`max-w-[225px] w-full h-[100vh] overflow-y-auto fixed pt-[24px] pl-[24px] bg-white border-r-[1px] border-gray-200 z-50 transform transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        } lg:translate-x-0 lg:pt-[36px]`}
       >
 				<button
 					onClick={() => setOpen(false)}
@@ -76,6 +76,7 @@ export default function Sidebar() {
                 viewBox="0 0 224 73"
                 fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
+								className="w-[100px] h-[40px] md:w-[125px] md:h-[50px]"
               >
                 <title>moim</title>
                 <path
@@ -99,15 +100,15 @@ export default function Sidebar() {
           </h1>
         </span>
         {/* 대시보드 */}
-        <div className="mt-[82px] mb-[20px]">
+        <div className="mt-[48px] mb-[20px]">
           <ul>
             <li
               className={`flex cursor-pointer hover:text-primary hover:font-semibold font-bold transition-all duration-300 ${
                 isActive("/dashboard") ? "text-primary font-bold" : ""
               }`}
             >
-              <FiGrid className="text-[20px]" />
-              <h3 className="pl-[8px] font-bold">
+              <FiGrid className="text-[18px] md:text-[20px]" />
+              <h3 className="pl-[8px] font-bold text-[14px] md:text-[16px]">
                 <button type="button" onClick={() => navigate("/dashboard")}>
                   대시보드
                 </button>
@@ -120,11 +121,11 @@ export default function Sidebar() {
         <div className="mb-[20px]">
           <ul>
             <li className="flex cursor-pointer">
-              <FiUser className="text-[20px]" />
-              <h3 className="pl-[8px] mb-[4px] font-bold">내 정보</h3>
+              <FiUser className="text-[18px] md:text-[20px]" />
+              <h3 className="pl-[8px] mb-[4px] font-bold text-[14px] md:text-[16px]">내 정보</h3>
             </li>
             <li
-              className={`ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold ${
+              className={`ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold text-[14px] md:text-[16px] ${
                 isActive("/mypage") ? "pl-[16px] text-primary font-semibold" : ""
               }`}
             >
@@ -139,11 +140,11 @@ export default function Sidebar() {
         <div className="mb-[20px]">
           <ul>
             <li className="flex cursor-pointer">
-              <FiUsers className="text-[20px]" />
-              <h3 className="pl-[8px] mb-[4px] font-bold">모임 관리</h3>
+              <FiUsers className="text-[18px] md:text-[20px]" />
+              <h3 className="pl-[8px] mb-[4px] font-bold text-[14px] md:text-[16px]">모임 관리</h3>
             </li>
             <li
-              className={`ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold ${
+              className={`ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold text-[14px] md:text-[16px] ${
                 isActive("/mygroup") ? "pl-[16px] text-primary font-semibold" : ""
               }`}
             >
@@ -152,7 +153,7 @@ export default function Sidebar() {
               </button>
             </li>
             <li
-              className={`ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold ${
+              className={`ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold text-[14px] md:text-[16px] ${
                 isActive("/joinedgroup") ? "pl-[16px] text-primary font-semibold" : ""
               }`}
             >
@@ -161,7 +162,7 @@ export default function Sidebar() {
               </button>
             </li>
             <li
-              className={`ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold ${
+              className={`ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold text-[14px] md:text-[16px] ${
                 isActive("/group/create") ? "pl-[16px] text-primary font-semibold" : ""
               }`}
             >
@@ -176,11 +177,11 @@ export default function Sidebar() {
         <div className="mb-[20px]">
           <ul>
             <li className="flex cursor-pointer">
-              <FiBarChart2 className="text-[20px]" />
-              <h3 className="pl-[8px] mb-[4px] font-bold">지출 통계</h3>
+              <FiBarChart2 className="text-[16px] md:text-[20px]" />
+              <h3 className="pl-[8px] mb-[4px] font-bold text-[14px] md:text-[16px]">지출 통계</h3>
             </li>
             <li
-              className={`ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold ${
+              className={`ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold text-[14px] md:text-[16px] ${
                 isActive("/monthlyexpensepage") ? "pl-[16px] text-primary font-semibold" : ""
               }`}
             >
@@ -189,7 +190,7 @@ export default function Sidebar() {
               </button>
             </li>
             <li
-              className={`ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold ${
+              className={`ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-primary hover:font-semibold text-[14px] md:text-[16px] ${
                 isActive("/monthlygraphpage") ? "pl-[16px] text-primary font-semibold" : ""
               }`}
             >
@@ -204,13 +205,13 @@ export default function Sidebar() {
         <div className="mb-[20px]">
           <ul>
             <li className="flex cursor-pointer">
-              <FiInfo className="text-[20px]" />
-              <h3 className="pl-[8px] mb-[4px] font-bold">고객지원</h3>
+              <FiInfo className="text-[16px] md:text-[20px]" />
+              <h3 className="pl-[8px] mb-[4px] font-bold text-[14px] md:text-[16px]">고객지원</h3>
             </li>
-            <li className="ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-[#000]">
+            <li className="ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-[#000] text-[14px] md:text-[16px]">
               고객센터
             </li>
-            <li className="ml-[20px] mr-[20px] p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-[#000]">
+            <li className="ml-[20px] mr-[20px] p-[4px] md:p-[8px] transition-all cursor-pointer hover:pl-[16px] hover:text-[#000] text-[14px] md:text-[16px]">
               문의하기
             </li>
           </ul>
@@ -219,7 +220,7 @@ export default function Sidebar() {
         {/* 로그아웃 */}
         <div className="mb-[20px]">
           <ul>
-            <li className="flex cursor-pointer hover:text-primary hover:font-semibold font-bold transition-all duration-300">
+            <li className="flex cursor-pointer hover:text-primary hover:font-semibold text-[14px] md:text-[16px] font-bold transition-all duration-300">
               <FiX className="text-[20px]" />
               <h3 className="pl-[8px] font-bold">
                 <button type="button" onClick={handleLogout}>

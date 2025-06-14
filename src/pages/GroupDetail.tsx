@@ -381,16 +381,16 @@ export default function GroupDetail() {
 	return (
     <div>
       <section className="flex flex-col mt-[148px] mr-[12px] p-[24px] border rounded-[8px] text-[14px]">
-        <div className="flex justify-between items-center mb-[24px]">
-          <h2 className="font-bold text-[20px]">모임 상세보기</h2>
-          <div className="flex gap-[12px]">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-[24px]">
+          <h2 className="mb-[12px] md:mb-0 font-bold text-[20px]">모임 상세보기</h2>
+          <div className="w-full flex flex-wrap gap-[12px]">
             {/* ✅ 모두에게 보이는 입금 버튼 */}
             {/* {!hasPaid && (
 						)} */}
             <button
               type="button"
               onClick={() => setIsDepositOpen(true)}
-              className={`button px-[24px] py-[4px] ${
+              className={`button w-[calc(50%-6px)] md:w-auto md:px-[24px] py-[4px] ${
                 hasPaid ? "bg-gray-300 text-gray-500 cursor-not-allowed" : ""
               }`}
               disabled={hasPaid}
@@ -404,7 +404,7 @@ export default function GroupDetail() {
                 {/* 참여자 관리 */}
                 <button
                   type="button"
-                  className="button px-[24px] py-[4px]"
+                  className="button w-[calc(50%-6px)] md:w-auto md:px-[24px] py-[4px]"
                   onClick={() => setIsInviteOpen(true)}
                 >
                   참여자 관리
@@ -415,14 +415,14 @@ export default function GroupDetail() {
                   <>
                     <button
                       type="button"
-                      className="button px-[24px] py-[4px]"
+                      className="button w-[calc(50%-6px)] md:w-auto md:px-[24px] py-[4px]"
                       onClick={handleEditToggle}
                     >
                       수정
                     </button>
                     <button
                       type="button"
-                      className="button px-[24px] py-[4px]"
+                      className="button w-[calc(50%-6px)] md:w-auto md:px-[24px] py-[4px]"
                       onClick={handleDelete}
                     >
                       삭제
@@ -432,14 +432,14 @@ export default function GroupDetail() {
                   <>
                     <button
                       type="button"
-                      className="button px-[24px] py-[4px]"
+                      className="button w-[calc(50%-6px)] md:w-auto md:px-[24px] py-[4px]"
                       onClick={handleSave}
                     >
                       저장
                     </button>
                     <button
                       type="button"
-                      className="button px-[24px] py-[4px]"
+                      className="button w-[calc(50%-6px)] md:w-auto md:px-[24px] py-[4px]"
                       onClick={handleCancelEdit}
                     >
                       취소
@@ -451,11 +451,11 @@ export default function GroupDetail() {
           </div>
         </div>
         {/* 모임 상세보기 */}
-        <div className="flex flex-wrap gap-[24px] mb-[48px]">
+        <div className="flex flex-col md:flex-row flex-wrap gap-[24px] mb-[24px] md:mb-[48px]">
           {/* 좌측(모임 이름, 설명, 모임 장, 예산) */}
-          <div className="flex-[2] flex flex-col gap-[24px]">
+          <div className="md:flex-[2] flex flex-col gap-[24px]">
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">모임 이름</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">모임 이름</span>
               {isEditing ? (
                 <input
                   type="text"
@@ -472,7 +472,7 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">모임 설명</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">모임 설명</span>
               {isEditing ? (
                 <input
                   type="text"
@@ -489,11 +489,11 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">모임 장</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">모임 장</span>
               <span className="flex-[4]">{ownerNickname}</span>
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">총 예산</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">총 예산</span>
               {isEditing ? (
                 <input
                   type="number"
@@ -518,7 +518,7 @@ export default function GroupDetail() {
           {/* 우측(모임 기간, 입금 마감일, 참여자, 예산 그래프) */}
           <div className="flex flex-col flex-[3] gap-[24px]">
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">모임 기간</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">모임 기간</span>
               {isEditing ? (
                 <div className="flex-[4]">
                   <span className="flex gap-[8px]">
@@ -551,7 +551,7 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">입금 마감일</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">입금 마감일</span>
               {isEditing ? (
                 <input
                   type="date"
@@ -568,7 +568,7 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[1] font-semibold">모임 참여자</span>
+              <span className="flex-[2] md:`flex-[1] font-semibold">모임 참여자</span>
               <span className="flex-[4]">
                 {participantCount}명 중 {paidCount}명 입금 완료
               </span>

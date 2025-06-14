@@ -8,7 +8,7 @@ export default function JoinSuccess() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center">
+		<div className="min-h-screen px-[24px] md:px-0 flex items-center justify-center">
 			<span className="w-[225px] mb-[48px]">
 				<svg
 					width="144"

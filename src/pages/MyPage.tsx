@@ -172,29 +172,29 @@ export default function MyPage() {
 	};
 
 	return (
-		<div>
+		<div className="text-[14px] md:[text-[16px]">
 			<section className="h-auto flex flex-col">
-				<h1 className="font-bold">마이페이지</h1>
+				<h1 className="font-bold text-[16px] md:text-[20px]">마이페이지</h1>
 				<main className="mt-[8px] w-full border">
-					<div className="p-[48px] pb-0">
+					<div className="p-[24px] md:p-[48px] pb-0">
 						<h2 className="font-bold">사용자 정보</h2>
 						<ul className="mt-[36px]">
 							{/* 닉네임 변경 */}
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
-								<span className="flex-[1]">닉네임</span>
-								<span className="flex-[2]">
+								<span className="flex-[1]">닉네임</span> 
+								<span className="flex-[1] md:flex-[2]">
 									{editingNickname ? (
 										<input
 											type="text"
 											value={newNickname}
 											onChange={(e) => setNewNickname(e.target.value)}
-											className="border px-[8px] py-[4px] focus:outline-primary"
+											className="border px-[8px] py-[4px] mr-[8px] md:mr-0 focus:outline-primary"
 										/>
 									) : (
 										user?.nickname || "사용자"
 									)}
 								</span>
-								<span className="flex-[1.5]">
+								<span className="flex-[2] md:flex-[1.5]">
 									{editingNickname ? (
 										<>
 											<button
@@ -206,7 +206,7 @@ export default function MyPage() {
 											</button>
 											<button
 												type="button"
-												className="button px-[24px] py-[8px] ml-[12px]"
+												className="button px-[24px] py-[8px] md:ml-[12px]"
 												onClick={handleNicknameCancel}
 											>
 												취소
@@ -226,8 +226,8 @@ export default function MyPage() {
 
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
 								<span className="flex-[1]">이메일</span>
-								<span className="flex-[2]">{user?.email || "-"}</span>
-								<span className="flex-[1.5]">{/* 그리드용 여백 */}</span>
+								<span className="flex-[3] md:flex-[2]">{user?.email || "-"}</span>
+								<span className="md:flex-[1.5]">{/* 그리드용 여백 */}</span>
 							</li>
 
 							{/* 패스워드 변경 */}
@@ -235,7 +235,7 @@ export default function MyPage() {
 								className={`${editingPassword ? "h-[96px] mb-[12px] flex justify-between items-center" : "h-[48px] mb-[12px] flex justify-between items-center"}`}
 							>
 								<span className="flex-[1]">비밀번호</span>
-								<span className="flex-[2]">
+								<span className="flex-[1] md:flex-[2]">
 									{editingPassword ? (
 										<span className="max-w-[300px] flex flex-col gap-[12px] pr-[12px]">
 											<input
@@ -259,7 +259,7 @@ export default function MyPage() {
 										</span>
 									) : null}
 								</span>
-								<span className="flex-[1.5]">
+								<span className="flex-[2] md:flex-[1.5]">
 									{editingPassword ? (
 										<>
 											<button
@@ -291,7 +291,7 @@ export default function MyPage() {
 						</ul>
 					</div>
 
-					<div className="p-[48px] pb-0">
+					<div className="p-[24px] md:p-[48px] pb-0">
 						<h2 className="font-bold">내 계좌 정보</h2>
 						<ul className="mt-[36px]">
 							{/* 계좌 정보 등록 및 수정 */}
@@ -301,39 +301,39 @@ export default function MyPage() {
 										<span className="flex-[1]">은행명</span>
 										<input
 											type="text"
-											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2] "
+											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[1] md:flex-[2] "
 											placeholder="예: 우리은행"
 											value={bank}
 											onChange={(e) => setBank(e.target.value)}
 										/>
-										<span className="flex-[1.5]">{/*  */}</span>
+										<span className="md:flex-[1.5]">{/*  */}</span>
 									</li>
 									<li className="h-[48px] mb-[12px] flex items-center">
 										<span className="flex-[1]">계좌번호</span>
 										<input
 											type="text"
-											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2]"
+											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[1] md:flex-[2]"
 											placeholder="123-456-789"
 											value={accountNumber}
 											onChange={(e) => setAccountNumber(e.target.value)}
 										/>
-										<span className="flex-[1.5]">{/*  */}</span>
+										<span className="md:flex-[1.5]">{/*  */}</span>
 									</li>
 									<li className="h-[48px] mb-[12px] flex items-center">
 										<span className="flex-[1]">초기잔액</span>
 										<input
 											type="number"
-											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[2]"
+											className="border px-[8px] py-[4px] focus:outline-primary mr-[12px] flex-[1] md:flex-[2]"
 											placeholder="예: 500000"
 											value={balance}
 											onChange={(e) => setBalance(e.target.value)}
 										/>
-										<span className="flex-[1.5]">{/*  */}</span>
+										<span className="md:flex-[1.5]">{/*  */}</span>
 									</li>
 									<li className="h-[48px] mb-[12px] flex items-center">
-										<span className="flex-[1]">{/*  */}</span>
-										<span className="flex-[2]">{/*  */}</span>
-										<span className="flex-[1.5]">
+										<span className="md:flex-[1]">{/*  */}</span>
+										<span className="md:flex-[2]">{/*  */}</span>
+										<span className="flex-[1] md:flex-[1.5]">
 											<button
 												type="button"
 												className="button px-[24px] py-[8px]"
@@ -355,8 +355,8 @@ export default function MyPage() {
 								<>
 									<li className="h-[48px] mb-[12px] flex justify-between items-center">
 										<span className="flex-[1]">은행</span>
-										<span className="flex-[2]">{user.account.bank}</span>
-										<span className="flex-[1.5]">
+										<span className="flex-[1] md:flex-[2]">{user.account.bank}</span>
+										<span className="flex-[2] md:flex-[1.5]">
 											<button
 												type="button"
 												className="button px-[24px] py-[8px]"
@@ -373,10 +373,10 @@ export default function MyPage() {
 									</li>
 									<li className="h-[48px] mb-[12px] flex justify-between items-center">
 										<span className="flex-[1]">잔액</span>
-										<span className="flex-[2]">
+										<span className="flex-[3] md:flex-[2]">
 											{user.account.balance.toLocaleString()} 원
 										</span>
-										<span className="flex-[1.5]">{/*  */}</span>
+										<span className="md:flex-[1.5]">{/*  */}</span>
 									</li>
 								</>
 							) : (
@@ -406,13 +406,13 @@ export default function MyPage() {
 						</ul>
 					</div>
 
-					<div className="p-[48px] pb-0">
+					<div className="p-[24px] md:p-[48px] pb-0">
 						<h2 className="font-bold">알림 설정</h2>
 						<ul className="mt-[36px]">
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
-								<span className="flex-[1]">입금 요청 알림</span>
-								<span className="flex-[2]">{/*  */}</span>
-								<span className="flex-[1.5]">
+								<span className="flex-[2] md:flex-[1]">입금 요청 알림</span>
+								<span className="md:flex-[2]">{/*  */}</span>
+								<span className="flex-[1] md:flex-[1.5]">
 									<input type="checkbox" className="switch" id="firstSwitch" />
 									<label htmlFor="firstSwitch" className="switchLabel">
 										<span className="switchButton">{/*  */}</span>
@@ -420,9 +420,9 @@ export default function MyPage() {
 								</span>
 							</li>
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
-								<span className="flex-[1]">공지사항 푸시 수신 여부 설정</span>
-								<span className="flex-[2]">{/*  */}</span>
-								<span className="flex-[1.5]">
+								<span className="flex-[2] md:flex-[1]">공지사항 푸시 수신 여부 설정</span>
+								<span className="md:flex-[2]">{/*  */}</span>
+								<span className="flex-[1] md:flex-[1.5]">
 									<input type="checkbox" className="switch" id="secondSwitch" />
 									<label htmlFor="secondSwitch" className="switchLabel">
 										<span className="switchButton">{/*  */}</span>
@@ -432,13 +432,13 @@ export default function MyPage() {
 						</ul>
 					</div>
 
-					<div className="p-[48px]">
+					<div className="p-[24px] md:p-[48px]">
 						<h2 className="font-bold">보안 설정</h2>
 						<ul className="mt-[36px]">
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
 								<span className="flex-[1]">6자리 PIN번호</span>
-								<span className="flex-[2]">{/*  */}</span>
-								<span className="flex-[1.5]">
+								<span className="flex-[1] md:flex-[2]">{/*  */}</span>
+								<span className="flex-[2] md:flex-[1.5]">
 									<button
 										type="button"
 										className="button px-[24px] py-[8px]"
@@ -450,8 +450,8 @@ export default function MyPage() {
 							</li>
 							<li className="h-[48px] mb-[12px] flex justify-between items-center">
 								<span className="flex-[1]">회원 탈퇴</span>
-								<span className="flex-[2]">{/*  */}</span>
-								<span className="flex-[1.5]">
+								<span className="flex-[1] md:flex-[2]">{/*  */}</span>
+								<span className="flex-[2] md:flex-[1.5]">
 									<button
 										type="button"
 										className="button px-[24px] py-[8px]"

@@ -59,7 +59,7 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
   return (
     <div>
       <div className="flex justify-between items-center mt-[48px] mb-[12px]">
-				<h2 className="text-lg font-bold">
+				<h2 className="text-[16px] md:text-[20px] font-bold">
         {format(selectedMonth, "yyyy년 MM월")} 지출 내역
 				</h2>
 				<div className="text-right text-[16px] font-bold">

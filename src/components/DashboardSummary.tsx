@@ -59,7 +59,7 @@ export default function MonthSummary({ groupId }: ThisMonthSummaryProps) {
   if (!groupId || monthlyData.length === 0) {
     return (
       <div>
-        <p className="mt-[36px] mb-[12px] text-center text-gray-500">
+        <p className="mt-[36px] mb-[12px] text-center text-gray-500 text-[14px] md:text-[16px]">
           💰 이번 달 등록된 지출 내역이 없습니다.
         </p>
       </div>
@@ -89,7 +89,7 @@ export default function MonthSummary({ groupId }: ThisMonthSummaryProps) {
 
   return (
     <div className="w-full h-full">
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <div className="flex-[1]">
           <ResponsiveContainer width="100%" height={180} style={{ fontSize: "14px" }}>
             <PieChart>

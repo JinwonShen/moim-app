@@ -53,13 +53,13 @@ export default function PinRegister() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-[375px]">
-        <h2 className="text-[24px] font-bold mb-[48px]">
+      <div className="w-full max-w-[300px] md:max-w-[375px]">
+        <h2 className="text-[20px] md:text-[24px] font-bold mb-[24px] md:mb-[48px]">
           6자리 PIN 번호를 설정해주세요
         </h2>
 
         {/* ● PIN 입력 상태 시각화 */}
-        <div className="flex justify-center gap-[12px] mb-[60px]">
+        <div className="flex justify-center gap-[12px] mb-[36px] md:mb-[60px]">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={`pin-${i}-${pin[i] ?? "empty"}`}

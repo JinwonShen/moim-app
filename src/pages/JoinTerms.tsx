@@ -24,7 +24,7 @@ export default function JoinTerms() {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col justify-center items-center">
+		<div className="min-h-screen px-[24px] md:px-0 flex flex-col justify-center items-center">
 			<div className="w-full max-w-[375px]">
 				<h2 className="mx-w-[375px] mb-[12px] text-[24px] font-bold">
 					약관동의
@@ -70,7 +70,7 @@ export default function JoinTerms() {
 			</div>
 			<button
 				type="button"
-				className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px] mt-[12px]"
+				className="max-w-[375px] w-full h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px] mt-[12px]"
 				onClick={handleNext}
 			>
 				다음

@@ -70,12 +70,11 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
         <span>{format(selectedMonth, "yyyy년 MM월", { locale: ko })}</span>
         <button onClick={() => onMonthChange(addMonths(selectedMonth, 1))}>▶</button>
       </div>
-      <div className="flex">
-        <div className="w-1/2">
-        
-        <ResponsiveContainer width="100%" height={250}>
-          <PieChart className="text-[14px]">
-            <Pie
+      <div className="flex flex-col">
+        <div className="w-full md:w-1/2">
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart className="text-[14px]">
+              <Pie
               data={pieData}
               cx="50%"
               cy="50%"
@@ -86,13 +85,13 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
               {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
-            </Pie>
-            <Tooltip formatter={(value: number) => `${value.toLocaleString()}원`} />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+              </Pie>
+              <Tooltip formatter={(value: number) => `${value.toLocaleString()}원`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
-      <div className="w-1/2 px-[24px] py-[16px] border rounded-[8px] text-[14px]">
+      <div className="w-full md:w-1/2 px-[24px] py-[16px] border rounded-[8px] text-[14px]">
         <p className="mb-[16px] pb-[12px] border-b-[1px] text-[16px] font-semibold">지출 전체 {totalAmount.toLocaleString()}원</p>
         <ul className="space-y-2">
           {pieData.map((item, index) => (

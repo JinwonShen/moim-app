@@ -53,7 +53,7 @@ export default function MonthlyExpensePage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-[12px]">
-        <h1 className="text-[20px] font-bold">월별 지출 일지</h1>
+        <h1 className="text-[16px] md:text-[20px] font-bold">월별 지출 일지</h1>
 
         {/* ✅ 모임 선택 드롭다운 */}
         <select

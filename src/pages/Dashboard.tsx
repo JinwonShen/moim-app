@@ -115,8 +115,8 @@ export default function Dashboard() {
   return (
     <div>
       <div>
-        <main className="min-h-[750px] max-h-[1000px] flex flex-1 gap-[24px]">
-          <div className="flex flex-col w-[calc(50%-12px)] gap-[24px]">
+        <main className="min-h-[750px] max-h-[1000px] flex flex-col md:flex-row flex-1 gap-[24px]">
+          <div className="flex flex-col w-full md:w-[calc(50%-12px)] gap-[24px]">
             <section className="min-h-[180px] max-h-[300px] p-[24px] border border-gray-200 rounded-[8px]">
               <h2 className="text-[14px] mb-[12px]">내가 만든 모임</h2>
               <div className="flex flex-col gap-[12px]">
@@ -240,7 +240,7 @@ export default function Dashboard() {
               <div><DepositReminder /></div>
             </section>
           </div>
-          <div className="flex flex-col gap-[24px] w-[calc(50%-12px)]">
+          <div className="flex flex-col gap-[24px] w-full md:w-[calc(50%-12px)] pb-[24px]">
             <section className="min-h-[180px] p-[24px] border border-gray-200 rounded-[8px]">
               <h2 className="text-[14px] mb-[12px]">이번 달 지출</h2>
               <div><MonthSummary groupId={selectedGroupId ?? ""} /></div>

@@ -85,12 +85,12 @@ export default function PinConfirm() {
 
 	return (
 		<div className="min-h-screen flex items-center justify-center">
-			<div className="w-full max-w-[375px]">
-				<h2 className="text-[24px] font-bold mb-[48px]">
+			<div className="w-full max-w-[300px] md:max-w-[375px]">
+				<h2 className="mb-[24px] text-[20px] md:mb-[48px] md:text-[24px] font-bold">
 					등록한 PIN을 입력해주세요
 				</h2>
 
-				<div className="flex justify-center gap-[12px] mb-[60px]">
+				<div className="mb-[36px] md:mb-[60px] flex justify-center gap-[12px]">
 					{Array.from({ length: 6 }).map((_, i) => (
 						<div
 							key={`pin-${i}-${pin[i] ?? "empty"}`}

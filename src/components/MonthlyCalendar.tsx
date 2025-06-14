@@ -1,11 +1,11 @@
 import {
-	addMonths,
-	eachDayOfInterval,
-	endOfMonth,
-	format,
-	getDay,
-	startOfMonth,
-	subMonths
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  getDay,
+  startOfMonth,
+  subMonths
 } from "date-fns";
 import { ko } from "date-fns/locale/ko";
 import { collection, getDocs } from "firebase/firestore";
@@ -71,7 +71,7 @@ export default function MonthlyCalendar({
         >
           ◀
         </button>
-        <h2 className="text-lg font-bold px-[12px]">
+        <h2 className="text-[16px] md:text-[20px] font-bold px-[12px]">
           {format(selectedMonth, "yyyy년 MM월", { locale: ko })}
         </h2>
         <button

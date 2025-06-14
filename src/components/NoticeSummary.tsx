@@ -62,7 +62,7 @@ export default function NoticeSummaryList() {
   if (notices.length === 0) {
     return (
       <div>
-        <p className="mt-[36px] mb-[12px] text-center text-gray-500">
+        <p className="mt-[36px] mb-[12px] text-center text-gray-500 text-[14px] md:text-[16px]">
           등록된 공지사항이 없습니다.
         </p>
       </div>

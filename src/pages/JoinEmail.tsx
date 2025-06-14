@@ -190,7 +190,7 @@ export default function JoinEmail() {
 	};
 
 	return (
-		<div className="min-h-screen flex justify-center items-center">
+		<div className="min-h-screen px-[24px] md:px-0 flex justify-center items-center">
 			<form className="w-full max-w-[375px] flex flex-col">
 				<div className="mb-[24px]">
 					<h2 className="text-[24px] font-bold">필수 정보 입력</h2>
@@ -275,7 +275,7 @@ export default function JoinEmail() {
 
 				<button
 					type="submit"
-					className="w-[375px] h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
+					className="w-full h-[48px] bg-gray-100 hover:bg-primary hover:text-[#ffffff] transition-all duration-300 rounded-[8px]"
 					onClick={handleSubmit}
 				>
 					회원가입 완료

@@ -27,9 +27,9 @@ export default function MonthlyGraphPage() {
   const selectedGroup = allGroups.find((g) => g.id === selectedGroupId);
 
   return (
-    <div className="px-4 py-6">
+    <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">월별 지출 그래프</h1>
+        <h1 className="text-[16px] md:text-[20px] font-bold">월별 지출 그래프</h1>
         <select
           className="border rounded px-3 py-2"
           value={selectedGroupId}

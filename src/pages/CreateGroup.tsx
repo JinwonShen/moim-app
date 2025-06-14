@@ -129,9 +129,9 @@ export default function CreateGroup() {
 
 	return (
 		<div>
-			<section className="pr-[12px] mt-[148px] pb-[24px]">
-				<h2 className="font-bold mb-[12px]">새 모임 만들기</h2>
-				<form className="flex gap-[24px] flex-wrap h-auto p-[48px] border">
+			<section className="md:mt-[148px] pb-[24px]">
+				<h2 className="font-bold mb-[12px] text-[16px] md:text-[20px]">새 모임 만들기</h2>
+				<form className="flex gap-[24px] flex-wrap h-auto p-[24px] md:p-[48px] border">
 					<div className="flex flex-col flex-1 gap-[24px]">
 						<label className="flex flex-col">
 							<span className="text-[14px]">모임 이름</span>
@@ -267,24 +267,24 @@ export default function CreateGroup() {
 							</span>
 						</label>
 					</div>
-					<div className="w-full flex justify-between gap-[24px]">
+					<div className="w-full flex justify-between gap-[12px] md:gap-[24px] text-[14px]">
 						<button
 							type="button"
-							className="button w-[calc(25%-18px)] py-[12px]"
+							className="button w-[calc(25%-6px)] md:w-[calc(25%-18px)] py-[12px]"
 							onClick={handleReset}
 						>
 							초기화
 						</button>
 						<button
 							type="button"
-							className="button w-[calc(25%-18px)]"
+							className="button w-[calc(25%-6px)] md:w-[calc(25%-18px)]"
 							onClick={() => handleSubmit("share")}
 						>
 							공유하기
 						</button>
 						<button
 							type="button"
-							className="button w-[calc(50%-12px)]"
+							className="button w-[calc(50%-12px)] md:w-[calc(50%-12px)]"
 							onClick={() => handleSubmit("start")}
 						>
 							모임 시작하기

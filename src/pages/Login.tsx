@@ -54,7 +54,7 @@ export default function Login() {
 					/>
 				</svg>
 			</span>
-			<div className="w-full max-w-[375px] flex flex-col">
+			<div className="w-full max-w-[375px] px-[24px] md:px-0 flex flex-col">
 				<button
 					onClick={handleEmailLogin}
 					type="button"

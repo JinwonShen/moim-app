@@ -43,7 +43,7 @@ export default function DepositReminder() {
   if (!targetGroup || !targetGroup.depositDeadline) {
     return (
       <div>
-        <p className="mt-[36px] mb-[12px] text-center text-gray-500">
+        <p className="mt-[36px] mb-[12px] text-center text-gray-500 text-[14px] md:text-[16px]">
           📭 현재 입금 요청이 필요한 모임이 없습니다.
         </p>
       </div>
