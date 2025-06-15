@@ -381,7 +381,7 @@ export default function GroupDetail() {
 	return (
     <div>
       <section className="flex flex-col mt-[148px] p-[24px] border rounded-[8px] text-[14px]">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-[24px]">
+        <div className="flex flex-col md:flex-row justify-between md:items-center mb-[24px]">
           <h2 className="mb-[12px] md:mb-0 font-bold text-[20px]">모임 상세보기</h2>
           <div className="flex flex-wrap gap-[12px]">
             {/* ✅ 모두에게 보이는 입금 버튼 */}
