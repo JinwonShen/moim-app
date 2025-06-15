@@ -8,11 +8,11 @@ React + TypeScript + Firebase + Zustand + Vite + TailwindCSS 기반
 
 ## 🔗 배포 링크
 
-👉 https://moim-app.vercel.app
+👉 <a href="https://moim-app.vercel.app" target="_blank">https://moim-app.vercel.app</a>
 
 ⸻
 
-## 📌 주요 기능
+## 📌 주요 기능1
 
 ✅ 사용자 인증
 
