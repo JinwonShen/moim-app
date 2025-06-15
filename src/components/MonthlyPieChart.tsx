@@ -82,7 +82,7 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
               dataKey="value"
               label={({ name, percent }) => `${name} ${percent?.toFixed(0)}%`}
             >
-              {pieData.map((entry, index) => (
+              {pieData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
               </Pie>

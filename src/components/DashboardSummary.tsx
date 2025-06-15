@@ -101,7 +101,7 @@ export default function MonthSummary({ groupId }: ThisMonthSummaryProps) {
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${percent}%`}
               >
-                {chartData.map((entry, index) => (
+                {chartData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
