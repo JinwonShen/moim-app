@@ -88,8 +88,8 @@ export default function JoinEmail() {
 	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setPassword(value);
-
-		if (passwordTouched && !validatePassword(value)) {
+		setPasswordTouched(true);
+		if (!validatePassword(value)) {
 			setPasswordError(
 				"비밀번호는 최소 8자 이상, 1개 이상의 문자, 숫자, 특수문자를 포함해야 합니다.",
 			);
@@ -98,30 +98,14 @@ export default function JoinEmail() {
 		}
 	};
 
-	const handlePasswordBlur = () => {
-		setPasswordTouched(true);
-		if (!validatePassword(password)) {
-			setPasswordError(
-				"비밀번호는 최소 8자 이상, 1개 이상의 문자, 숫자, 특수문자를 포함해야 합니다.",
-			);
-		}
-	};
-
 	const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setConfirmPassword(value);
-
-		if (confirmTouched && password !== value) {
+		setConfirmTouched(true);
+		if (password !== value) {
 			setConfirmError("비밀번호가 일치하지 않습니다.");
 		} else {
 			setConfirmError("");
-		}
-	};
-
-	const handleConfirmBlur = () => {
-		setConfirmTouched(true);
-		if (confirmPassword !== password) {
-			setConfirmError("비밀번호가 일치하지 않습니다.");
 		}
 	};
 
@@ -215,7 +199,6 @@ export default function JoinEmail() {
 						placeholder="비밀번호"
 						value={password}
 						onChange={handlePasswordChange}
-						onBlur={handlePasswordBlur}
 						className={`mb-[8px] h-12 px-4 bg-gray-100 pl-[24px] rounded-[8px] ${
 							passwordTouched && passwordError ? "border border-red-500" : ""
 						} `}
@@ -232,7 +215,6 @@ export default function JoinEmail() {
 						placeholder="비밀번호 확인"
 						value={confirmPassword}
 						onChange={handleConfirmChange}
-						onBlur={handleConfirmBlur}
 						className={`mb-4 h-12 px-4 bg-gray-100 pl-[24px] rounded-[8px] ${
 							confirmTouched && confirmError ? "border border-red-500" : ""
 						}`}
