@@ -1,8 +1,8 @@
 import { startOfMonth } from "date-fns";
 import { useState } from "react";
-import ExpenseList from "../components/ExpenseList";
-import MonthlyLineGraph from "../components/MonthlyLineChart";
-import CategoryPieChart from "../components/MonthlyPieChart";
+import ExpenseList from "../components/group/ExpenseList";
+import MonthlyLineGraph from "../components/monthly/MonthlyLineChart";
+import CategoryPieChart from "../components/monthly/MonthlyPieChart";
 import { useGroupStore } from "../store/groupStore";
 
 export default function MonthlyGraphPage() {

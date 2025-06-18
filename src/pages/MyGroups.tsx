@@ -1,7 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GroupCard from "../components/GroupCard";
+import GroupCard from "../components/group/GroupCard";
 import AddExpenseModal from "../components/modal/AddExpenseModal";
 import InviteModal from "../components/modal/InviteModal";
 import { useAuthStore } from "../store/authStore";

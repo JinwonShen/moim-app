@@ -1,7 +1,7 @@
 import { differenceInCalendarDays, isValid, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGroupStore } from "../store/groupStore";
+import { useGroupStore } from "../../store/groupStore";
 
 export default function DepositReminder() {
   const navigate = useNavigate();

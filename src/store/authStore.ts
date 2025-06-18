@@ -22,6 +22,7 @@ interface AuthState {
 	verified: boolean;
 	setUser: (user: User | null) => void;
 	setVerified: (value: boolean) => void;
+	clearUser: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -31,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
 			verified: false,
 			setUser: (user) => set({ user }),
 			setVerified: (verified) => set({ verified }),
+			clearUser: () => set({ user:null, verified:false }),
 		}),
 		{
 			name: "auth-storage",

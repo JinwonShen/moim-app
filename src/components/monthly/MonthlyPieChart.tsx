@@ -3,7 +3,7 @@ import { ko } from "date-fns/locale";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { db } from "../lib/firebase";
+import { db } from "../../lib/firebase";
 
 interface ExpenseItem {
   id: string;

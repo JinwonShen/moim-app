@@ -5,8 +5,8 @@ import {
 	DialogTitle,
 } from "@radix-ui/react-dialog";
 import { useState } from "react";
-import { sendGroupNotification } from "../../lib/api/notificationApi"; // 🔹 알림 함수 import
-import { depositToGroup } from "../../lib/api/walletApi";
+import { sendGroupNotification } from "../../lib/apis/notificationApi"; // 🔹 알림 함수 import
+import { depositToGroup } from "../../lib/apis/walletApi";
 import { useWalletStore } from "../../store/walletStore";
 
 interface DepositModalProps {

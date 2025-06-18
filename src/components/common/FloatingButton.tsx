@@ -1,7 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
-import AddExpenseModal from "./modal/AddExpenseModal";
+import AddExpenseModal from "../modal/AddExpenseModal";
 
 type FloatingButtonProps = {
 	groupId: string;

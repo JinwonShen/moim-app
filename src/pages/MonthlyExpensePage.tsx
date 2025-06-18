@@ -1,7 +1,7 @@
 import { startOfMonth } from "date-fns";
 import { useEffect, useState } from "react";
-import ExpenseList from "../components/ExpenseList";
-import MonthlyCalendar from "../components/MonthlyCalendar";
+import ExpenseList from "../components/group/ExpenseList";
+import MonthlyCalendar from "../components/monthly/MonthlyCalendar";
 import { useAuthStore } from "../store/authStore";
 import { useGroupStore } from "../store/groupStore";
 import type { Group } from "../types/group";

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchAccountBalance } from "../lib/api/walletApi";
-import { useAuthStore } from "../store/authStore";
-import { useWalletStore } from "../store/walletStore";
-import NotificationBell from "./NotificationBell";
+import { fetchAccountBalance } from "../../lib/apis/walletApi";
+import { useAuthStore } from "../../store/authStore";
+import { useWalletStore } from "../../store/walletStore";
+import NotificationBell from "../modal/NotificationBell";
 
 export default function Header() {
 	const user = useAuthStore((state) => state.user);

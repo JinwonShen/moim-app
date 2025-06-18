@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ExpenseForm from "../components/ExpenseForm";
+import ExpenseForm from "../components/group/ExpenseForm";
 import DepositModal from "../components/modal/DepositModal";
 import InviteModal from "../components/modal/InviteModal";
 import { db } from "../lib/firebase";
@@ -382,7 +382,9 @@ export default function GroupDetail() {
     <div>
       <section className="flex flex-col mt-[148px] p-[24px] border rounded-[8px] text-[14px]">
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-[24px]">
-          <h2 className="mb-[12px] md:mb-0 font-bold text-[20px]">모임 상세보기</h2>
+          <h2 className="mb-[12px] md:mb-0 font-bold text-[20px]">
+            모임 상세보기
+          </h2>
           <div className="flex flex-wrap gap-[12px]">
             {/* ✅ 모두에게 보이는 입금 버튼 */}
             {/* {!hasPaid && (
@@ -455,7 +457,9 @@ export default function GroupDetail() {
           {/* 좌측(모임 이름, 설명, 모임 장, 예산) */}
           <div className="md:flex-[2] flex flex-col gap-[24px]">
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:flex-[1] font-semibold">모임 이름</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">
+                모임 이름
+              </span>
               {isEditing ? (
                 <input
                   type="text"
@@ -472,7 +476,9 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:flex-[1] font-semibold">모임 설명</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">
+                모임 설명
+              </span>
               {isEditing ? (
                 <input
                   type="text"
@@ -489,11 +495,15 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:flex-[1] font-semibold">모임 장</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">
+                모임 장
+              </span>
               <span className="flex-[4]">{ownerNickname}</span>
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:flex-[1] font-semibold">총 예산</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">
+                총 예산
+              </span>
               {isEditing ? (
                 <input
                   type="number"
@@ -518,7 +528,9 @@ export default function GroupDetail() {
           {/* 우측(모임 기간, 입금 마감일, 참여자, 예산 그래프) */}
           <div className="flex flex-col flex-[3] gap-[24px]">
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:flex-[1] font-semibold">모임 기간</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">
+                모임 기간
+              </span>
               {isEditing ? (
                 <div className="flex-[4]">
                   <span className="flex gap-[8px]">
@@ -551,7 +563,9 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:flex-[1] font-semibold">입금 마감일</span>
+              <span className="flex-[2] md:flex-[1] font-semibold">
+                입금 마감일
+              </span>
               {isEditing ? (
                 <input
                   type="date"
@@ -568,7 +582,9 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:`flex-[1] font-semibold">모임 참여자</span>
+              <span className="flex-[2] md:`flex-[1] font-semibold">
+                모임 참여자
+              </span>
               <span className="flex-[4]">
                 {participantCount}명 중 {paidCount}명 입금 완료
               </span>
@@ -604,7 +620,7 @@ export default function GroupDetail() {
                     <button
                       type="button"
                       onClick={handleBulkDelete}
-                      className="text-[12px] text-primary"
+                      className="button px-[24px] py-[4px]"
                     >
                       선택 삭제
                     </button>
@@ -623,6 +639,23 @@ export default function GroupDetail() {
                 </div>
               )}
             </div>
+            {/* 편집 모드 토글 버튼 */}
+            <button
+              type="button"
+              className="button px-[24px] py-[4px] mb-[12px]"
+              onClick={() =>
+                setEditMode((prev) => {
+                  // 편집 종료시 선택/수정 상태 초기화
+                  if (prev) {
+                    setEditingExpenseId(null);
+                    setSelectedExpenseIds([]);
+                  }
+                  return !prev;
+                })
+              }
+            >
+              {editMode ? "편집 종료" : "편집하기"}
+            </button>
             {recentExpenses.length === 0 ? (
               <p className="text-gray-500 text-sm">
                 최근 지출 내역이 없습니다.
@@ -741,27 +774,31 @@ export default function GroupDetail() {
 
                         {/* 수정 버튼 (편집 모드 + 수정 중 아님) */}
                         {editMode && !isEditing && (
-                          <div className="flex gap-[6px] text-[12px]">
-                            <button
-                              type="button"
-                              className="text-primary"
-                              onClick={() => {
-                                setEditingExpenseId(item.id);
-                                setEditedExpense({
-                                  category: item.category,
-                                  memo: item.description,
-                                  amount: String(item.amount),
-                                  date:
-                                    item.createdAt
-                                      ?.toDate?.()
-                                      ?.toISOString()
-                                      ?.split("T")[0] ?? "",
-                                });
-                              }}
-                            >
-                              수정
-                            </button>
-                          </div>
+                          <>
+                            {editMode && (
+                              <div className="flex gap-[6px] text-[12px]">
+                                <button
+                                  type="button"
+                                  className="text-primary"
+                                  onClick={() => {
+                                    setEditingExpenseId(item.id);
+                                    setEditedExpense({
+                                      category: item.category,
+                                      memo: item.description,
+                                      amount: String(item.amount),
+                                      date:
+                                        item.createdAt
+                                          ?.toDate?.()
+                                          ?.toISOString()
+                                          ?.split("T")[0] ?? "",
+                                    });
+                                  }}
+                                >
+                                  수정
+                                </button>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </li>
@@ -819,7 +856,7 @@ export default function GroupDetail() {
                   {editNoticeMode && selectedNotices.length > 0 && (
                     <button
                       type="button"
-                      className="text-[12px] text-primary"
+                      className="button px-[24px] py-[4px]"
                       onClick={handleDeleteSelectedNotices}
                     >
                       선택 삭제
@@ -840,6 +877,22 @@ export default function GroupDetail() {
               )}
             </div>
 
+            {/* 편집 모드 토글 버튼 */}
+            <button
+              type="button"
+              className="button px-[24px] py-[4px] mb-[12px]"
+              onClick={() => {
+                setEditNoticeMode((prev) => {
+                  if (prev) {
+                    setSelectedNotices([]);
+                    setEditingNoticeId(null);
+                  }
+                  return !prev;
+                });
+              }}
+            >
+              {editNoticeMode ? "편집 종료" : "편집하기"}
+            </button>
             {recentNotices.length === 0 ? (
               <p className="text-gray-500 text-sm">등록된 공지가 없습니다.</p>
             ) : (
@@ -924,20 +977,24 @@ export default function GroupDetail() {
                           {authorNames[notice.author] ?? notice.author}
                         </span>
                         {editNoticeMode && !isEditing && (
-                          <button
-                            type="button"
-                            className="text-primary text-[12px] mt-[4px]"
-                            onClick={() => {
-                              if (selectedNotices.length <= 1) {
-                                setEditingNoticeId(notice.id);
-                                setEditedTitle(notice.title);
-                                setEditedContent(notice.content);
-                              }
-                            }}
-                            disabled={selectedNotices.length > 1}
-                          >
-                            수정
-                          </button>
+                          <>
+                            {editNoticeMode && (
+                              <button
+                                type="button"
+                                className="text-primary text-[12px] mt-[4px]"
+                                onClick={() => {
+                                  if (selectedNotices.length <= 1) {
+                                    setEditingNoticeId(notice.id);
+                                    setEditedTitle(notice.title);
+                                    setEditedContent(notice.content);
+                                  }
+                                }}
+                                disabled={selectedNotices.length > 1}
+                              >
+                                수정
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </li>
@@ -988,14 +1045,14 @@ export default function GroupDetail() {
         )}
         {uid && (
           <DepositModal
-						open={isDepositOpen}
-						onClose={() => setIsDepositOpen(false)}
-						groupId={groupId}
-						groupName={groupData.groupName}
-						uid={uid}
-						onSuccess={fetchGroup} 
-						creatorId={groupData.creatorId}
-						/>
+            open={isDepositOpen}
+            onClose={() => setIsDepositOpen(false)}
+            groupId={groupId}
+            groupName={groupData.groupName}
+            uid={uid}
+            onSuccess={fetchGroup}
+            creatorId={groupData.creatorId}
+          />
         )}
       </section>
     </div>

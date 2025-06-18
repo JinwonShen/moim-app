@@ -1,20 +1,19 @@
-import type { Group } from "../types/group";
+import type { Group } from "../../types/group";
 
-interface GroupCardProps {
+type GroupCardProps = {
 	group: Group;
 	isOwner: boolean;
 	onClickDetail: () => void;
-	onClickAction: () => void;
+	variant?: 'default' | 'dashboard';
+	onClickDeposit?: () => void;
+	depositDisabled?: boolean;
+	hasPaid?: boolean;
+	onClickAction?: () => void;
 	onClickManage?: () => void;
-}
+};
 
-export default function GroupCard({
-	group,
-	isOwner,
-	onClickDetail,
-	onClickAction,
-	onClickManage,
-}: GroupCardProps) {
+export default function GroupCard(props: GroupCardProps) {
+	const { group, isOwner, onClickDetail, variant = 'default', ...rest } = props;
 	const now = new Date();
 	const start = new Date(group.startDate);
 	const end = new Date(group.endDate);
@@ -73,34 +72,52 @@ export default function GroupCard({
 
 				{/* 하단: 버튼 영역 */}
 				<div className="flex gap-3 mt-3 justify-between">
-					<button
-						type="button"
-						disabled={isEnded}
-						onClick={() => {
-							console.log("📦 지출추가 버튼 클릭됨:", group.groupName);
-							onClickAction();
-						}}
-						className={`flex-1 py-2 rounded-lg text-sm transition-all duration-300 ${
-							isEnded
-								? "bg-gray-300 text-white cursor-not-allowed"
-								: "button"
-						}`}
-					>
-						지출추가
-					</button>
-					{isOwner && onClickManage && (
-						<button
-							type="button"
-							disabled={isEnded}
-							onClick={onClickManage}
-							className={`flex-1 rounded-lg text-[14px] transition-all duration-300 ${
-								isEnded
-									? "bg-gray-300 text-white cursor-not-allowed"
-									: "button"
-							}`}
-						>
-							참여자 관리
-						</button>
+					{isOwner ? (
+						<>
+							<button
+								type="button"
+								disabled={isEnded}
+								onClick={() => {
+									console.log('📦 지출추가 버튼 클릭됨:', group.groupName);
+									rest.onClickAction?.();
+								}}
+								className={`flex-1 py-2 rounded-lg text-sm transition-all duration-300 ${
+									isEnded ? 'bg-gray-300 text-white cursor-not-allowed' : 'button'
+								}`}
+							>
+								지출추가
+							</button>
+							{rest.onClickManage && (
+								<button
+									type="button"
+									disabled={isEnded}
+									onClick={rest.onClickManage}
+									className={`flex-1 rounded-lg text-[14px] transition-all duration-300 ${
+										isEnded ? 'bg-gray-300 text-white cursor-not-allowed' : 'button'
+									}`}
+								>
+									참여자 관리
+								</button>
+							)}
+						</>
+					) : (
+						<>
+							<span className="flex-1">
+								{/*  */}
+							</span>
+							<button
+								type="button"
+								disabled={rest.depositDisabled || rest.hasPaid}
+								onClick={rest.onClickDeposit}
+								className={`flex-1 py-2 rounded-lg text-sm transition-all duration-300 ${
+									rest.depositDisabled || rest.hasPaid
+										? 'bg-gray-300 text-white cursor-not-allowed'
+										: 'button'
+								}`}
+							>
+								{rest.hasPaid ? '입금완료' : '입금하기'}
+							</button>
+						</>
 					)}
 					<button
 						type="button"

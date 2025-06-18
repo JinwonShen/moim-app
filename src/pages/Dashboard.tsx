@@ -1,27 +1,32 @@
+import * as Dialog from "@radix-ui/react-dialog";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MonthSummary from "../components/DashboardSummary";
-import DepositReminder from "../components/DepositReminder";
-import FloatingButton from "../components/FloatingButton";
+import FloatingButton from "../components/common/FloatingButton";
+import DashboardGroupCard from "../components/dashboard/DashboardGroupCard";
+import MonthSummary from "../components/dashboard/DashboardSummary";
+import DepositReminder from "../components/dashboard/DepositReminder";
+import NoticeSummary from "../components/dashboard/NoticeSummary";
+import RecentExpenses from "../components/dashboard/RecentExpenses";
+import AddExpenseModal from "../components/modal/AddExpenseModal";
 import DepositModal from "../components/modal/DepositModal";
-import NoticeSummary from "../components/NoticeSummary";
-import RecentExpenses from "../components/RecentExpenses";
+import { useUserGroups } from "../hooks/useGroups";
 import { db } from "../lib/firebase";
 import { useAuthStore } from "../store/authStore";
 import { useExpenseStore } from "../store/expenseStore";
-import { useGroupStore } from "../store/groupStore";
+import type { Group } from "../types/group";
 import { getGroupStatus } from "../utils/groupStatus";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const uid = useAuthStore((state) => state.user?.uid);
-  const { myGroups, joinedGroups, fetchGroups, loading } = useGroupStore();
-  const [categories, setCategories] = useState<string[]>(["식비", "커피", "교통비", "숙박비", "엑티비티", "기타"]);
+  const user = useAuthStore((state) => state.user);
+  const uid = user?.uid;
+  const { myGroups, joinedGroups, loading } = useUserGroups(uid ?? "");
+  const [selectedGroupForExpense, setSelectedGroupForExpense] = useState<Group | null>(null);
+  const [categories, setCategories] = useState<string[]>(["식비", "교통비", "숙박비", "기타"]);
   const { setRecentExpenses } = useExpenseStore();
   const [isDepositOpen, setDepositOpen] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const user = useAuthStore((state) => state.user);
   const selectedGroup =
     myGroups.find((group) => group.id === selectedGroupId) ||
     joinedGroups.find((group) => group.id === selectedGroupId);
@@ -52,9 +57,6 @@ export default function Dashboard() {
     sessionStorage.removeItem("pin_verified");
   }, []);
 
-  useEffect(() => {
-    if (uid) fetchGroups(uid as string);
-  }, [uid, fetchGroups]);
 
   useEffect(() => {
     const now = new Date();
@@ -118,56 +120,25 @@ export default function Dashboard() {
         <main className="min-h-[750px] max-h-[1000px] flex flex-col md:flex-row flex-1 gap-[24px]">
           <div className="flex flex-col w-full md:w-[calc(50%-12px)] gap-[24px]">
             <section className="min-h-[180px] max-h-[300px] p-[24px] border border-gray-200 rounded-[8px]">
-              <h2 className="text-[14px] mb-[12px]">내가 만든 모임</h2>
               <div className="flex flex-col gap-[12px]">
                 {topMyGroup ? (
-                  [topMyGroup].map((group) => {
-                    const { status, labelColor, disabled } = getGroupStatus(String(group.startDate), String(group.endDate));
-                    const participantCount = group.participantCount ?? 0;
-                    const paidCount = group.paidParticipants?.length ?? 0;
-                    const paidPercent = participantCount > 0 ? Math.floor((paidCount / participantCount) * 100) : 0;
-                    const totalBudget = group.totalBudget ?? 0;
-                    const balance = group.balance ?? 0;
-                    const balancePercent = totalBudget > 0 ? Math.floor((balance / totalBudget) * 100) : 0;
-                    const eachFee = participantCount > 0 ? Math.floor(totalBudget / participantCount) : 0;
-                    const paidTotal = eachFee * paidCount;
-                    const hasPaid = user?.uid ? group.paidParticipants?.includes(user.uid) : false;
-
-                    return (
-                      <div key={group.id} className="flex flex-col">
-                        <div className="flex justify-between items-center mb-[8px]">
-                          <h3 className="text-[16px] font-bold">{group.groupName}</h3>
-                          <span className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${labelColor}`}>{status}</span>
-                        </div>
-                        <p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">{group.startDate} ~ {group.endDate}</p>
-                        <p className="text-[14px] py-[8px]">참여자: {participantCount}명 중 {paidCount}명 입금 완료</p>
-                        <div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${status === "모집중" ? paidPercent : balancePercent}%` }} />
-                        </div>
-                        <p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-                          {status === "모집중" || balancePercent === 100 ? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원` : `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
-                        </p>
-                        <div className="flex gap-[8px]">
-                          <button
-                            type="button"
-                            disabled={disabled || hasPaid}
-                            onClick={() => {
-                              setDepositOpen(true);
-                              if (group.id) setSelectedGroupId(group.id);
-                            }}
-                            className={`w-full py-[8px] rounded-lg text-sm transition-all duration-300 ${
-                              disabled || hasPaid
-                                ? "bg-gray-300 text-white cursor-not-allowed"
-                                : "button"
-                            }`}
-                          >
-                            {hasPaid ? "입금완료" : "입금하기"}
-                          </button>
-                          <button type="button" className="w-full py-[8px] button text-[14px] transition-all duration-300" onClick={() => navigate(`/group/${group.id}`)}>모임 상세보기</button>
-                        </div>
-                      </div>
-                    );
-                  })
+                  <DashboardGroupCard
+                    group={topMyGroup}
+                    isOwner={true}
+                    onClickDeposit={() => {
+                      if (topMyGroup?.id) {
+                        setSelectedGroupId(topMyGroup.id);
+                        if (topMyGroup.creatorId === uid && topMyGroup.balance > 0) {
+                          setSelectedGroupForExpense(topMyGroup);
+                        } else {
+                          setDepositOpen(true);
+                        }
+                      }
+                    }}
+                    onClickDetail={() => navigate(`/group/${topMyGroup?.id}`)}
+                    userId={""}
+                    onClickAction={() => setSelectedGroupForExpense(topMyGroup)}
+                  />
                 ) : (
                   <>
                     <p className="font-bold">👍 현재 진행중이거나 생성된 모임이 없어요!</p>
@@ -177,56 +148,19 @@ export default function Dashboard() {
               </div>
             </section>
             <section className="min-h-[180px] p-[24px] border border-gray-200 rounded-[8px]">
-              <h2 className="text-[14px] mb-[12px]">참여 중인 모임</h2>
               <div>
                 {topJoinedGroup ? (
-                  [topJoinedGroup].map((group) => {
-                    const { status, labelColor, disabled } = getGroupStatus(String(group.startDate), String(group.endDate));
-                    const participantCount = group.participantCount ?? 0;
-                    const paidCount = group.paidParticipants?.length ?? 0;
-                    const paidPercent = participantCount > 0 ? Math.floor((paidCount / participantCount) * 100) : 0;
-                    const totalBudget = group.totalBudget ?? 0;
-                    const balance = group.balance ?? 0;
-                    const balancePercent = totalBudget > 0 ? Math.floor((balance / totalBudget) * 100) : 0;
-                    const eachFee = participantCount > 0 ? Math.floor(totalBudget / participantCount) : 0;
-                    const paidTotal = eachFee * paidCount;
-                    const hasPaid = user?.uid ? group.paidParticipants?.includes(user.uid) : false;
-
-                    return (
-                      <div key={group.id} className="flex flex-col">
-                        <div className="flex justify-between items-center mb-[8px]">
-                          <h3 className="text-[16px] font-bold">{group.groupName}</h3>
-                          <span className={`text-[12px] px-[12px] py-[7px] rounded-[4px] font-semibold ${labelColor}`}>{status}</span>
-                        </div>
-                        <p className="text-[12px] text-gray-500 pb-[8px] border-b-[2px]">{group.startDate} ~ {group.endDate}</p>
-                        <p className="text-[14px] py-[8px]">참여자: {participantCount}명 중 {paidCount}명 입금 완료</p>
-                        <div className="h-[12px] bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${status === "모집중" ? paidPercent : balancePercent}%` }} />
-                        </div>
-                        <p className="pt-[8px] pb-[16px] text-[12px] text-gray-600">
-                          {status === "모집중" || balancePercent === 100 ? `예산: ${totalBudget.toLocaleString()}원 / 입금액: ${paidTotal.toLocaleString()}원` : `예산: ${totalBudget.toLocaleString()}원 / 잔액: ${balance.toLocaleString()}원`}
-                        </p>
-                        <div className="flex gap-[8px]">
-                          <button
-                            type="button"
-                            disabled={disabled || hasPaid}
-                            onClick={() => {
-                              setDepositOpen(true);
-                              if (group.id) setSelectedGroupId(group.id);
-                            }}
-                            className={`w-full py-[8px] rounded-lg text-sm transition-all duration-300 ${
-                              disabled || hasPaid
-                                ? "bg-gray-300 text-white cursor-not-allowed"
-                                : "bg-gray-100 hover:bg-primary hover:text-white"
-                            }`}
-                          >
-                            {hasPaid ? "입금완료" : "입금하기"}
-                          </button>
-                          <button type="button" className="w-full py-[8px] button text-[14px] transition-all duration-300" onClick={() => navigate(`/group/${group.id}`)}>모임 상세보기</button>
-                        </div>
-                      </div>
-                    );
-                  })
+                  <DashboardGroupCard
+                    group={topJoinedGroup}
+                    isOwner={false}
+                    onClickDeposit={() => {
+                      setDepositOpen(true);
+                      if (topJoinedGroup?.id) setSelectedGroupId(topJoinedGroup.id);
+                    }}
+                    onClickDetail={() => navigate(`/group/${topJoinedGroup?.id}`)}
+                    userId={""}
+                    onClickAction={() => setSelectedGroupForExpense(topJoinedGroup)}
+                  />
                 ) : (
                   <>
                     <p className="font-bold">🙋🏻 현재 진행중이거나 참여중인 모임이 없어요!</p>
@@ -260,6 +194,23 @@ export default function Dashboard() {
         )}
         {isDepositOpen && selectedGroupId && user?.uid && selectedGroup && (
           <DepositModal open={isDepositOpen} onClose={() => setDepositOpen(false)} groupId={selectedGroupId} uid={user.uid} creatorId={selectedGroup.creatorId} groupName={selectedGroup.groupName} onSuccess={() => {}} />
+        )}
+        {selectedGroupForExpense && (
+          <Dialog.Root
+            open={true}
+            onOpenChange={(open) => {
+              if (!open) setSelectedGroupForExpense(null);
+            }}
+          >
+            <AddExpenseModal
+              groupId={selectedGroupForExpense.id}
+              uid={uid ?? "test-uid"}
+              categories={categories}
+              setCategories={setCategories}
+              fetchExpenses={fetchExpenses}
+              onClose={() => setSelectedGroupForExpense(null)}
+            />
+          </Dialog.Root>
         )}
       </div>
     </div>

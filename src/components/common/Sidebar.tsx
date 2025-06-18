@@ -1,3 +1,4 @@
+import { signOut } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import {
   FiBarChart2,
@@ -9,7 +10,8 @@ import {
   FiX
 } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../lib/auth";
+import { auth } from "../../lib/firebase";
+import { useAuthStore } from "../../store/authStore";
 
 export default function Sidebar() {
 	const [open, setOpen] = useState(false);
@@ -17,12 +19,22 @@ export default function Sidebar() {
 	const location = useLocation();
 	const pathname = location.pathname;
 	const sidebarRef = useRef(null);
+  const clearUser = useAuthStore((state) => state.clearUser);
 
 	const isActive = (target: string) => pathname === target;
 
 	const handleLogout = async () => {
-		await logout(navigate);
-	};
+    const confirmLogout = window.confirm("정말 로그아웃하시겠습니까?");
+    if (!confirmLogout) return;
+
+    try {
+      await signOut(auth);
+      clearUser(); // Zustand 상태 초기화
+      navigate("/login");
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+    }
+  };
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {

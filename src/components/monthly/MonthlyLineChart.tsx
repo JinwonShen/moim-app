@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { db } from "../lib/firebase";
+import { db } from "../../lib/firebase";
 
 interface LineGraphProps {
   groupId: string;

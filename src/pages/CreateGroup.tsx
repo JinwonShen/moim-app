@@ -30,7 +30,78 @@ export default function CreateGroup() {
 	const handleSubmit = async (type: "start" | "share") => {
 		if (!uid || !groupName.trim()) return;
 
+		const now = new Date();
+		const start = new Date(startDate);
+		const end = new Date(endDate);
+		const deadline = new Date(dueDate)
 		const fullParticipants = [nickname, ...participants];
+
+		if (start < now) {
+    alert("모임 시작일은 오늘 이후로 설정해야 합니다.");
+    return;
+		}
+
+		if (end <= start) {
+			alert("모임 종료일은 시작일보다 이후여야 합니다.");
+			return;
+		}
+
+		if (deadline >= start) {
+			alert("입금 마감일은 모임 시작일보다 빨라야 합니다.");
+			return;
+		}
+
+		if (deadline > end) {
+			alert("입금 마감일은 모임 종료일보다 빨라야 합니다.");
+			return;
+		}
+
+		if (!description.trim()) {
+			alert("모임 설명을 입력해주세요.");
+			return;
+		}
+
+		if (!startDate || !endDate || !dueDate) {
+			alert("모임 기간과 마감일을 모두 선택해주세요.");
+			return;
+		}
+
+		if (totalBudget <= 0) {
+			alert("총 예산은 0보다 커야 합니다.");
+			return;
+		}
+
+		// 유효성 검사: 모임 이름
+		if (!uid || !groupName.trim()) {
+		  alert("모임 이름을 입력해주세요.");
+		  return;
+		}
+
+		// 유효성 검사: 모임 설명
+		if (!description.trim()) {
+		  alert("모임 설명을 입력해주세요.");
+		  return;
+		}
+
+		// 유효성 검사: 날짜 필드
+		if (!startDate || !endDate || !dueDate) {
+		  alert("모임 시작일, 종료일, 마감일을 모두 선택해주세요.");
+		  return;
+		}
+
+		// 유효성 검사: 총 예산
+		if (totalBudget <= 0) {
+		  alert("총 예산은 0보다 커야 합니다.");
+		  return;
+		}
+
+		// 유효성 검사: 참여자 닉네임 빈 값
+		const hasEmptyParticipant = fullParticipants.some((p) => !p.trim());
+		if (hasEmptyParticipant) {
+		  alert("참여자 닉네임 중 빈 값이 있습니다.");
+		  return;
+		}
+
 		const newGroup = {
 			groupName,
 			description,

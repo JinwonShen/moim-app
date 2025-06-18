@@ -16,7 +16,7 @@ import {
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
 import { db } from "../../lib/firebase";
-import ExpenseForm from "../ExpenseForm";
+import ExpenseForm from "../group/ExpenseForm";
 
 interface Props {
 	groupId: string;

@@ -2,8 +2,8 @@ import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import { FiBell } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { useNotifications } from "../hooks/useNotifications"; // ✅ custom hook 사용
-import { useAuthStore } from "../store/authStore";
+import { useNotifications } from "../../hooks/useNotifications"; // ✅ custom hook 사용
+import { useAuthStore } from "../../store/authStore";
 
 export default function NotificationBell() {
 	const [open, setOpen] = useState(false);

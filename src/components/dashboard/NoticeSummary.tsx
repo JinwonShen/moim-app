@@ -1,8 +1,8 @@
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { db } from "../lib/firebase";
-import { useGroupStore } from "../store/groupStore";
+import { db } from "../../lib/firebase";
+import { useGroupStore } from "../../store/groupStore";
 
 interface NoticeItem {
   id: string;
