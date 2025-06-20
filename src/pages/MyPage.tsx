@@ -1,3 +1,11 @@
+/**
+ * 사용자 마이페이지 컴포넌트.
+ * - 닉네임, 비밀번호, 계좌 정보, 알림 설정, 보안 설정(PIN, 회원탈퇴) 등 수정 가능
+ * - 각 항목은 수정 모드로 전환 후 저장 또는 취소 가능
+ * - 상태는 useState로 관리되며, 사용자 정보는 Firebase Firestore와 연동됨
+ * - PIN 인증 보호(usePinGuard)를 통해 로그인 후 인증된 사용자만 접근 가능
+ */
+
 import {
 	EmailAuthProvider,
 	reauthenticateWithCredential,
@@ -32,7 +40,8 @@ export default function MyPage() {
 	// PIN 인증이 필요한 영역에만 !
 	usePinGuard("/mypage");
 
-	// 닉네임 변경 저장
+	// ✅ 닉네임 저장 핸들러
+	// - Firestore에 닉네임 업데이트 후 전역 상태도 동기화
 	const handleNicknameSave = async () => {
 		if (!user) return;
 		if (!newNickname) return;
@@ -68,13 +77,17 @@ export default function MyPage() {
 		setEditingPassword(true);
 	};
 
+	// ✅ 비밀번호 유효성 검사 정규식
+	// - 영문 대소문자, 숫자, 특수문자 포함 8자 이상 여부 확인
 	const isValidPassword = (password: string): boolean => {
 		const regex =
 			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=~`[\]{}|\\:;"'<>,.?/])[A-Za-z\d!@#$%^&*()_\-+=~`[\]{}|\\:;"'<>,.?/]{8,}$/;
 		return regex.test(password);
 	};
 
-	// 패스워드 수정 및 저장
+	// ✅ 비밀번호 변경 핸들러
+	// - 현재 비밀번호 재인증 후 새 비밀번호 유효성 검사 및 저장
+	// - 비밀번호는 영문 대소문자, 숫자, 특수문자 포함 8자 이상
 	const handlePasswordSave = async () => {
 		if (!currentPassword || !newPassword || !confirmPassword) {
 			alert("모든 입력란을 작성해주세요.");
@@ -117,7 +130,8 @@ export default function MyPage() {
 		}
 	};
 
-	// 계좌 저장
+	// ✅ 계좌 정보 저장 핸들러
+	// - 은행명, 계좌번호, 초기잔액을 Firestore에 저장 후 전역 상태에 반영
 	const handleAccountSave = async () => {
 		if (!user) return;
 
@@ -154,14 +168,14 @@ export default function MyPage() {
 		}
 	};
 
-	// PIN 설정 및 변경
+	// ✅ PIN 변경 페이지로 이동
 	const handlePinChange = () => {
 		navigate("/pinconfirm", {
 			state: { from: "/pinregister", mode: "changePin" },
 		});
 	};
 
-	// 회원 탈퇴
+	// ✅ 회원 탈퇴 페이지로 이동
 	const handleWithdrawClick = () => {
 		navigate("/pinconfirm", {
 			state: {

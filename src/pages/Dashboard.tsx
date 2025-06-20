@@ -1,3 +1,11 @@
+/**
+ * 사용자 대시보드 페이지 컴포넌트.
+ * - 내가 만든 모임과 참여 중인 모임 중 우선순위 그룹을 선택해 카드 형태로 표시
+ * - 모임별 입금, 지출 등록, 상세보기, 공지, 통계 요약 기능을 요약해 표시
+ * - 진행중인 모임이 있을 경우 자동 선택, 없으면 안내 메시지 표시
+ * - FloatingButton(지출 등록), AddExpenseModal, DepositModal 등 모달 UI 포함
+ */
+
 import * as Dialog from "@radix-ui/react-dialog";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -21,7 +29,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const uid = user?.uid;
-  const { myGroups, joinedGroups, loading } = useUserGroups(uid ?? "");
+  const { myGroups, joinedGroups, loading, fetchGroups } = useUserGroups(uid ?? "");
   const [selectedGroupForExpense, setSelectedGroupForExpense] = useState<Group | null>(null);
   const [categories, setCategories] = useState<string[]>(["식비", "교통비", "숙박비", "기타"]);
   const { setRecentExpenses } = useExpenseStore();
@@ -31,6 +39,9 @@ export default function Dashboard() {
     myGroups.find((group) => group.id === selectedGroupId) ||
     joinedGroups.find((group) => group.id === selectedGroupId);
 
+  // ✅ 최근 지출 내역 조회 함수
+  // - 내가 만든 첫 번째 모임을 기준으로 최근 5건의 지출 데이터를 불러온다
+  // - Firestore에서 createdAt 기준 내림차순 정렬 후 setRecentExpenses 상태 저장
   const fetchExpenses = async () => {
     if (!myGroups.length) return;
     const groupId = myGroups[0].id;
@@ -53,11 +64,15 @@ export default function Dashboard() {
     setRecentExpenses(items);
   };
 
+  // ✅ 컴포넌트 마운트 시 PIN 인증 상태 초기화 (로그인 이후 인증값 제거)
   useEffect(() => {
     sessionStorage.removeItem("pin_verified");
   }, []);
 
 
+  // ✅ 진행중인 그룹 자동 선택 로직
+  // - 현재 시각 기준으로 시작일~종료일 사이에 해당하는 모임 필터링
+  // - 가장 최근 시작된 모임을 우선 선택해 selectedGroupId 설정
   useEffect(() => {
     const now = new Date();
     const progressingGroups = [...myGroups, ...joinedGroups].filter((group) => {
@@ -75,7 +90,9 @@ export default function Dashboard() {
 
   if (loading) return <p>로딩중...</p>;
 
-  // Helper: 그룹 우선순위 정렬 및 최상위 그룹 반환
+  // ✅ 그룹 우선순위 판단 함수
+  // - 모임 상태("진행중" > "모집중" > "모임종료") 및 날짜 기준 정렬
+  // - 가장 우선순위가 높은 그룹 하나를 반환
   const getTopPriorityGroup = (groups: typeof myGroups) => {
     const priority = { "진행중": 0, "모집중": 1, "모임종료": 2 };
 
@@ -136,8 +153,9 @@ export default function Dashboard() {
                       }
                     }}
                     onClickDetail={() => navigate(`/group/${topMyGroup?.id}`)}
-                    userId={""}
+                    userId={uid ?? ""}
                     onClickAction={() => setSelectedGroupForExpense(topMyGroup)}
+                    
                   />
                 ) : (
                   <>
@@ -158,7 +176,7 @@ export default function Dashboard() {
                       if (topJoinedGroup?.id) setSelectedGroupId(topJoinedGroup.id);
                     }}
                     onClickDetail={() => navigate(`/group/${topJoinedGroup?.id}`)}
-                    userId={""}
+                    userId={uid ?? ""}
                     onClickAction={() => setSelectedGroupForExpense(topJoinedGroup)}
                   />
                 ) : (
@@ -193,7 +211,17 @@ export default function Dashboard() {
           <FloatingButton groupId={myGroups[0].id} uid={uid} categories={categories} setCategories={setCategories} fetchExpenses={fetchExpenses} showGroupSelector={true} />
         )}
         {isDepositOpen && selectedGroupId && user?.uid && selectedGroup && (
-          <DepositModal open={isDepositOpen} onClose={() => setDepositOpen(false)} groupId={selectedGroupId} uid={user.uid} creatorId={selectedGroup.creatorId} groupName={selectedGroup.groupName} onSuccess={() => {}} />
+          <DepositModal 
+            open={isDepositOpen} 
+            onClose={() => setDepositOpen(false)} 
+            groupId={selectedGroupId} 
+            uid={user.uid} 
+            creatorId={selectedGroup.creatorId} 
+            groupName={selectedGroup.groupName} 
+            onSuccess={() => {
+              fetchGroups(uid ?? "");
+            }} 
+          />
         )}
         {selectedGroupForExpense && (
           <Dialog.Root
@@ -209,6 +237,9 @@ export default function Dashboard() {
               setCategories={setCategories}
               fetchExpenses={fetchExpenses}
               onClose={() => setSelectedGroupForExpense(null)}
+              onSuccess={() => {
+                fetchGroups(uid ?? "");
+              }} 
             />
           </Dialog.Root>
         )}

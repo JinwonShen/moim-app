@@ -1,3 +1,11 @@
+/**
+ * 사용자 회원 탈퇴 페이지 컴포넌트.
+ * - 현재 로그인된 사용자의 인증 상태를 확인한 후 회원 탈퇴 처리
+ * - 비밀번호 로그인 사용자는 재인증 과정을 거친 후 Firebase 사용자 및 Firestore 문서 삭제
+ * - 전역 상태 초기화 및 인증 세션 제거
+ * - 탈퇴 완료 시 로그인 페이지로 이동
+ */
+
 import {
 	EmailAuthProvider,
 	deleteUser,
@@ -12,6 +20,11 @@ export default function Withdraw() {
 	const user = useAuthStore((state) => state.user);
 	const navigate = useNavigate();
 
+	// ✅ 회원 탈퇴 처리 함수
+	// - 사용자 인증 확인 및 탈퇴 의사 재확인
+	// - 비밀번호 로그인 사용자는 재인증 절차 수행
+	// - Firestore 사용자 문서 및 Firebase 계정 삭제
+	// - 상태 초기화 후 로그인 페이지로 이동
 	const handleWithdraw = async () => {
 		if (!user || !auth.currentUser) {
 			alert("사용자 정보가 유효하지 않습니다.");

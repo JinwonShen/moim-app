@@ -1,3 +1,11 @@
+/****
+ * 회원가입 세 번째 단계인 이메일/비밀번호/닉네임/생년월일 입력 페이지 컴포넌트.
+ * - 비밀번호는 영문 대소문자, 숫자, 특수문자 포함 8자 이상 조건 유효성 검사
+ * - 닉네임은 최소 2자 이상이며, 중복 확인 기능 포함
+ * - 모든 조건이 만족되면 Firebase를 통해 계정 생성 및 Firestore에 사용자 정보 저장
+ * - 회원가입 성공 시 전역 상태 저장 후 PIN 등록 페이지로 이동
+ */
+
 import type { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
@@ -40,6 +48,7 @@ export default function JoinEmail() {
 
 	// 중복확인 로직
 	const handleCheckNickname = async () => {
+		// ✅ 닉네임 유효성 검사 (입력 여부 및 길이 체크)
 		if (!nickname) {
 			alert("닉네임을 입력해주세요!");
 			return;
@@ -52,10 +61,12 @@ export default function JoinEmail() {
 		setIsChecking(true); // 로딩 시작
 
 		try {
+			// 🔄 Firebase에서 닉네임 중복 여부 확인
 			const usersRef = collection(db, "users");
 			const q = query(usersRef, where("nickname", "==", nickname));
 			const snapshot = await getDocs(q);
 
+			// ✅ 사용 가능 여부에 따라 상태 업데이트
 			if (snapshot.empty) {
 				alert("사용 가능한 닉네임입니다.");
 				setNicknameChecked(true);
@@ -79,12 +90,14 @@ export default function JoinEmail() {
 	};
 
 	// 비밀번호 로직(8자리 이상의 영문 대소문자, 특수문자 포함)
+	// ✅ 비밀번호 조건 유효성 검사 정규식
 	const validatePassword = (pw: string) => {
 		const regex =
 			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=\-]).{8,}$/;
 		return regex.test(pw);
 	};
 
+	// ✅ 비밀번호 입력 시 유효성 체크 및 에러 메시지 처리
 	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setPassword(value);
@@ -98,6 +111,7 @@ export default function JoinEmail() {
 		}
 	};
 
+	// ✅ 비밀번호 확인값이 원본 비밀번호와 일치하는지 확인
 	const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setConfirmPassword(value);
@@ -113,6 +127,7 @@ export default function JoinEmail() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
+		// ✅ 각 입력값 유효성 검사 및 중복 확인
 		if (!email.includes("@"))
 			return alert("올바른 이메일 형식을 입력해주세요.");
 		if (password.length < 6)
@@ -129,6 +144,7 @@ export default function JoinEmail() {
 		}
 
 		try {
+			// 🔐 Firebase Authentication으로 계정 생성
 			const userCredential = await createUserWithEmailAndPassword(
 				auth,
 				email,
@@ -142,6 +158,7 @@ export default function JoinEmail() {
 				return;
 			}
 
+			// 🗂️ Firestore에 사용자 정보 저장
 			await setDoc(doc(db, "users", userCredential.user.uid), {
 				email,
 				nickname,
@@ -149,6 +166,7 @@ export default function JoinEmail() {
 				profileImage: "/default-image.png",
 			});
 
+			// 🧠 Zustand 상태 저장소에 유저 정보 저장
 			setUser({
 				uid: userCredential.user.uid,
 				email: email,
@@ -158,10 +176,12 @@ export default function JoinEmail() {
 				account: undefined,
 			});
 
+			// ✅ 완료 후 PIN 등록 페이지로 이동
 			alert("회원가입이 완료되었습니다.");
 			console.log(userCredential.user);
 			navigate("/pinregister");
 		} catch (error) {
+			// 🚨 에러 처리 (이메일 중복, 기타 실패)
 			const firebaseError = error as FirebaseError;
 
 			if (firebaseError.code === "auth/email-already-in-use") {

@@ -1,3 +1,9 @@
+/**
+ * 사용자가 특정 모임에 입금할 수 있도록 도와주는 모달 컴포넌트입니다.
+ * - 입금 금액을 입력하고 `입금하기` 버튼을 눌러 입금을 처리합니다.
+ * - 입금 성공 시 알림을 모임장에게 전송하고, 모달을 닫은 후 콜백을 실행합니다.
+ */
+
 import {
 	Dialog,
 	DialogContent,
@@ -32,22 +38,25 @@ export default function DepositModal({
 	const wallet = useWalletStore((state) => state.wallet);
 
 	const handleDeposit = async () => {
+		// 유효하지 않은 금액 처리
 		if (!amount || amount <= 0) {
 			alert("입금 금액을 입력해주세요.");
 			return;
 		}
 
+		// 사용자의 현재 지갑 잔액보다 많은 금액을 입력한 경우
 		if (wallet && amount > wallet.balance) {
 			alert("잔액이 부족합니다.");
 			return;
 		}
 
 		try {
-			setLoading(true);
+			setLoading(true); // 로딩 시작
 
+			// 지정된 모임에 입금 처리
 			await depositToGroup(groupId, uid, amount);
 
-			// 🔹 알림 전송
+			// 입금 후 알림 전송 (모임장에게)
 			await sendGroupNotification(
 				groupId,
 				"deposit",
@@ -55,12 +64,14 @@ export default function DepositModal({
 				"참가자가 입금했습니다.",
 			);
 
+			// 모달 닫기 및 성공 콜백 실행
 			onClose();
 			onSuccess?.();
 		} catch (error) {
+			// 입금 처리 중 오류 발생 시 콘솔에 출력
 			console.error("입금 실패: ", error);
 		} finally {
-			setLoading(false);
+			setLoading(false); // 로딩 종료
 		}
 	};
 

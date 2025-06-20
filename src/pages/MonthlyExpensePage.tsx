@@ -1,3 +1,10 @@
+/**
+ * - 사용자가 만든 모임 또는 참여 중인 모임을 선택하여 월별 지출을 확인할 수 있는 페이지
+ * - 기본적으로 가장 최근 진행 중인 모임이 자동 선택됨
+ * - 선택된 모임과 월에 따라 달력(MonthlyCalendar)과 지출 내역(ExpenseList)을 렌더링
+ * - Zustand 상태(store)를 통해 그룹 데이터를 불러오며, 선택된 그룹과 월은 로컬 상태로 관리됨
+ */
+
 import { startOfMonth } from "date-fns";
 import { useEffect, useState } from "react";
 import ExpenseList from "../components/group/ExpenseList";
@@ -16,11 +23,14 @@ export default function MonthlyExpensePage() {
   // ✅ 현재 월 선택 상태 (기본값: 이번 달)
   const [selectedMonth, setSelectedMonth] = useState<Date>(startOfMonth(new Date()));
 
-	useEffect(() => {
-  if (uid) fetchGroups(uid);
-}, [uid]);
+  // ✅ 로그인된 사용자의 모임 데이터를 불러옴 (내가 만든 모임 + 참여 모임)
+  useEffect(() => {
+    if (uid) fetchGroups(uid);
+  }, [uid]);
 
-  // ✅ 가장 최근 진행 중인 모임 자동 선택
+  // ✅ 가장 최근 진행 중인 모임을 자동으로 선택
+  // - 현재 날짜 기준으로 시작일~종료일 사이에 있는 모임 필터링
+  // - 그 중 가장 최근 시작일을 기준으로 정렬하여 선택
   useEffect(() => {
     const now = new Date();
     const progressingGroups = [...myGroups, ...joinedGroups].filter((group) => {
@@ -37,7 +47,8 @@ export default function MonthlyExpensePage() {
     }
   }, [myGroups, joinedGroups]);
 
-  // ✅ 선택된 모임 객체 설정
+  // ✅ 선택된 모임 ID에 따라 실제 모임 객체를 상태에 설정
+  // - 내가 만든 모임 또는 참여 중인 모임에서 검색
   useEffect(() => {
     const found =
       myGroups.find((g) => g.id === selectedGroupId) ||
@@ -45,7 +56,7 @@ export default function MonthlyExpensePage() {
     setSelectedGroup(found ?? null);
   }, [selectedGroupId, myGroups, joinedGroups]);
 
-  // ✅ 로딩 상태
+  // ✅ 모임 ID가 아직 선택되지 않은 경우 로딩 메시지 표시
   if (selectedGroupId === null) {
     return <p className="text-gray-500">모임 데이터를 불러오는 중...</p>;
   }

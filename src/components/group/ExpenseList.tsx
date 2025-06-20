@@ -1,3 +1,10 @@
+/**
+ * ExpenseList 컴포넌트
+ * - 특정 모임(groupId)에서 지정한 월(selectedMonth)에 해당하는 지출 데이터를 Firestore에서 가져와 렌더링합니다.
+ * - 지출 내역은 날짜순으로 정렬되며, 페이지네이션을 지원합니다.
+ * - 총 지출 금액도 함께 계산 및 출력합니다.
+ */
+
 import { format, isSameMonth, parseISO } from "date-fns";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -21,6 +28,7 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Firestore에서 해당 모임의 지출 데이터를 가져와 상태로 저장
   useEffect(() => {
     const fetchExpenses = async () => {
       const ref = collection(db, "groups", groupId, "expenses");
@@ -37,6 +45,7 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
         };
       });
 
+      // 정리된 지출 데이터를 상태에 저장
       setExpenses(items);
       setCurrentPage(1); // 그룹 변경 시 초기 페이지로
     };
@@ -44,16 +53,18 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
     fetchExpenses();
   }, [groupId]);
 
-  // 해당 월 필터 및 정렬
+  // 선택된 월과 일치하는 지출 항목만 필터링
   const filtered = expenses.filter((e) =>
     isSameMonth(parseISO(e.date), selectedMonth)
   );
+  // 날짜 기준 오름차순 정렬
   const sorted = [...filtered].sort((a, b) => a.date.localeCompare(b.date));
 
-  // ✅ 페이지네이션 처리
+  // 페이지네이션 처리 관련 변수 설정
   const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = sorted.slice(startIndex, startIndex + itemsPerPage);
+  // 전체 지출 금액 계산 (월 필터와는 별개로 전체 합산)
   const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
@@ -102,7 +113,7 @@ export default function ExpenseList({ groupId, selectedMonth }: ExpenseListProps
         )}
       </ul>
 
-      {/* ✅ 페이지네이션 UI */}
+      {/* 페이지네이션 버튼 UI 렌더링 */}
       {totalPages >= 1 && (
         <div className="flex justify-center gap-2 mt-[12px] text-[14px]">
           <button

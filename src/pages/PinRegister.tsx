@@ -1,3 +1,11 @@
+/**
+ * 사용자 PIN 등록/변경 페이지 컴포넌트.
+ * - 회원가입 시 또는 마이페이지에서 PIN을 설정하거나 변경할 수 있음
+ * - 6자리 숫자 키패드를 통해 PIN 입력을 받고, Firebase에 해시값으로 저장
+ * - 저장 성공 시 sessionStorage에 인증 상태 저장 후 적절한 경로로 리디렉션
+ * - "등록" 모드와 "변경" 모드를 구분하여 UI와 경로 처리
+ */
+
 import bcrypt from "bcryptjs";
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
@@ -20,14 +28,19 @@ export default function PinRegister() {
       ? "/mypage" // 핀 변경 시 리디렉션
       : location.state?.from || "/dashboard"; // 회원가입 시 리디렉션
 
+  // ✅ 키패드 숫자 입력 처리 (최대 6자리)
   const handleClick = (digit: string) => {
     if (pin.length < 6) setPin([...pin, digit]);
   };
 
+  // ✅ 마지막 숫자 삭제 처리
   const handleDelete = () => {
     setPin((prev) => prev.slice(0, -1));
   };
 
+  // ✅ 입력된 PIN 해시화 후 Firebase에 저장
+  // - 성공 시 sessionStorage에 인증 상태 저장 후 알림 및 이동
+  // - 실패 시 콘솔 출력 및 에러 알림
   const handleSubmit = async () => {
     if (pin.length !== 6 || !uid) return;
 

@@ -1,3 +1,11 @@
+/**
+ * 이 파일은 모임 지갑 관련 Firebase Firestore 연동 API 함수들을 정의한다.
+ * 주요 기능:
+ * - 개인 및 모임 지갑 데이터 불러오기
+ * - 입금 처리 로직 및 알림 전송
+ * - 상태 스토어 업데이트 (walletStore, authStore)
+ */
+
 import {
 	arrayUnion,
 	collection,
@@ -16,9 +24,11 @@ import { sendGroupNotification } from "./notificationApi";
 
 export const fetchWallet = async (groupId: string, uid: string) => {
 	try {
+		// 🔍 지정된 그룹과 유저 ID로 지갑 문서 참조
 		const walletRef = doc(db, "groups", groupId, "wallets", uid);
 		const snap = await getDoc(walletRef);
 
+		// 📄 문서가 존재할 경우, 전역 상태 업데이트
 		if (snap.exists()) {
 			useWalletStore.getState().setWallet({
 				uid,
@@ -26,6 +36,7 @@ export const fetchWallet = async (groupId: string, uid: string) => {
 				updatedAt: snap.data().updatedAt,
 			});
 		} else {
+			// ⚠️ 문서가 없을 경우 콘솔 경고
 			console.warn("지갑 정보 없음");
 		}
 	} catch (error) {
@@ -35,18 +46,22 @@ export const fetchWallet = async (groupId: string, uid: string) => {
 
 export const fetchAccountBalance = async (uid: string) => {
 	try {
+		// 🔍 사용자 문서 참조
 		const userRef = doc(db, "users", uid);
 		const userSnap = await getDoc(userRef);
 		const data = userSnap.data();
 
+		// 🏦 계좌 정보 유무 확인
 		if (!data?.account) throw new Error("계좌 정보 없음");
 
+		// ✅ 전역 상태 업데이트
 		useWalletStore.getState().setWallet({
 			uid,
 			balance: data.account.balance,
 			updatedAt: data.account.updatedAt?.toDate?.() ?? new Date(),
 		});
 
+		// 🔁 balance 반환
 		return data.account.balance;
 	} catch (error) {
 		console.error("계좌 잔액 로딩 실패:", error);
@@ -60,7 +75,7 @@ export const depositToGroup = async (
 	amount: number,
 ) => {
 	try {
-		// 1️⃣ 개인 계좌 불러오기
+		// 1️⃣ 사용자 계좌 정보 로딩 및 잔액 확인
 		const userRef = doc(db, "users", uid);
 		const userSnap = await getDoc(userRef);
 		const userData = userSnap.data();
@@ -69,17 +84,17 @@ export const depositToGroup = async (
 			throw new Error("잔액 부족 또는 계좌 정보 없음");
 		}
 
-		// 2️⃣ 모임 지갑 불러오기
+		// 2️⃣ 그룹 지갑 정보 확인
 		const groupWalletRef = doc(db, "groups", groupId, "wallets", uid);
 		const groupSnap = await getDoc(groupWalletRef);
 		if (!groupSnap.exists()) throw new Error("모임 지갑 없음");
 
-		// 3️⃣ Firestore 업데이트
+		// 3️⃣ 사용자 계좌에서 금액 차감
 		await updateDoc(userRef, {
 			"account.balance": userData.account.balance - amount,
 		});
 
-		// 알림 전송 !
+		// 📢 모임장에게 알림 전송 준비
 		const participantsRef = collection(db, "groups", groupId, "participants");
 		const participantSnap = await getDocs(participantsRef);
 
@@ -95,6 +110,7 @@ export const depositToGroup = async (
 		const groupData = groupInfoSnap.data();
 		console.log("👑 찾은 모임장:", owner?.uid); // 👈 여기를 꼭 찍어봐!
 
+		// 🔔 알림 전송
 		if (owner && groupData?.groupName && userData?.nickname) {
 			console.log("✅ 알림 전송 시도");
 			await sendGroupNotification(
@@ -105,6 +121,7 @@ export const depositToGroup = async (
 			);
 		}
 
+		// 💰 그룹 지갑 및 그룹 문서 업데이트
 		await updateDoc(groupWalletRef, {
 			balance: increment(amount),
 			updatedAt: serverTimestamp(),
@@ -115,14 +132,13 @@ export const depositToGroup = async (
 			balance: increment(amount),
 		});
 
-		// ✅ walletStore 전역 상태 갱신
+		// ♻️ 상태 스토어(walletStore, authStore) 업데이트
 		useWalletStore.getState().setWallet({
 			uid,
 			balance: userData.account.balance - amount,
 			updatedAt: new Date(),
 		});
 
-		// ✅ authStore 전역 상태 갱신 (UI 반영 위해 추가)
 		const prevUser = useAuthStore.getState().user;
 
 		if (prevUser) {
@@ -137,6 +153,7 @@ export const depositToGroup = async (
 			});
 		}
 
+		// ✅ 입금 완료 알림
 		alert("입금이 완료되었습니다.");
 	} catch (error) {
 		console.error("입금 실패", error);

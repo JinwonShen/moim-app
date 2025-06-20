@@ -1,3 +1,11 @@
+/**
+ * 사용자의 이메일 로그인 기능을 제공하는 페이지 컴포넌트.
+ * - 이메일과 비밀번호를 입력받아 Firebase 인증 시도
+ * - 로그인 성공 시 상태 저장 및 대시보드로 이동
+ * - 실패 시 에러 메시지 출력
+ * - 소셜 로그인 페이지로 되돌아가는 버튼 포함
+ */
+
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,16 +19,20 @@ export default function EmailLogin() {
 
 	const handleLogin = async () => {
 		try {
+			// ✅ 입력된 이메일/비밀번호로 로그인 요청
 			const result = await loginWithEmail(email, password);
+			// 🔐 Firebase 인증 처리 및 사용자 정보 확인
 			const userCredential = await signInWithEmailAndPassword(
 				auth,
 				email,
 				password,
 			);
+			// ✅ 로그인 성공 시 상태 저장 및 이동
 			console.log("로그인 성공!", result.user);
 			alert("로그인 성공!");
 			await handleLoginSuccess(userCredential.user, navigate);
 		} catch (error) {
+			// 🚨 로그인 실패 시 에러 알림
 			console.error("로그인 실패: ", error);
 			alert("로그인 실패");
 		}

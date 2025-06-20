@@ -1,3 +1,11 @@
+/**
+ * 사용자 PIN 인증 페이지 컴포넌트.
+ * - 6자리 PIN 번호를 입력받아 Firebase에서 해시값과 비교 후 인증 처리
+ * - 인증 성공 시 sessionStorage에 인증 상태 저장 후 페이지 이동
+ * - 인증 목적에 따라 (mode: changePin | deleteUser | default) 분기 처리
+ * - 인증 실패 또는 에러 발생 시 에러 메시지 출력
+ */
+
 import bcrypt from "bcryptjs";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -14,6 +22,7 @@ export default function PinConfirm() {
 	const redirecTo = location.state?.from || "";
 	const mode = location.state?.mode;
 
+	// ✅ 로그인 여부 확인 - 비로그인 시 로그인 페이지로 이동
 	useEffect(() => {
 		if (!user) {
 			alert("로그인이 필요합니다.");
@@ -29,6 +38,9 @@ export default function PinConfirm() {
 		setPin(pin.slice(0, -1));
 	};
 
+	// ✅ 입력된 PIN을 Firebase에 저장된 해시와 비교하여 인증 처리
+	// - 인증 성공 시 목적에 맞는 페이지로 이동 (handleSuccess 호출)
+	// - 인증 실패 시 에러 메시지 출력 및 PIN 초기화
 	const handleSubmit = async () => {
 		if (!user || pin.length !== 6) {
 			console.log("user 없음 또는 핀 길이 부족", user, pin);
@@ -71,6 +83,10 @@ export default function PinConfirm() {
 		}
 	};
 
+	// ✅ 인증 성공 후 목적에 따라 라우팅 처리
+	// - PIN 변경: /pinregister
+	// - 회원 탈퇴: /withdraw
+	// - 기본: redirecTo 또는 /dashboard
 	const handleSuccess = () => {
 		if (mode === "changePin") {
 			navigate("/pinregister", {

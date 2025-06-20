@@ -1,3 +1,9 @@
+/**
+ * 대시보드 내 공지사항 요약 컴포넌트입니다.
+ * 사용자가 속한 모든 모임의 최신 공지사항(1건씩)을 가져와 최신순으로 표시합니다.
+ * 공지 클릭 시 해당 모임 상세 페이지로 이동합니다.
+ */
+
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,10 +24,12 @@ export default function NoticeSummaryList() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 사용자가 속한 모든 그룹에서 최신 공지사항 1건씩 비동기적으로 가져오기
   useEffect(() => {
     const fetchAllNotices = async () => {
       const allGroups = [...myGroups, ...joinedGroups];
       if (allGroups.length === 0) {
+        // 그룹이 없을 경우 바로 로딩 종료
         setLoading(false);
         return;
       }
@@ -36,6 +44,7 @@ export default function NoticeSummaryList() {
 
           snapshot.forEach((doc) => {
             const data = doc.data();
+            // 각 그룹의 공지사항 중 최신 1건만 추출하여 배열에 추가
             results.push({
               id: doc.id,
               groupId: group.id,
@@ -47,6 +56,7 @@ export default function NoticeSummaryList() {
         })
       );
 
+      // 모든 공지를 최신순으로 정렬
       const sorted = results.sort((a, b) =>
         b.createdAt.localeCompare(a.createdAt)
       );
@@ -59,6 +69,7 @@ export default function NoticeSummaryList() {
 
   if (loading) return null;
 
+  // 공지사항이 하나도 없는 경우 메시지 표시
   if (notices.length === 0) {
     return (
       <div>
@@ -69,6 +80,7 @@ export default function NoticeSummaryList() {
     );
   }
 
+  // 공지사항 리스트 렌더링
   return (
     <ul className="text-[14px]">
       {notices.map((notice) => (

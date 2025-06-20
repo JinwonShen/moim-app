@@ -1,3 +1,9 @@
+/**
+ * 모임 참여자를 초대할 수 있는 모달 컴포넌트입니다.
+ * - 초대 링크 복사 기능을 제공합니다.
+ * - 입금 요청 알림 기능은 추후 구현 예정입니다.
+ */
+
 import {
 	Dialog,
 	DialogContent,
@@ -13,13 +19,16 @@ interface Props {
 }
 
 export default function InviteModal({ open, onClose, groupId }: Props) {
+	// 현재 브라우저 도메인과 groupId를 활용해 초대 링크 생성
 	const inviteUrl = `${window.location.origin}/joingroup?groupId=${groupId}`;
 
+	// 초대 링크를 클립보드에 복사하고 사용자에게 알림 표시
 	const handleCopy = () => {
 		navigator.clipboard.writeText(inviteUrl);
 		alert("초대 링크가 복사되었습니다.");
 	};
 
+	// 입금 요청 알림 기능은 아직 구현되지 않음 (예정 기능)
 	const handleRequestPayment = () => {
 		alert("입금 요청 알림 기능은 추후 구현 예정입니다.");
 	};

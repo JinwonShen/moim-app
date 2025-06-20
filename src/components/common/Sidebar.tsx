@@ -1,3 +1,10 @@
+/**
+ * - 대시보드 및 페이지의 좌측에 고정된 사이드바 컴포넌트
+ * - 로그인 상태에 따라 사용자 정보 및 메뉴 항목 표시
+ * - 현재 활성화된 메뉴는 강조되며, 페이지 이동은 useRouter를 통해 처리됨
+ * - 모바일 화면에서는 보이지 않으며, PC 화면에서만 렌더링
+ */
+
 import { signOut } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -23,6 +30,9 @@ export default function Sidebar() {
 
 	const isActive = (target: string) => pathname === target;
 
+  // ✅ 로그아웃 처리 함수
+  // - Zustand 상태 초기화
+  // - Firebase 로그아웃 처리 후 로그인 페이지로 이동
 	const handleLogout = async () => {
     const confirmLogout = window.confirm("정말 로그아웃하시겠습니까?");
     if (!confirmLogout) return;
@@ -36,49 +46,55 @@ export default function Sidebar() {
     }
   };
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				sidebarRef.current &&
-				!(sidebarRef.current as HTMLElement).contains(event.target as Node)
-			) {
-				setOpen(false);
-			}
-		};
+  useEffect(() => {
+    // ✅ 로그인 상태 확인 후 처리
+    // - 로그인된 사용자가 없는 경우 로그인 페이지로 리디렉션
+    // - 페이지 새로고침 시에도 유효한 상태 확인 가능
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current &&
+        !(sidebarRef.current as HTMLElement).contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
 
-		if (open) {
-			document.addEventListener("mousedown", handleClickOutside);
-		} else {
-			document.removeEventListener("mousedown", handleClickOutside);
-		}
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [open]);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
-	return (
+  return (
     <>
-			{!open && (
-				<button
-					onClick={() => setOpen(true)}
-					className="fixed top-[36px] left-[12px] z-50 p-[4px] lg:hidden"
-				>
-					<FiMenu size={24} />
-				</button>
-			)}
+      {/* ✅ 사이드바 전체 레이아웃 구성 */}
+      {/* - 로고, 사용자 정보, 메뉴 리스트로 구성 */}
+      {/* - PC 화면 전용 컴포넌트 (mobile에서는 hidden) */}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="fixed top-[36px] left-[12px] z-50 p-[4px] lg:hidden"
+        >
+          <FiMenu size={24} />
+        </button>
+      )}
       <header
         ref={sidebarRef}
         className={`max-w-[225px] w-full h-[100vh] overflow-y-auto fixed pt-[24px] pl-[24px] bg-white border-r-[1px] border-gray-200 z-50 transform transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:pt-[36px]`}
       >
-				<button
-					onClick={() => setOpen(false)}
-					className="absolute top-[36px] right-[16px] z-50 lg:hidden"
-				>
-					<FiX size={24} />
-				</button>
+        <button
+          onClick={() => setOpen(false)}
+          className="absolute top-[36px] right-[16px] z-50 lg:hidden"
+        >
+          <FiX size={24} />
+        </button>
         <span className="cursor-pointer">
           <h1>
             <button type="button" onClick={() => navigate("/dashboard")}>
@@ -111,6 +127,9 @@ export default function Sidebar() {
             </button>
           </h1>
         </span>
+        {/* ✅ 사용자 프로필 영역 */}
+        {/* - 닉네임과 프로필 이미지를 표시 */}
+        {/* - 로그인된 사용자의 UID 기준으로 상태값 추출 */}
         {/* 대시보드 */}
         <div className="mt-[48px] mb-[20px]">
           <ul>
@@ -132,6 +151,9 @@ export default function Sidebar() {
         {/* 마이페이지 */}
         <div className="mb-[20px]">
           <ul>
+            {/* ✅ 메뉴 항목을 반복 렌더링 */}
+            {/* - 현재 경로(router.pathname)와 일치하는 메뉴는 강조 스타일 적용 */}
+            {/* - 클릭 시 해당 경로로 이동 */}
             <li className="flex cursor-pointer">
               <FiUser className="text-[18px] md:text-[20px]" />
               <h3 className="pl-[8px] mb-[4px] font-bold text-[14px] md:text-[16px]">내 정보</h3>

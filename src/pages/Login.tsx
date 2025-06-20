@@ -1,3 +1,10 @@
+/**
+ * 사용자의 로그인 기능을 제공하는 페이지 컴포넌트.
+ * - Google 로그인 버튼 클릭 시 로그인 진행 및 상태 저장
+ * - 이메일 로그인 페이지 및 회원가입 약관 페이지로 이동 가능
+ * - 추후 카카오/네이버 로그인 기능 확장 가능 (현재 버튼만 UI 있음)
+ */
+
 import { useNavigate } from "react-router-dom";
 import { handleLoginSuccess, loginWithGoogle } from "../lib/auth";
 
@@ -5,6 +12,9 @@ export default function Login() {
 	const navigate = useNavigate();
 
 	const handleGoogleLogin = async () => {
+		// ✅ Google 로그인 시도
+		// 🔐 로그인 성공 시 상태 저장 및 페이지 이동
+		// 🚨 실패 시 에러 처리
 		try {
 			const user = await loginWithGoogle();
 			// TODO: 상태 저장, 페이지 이동 등 처리
@@ -17,10 +27,12 @@ export default function Login() {
 	};
 
 	const handleEmailLogin = () => {
+		// 📩 이메일 로그인 페이지로 이동
 		navigate("/emaillogin");
 	};
 
 	const handleJoinTerms = () => {
+		// 📝 회원가입 약관 페이지로 이동
 		navigate("/jointerms");
 	};
 

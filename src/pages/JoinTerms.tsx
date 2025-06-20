@@ -1,3 +1,11 @@
+/**
+ * 회원가입 첫 단계인 약관 동의 페이지 컴포넌트.
+ * - 필수 항목(이용약관, 만 14세 이상 확인, 개인정보 수집)에 모두 동의해야 다음 단계로 진행 가능
+ * - 선택 항목(마케팅 동의)은 필수가 아님
+ * - 모든 동의 항목은 상태로 관리되며, '다음' 버튼 클릭 시 검증 처리
+ * - 소셜 로그인 페이지로 돌아가는 버튼 포함
+ */
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,10 +20,14 @@ export default function JoinTerms() {
 	});
 
 	const handleChange = (key: keyof typeof terms) => {
+		// ✅ 선택한 항목의 체크 상태를 토글
 		setTerms((prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
 	const handleNext = () => {
+		// ✅ 필수 항목 동의 여부 확인
+		// ❌ 하나라도 동의하지 않았을 경우 알림 후 중단
+		// ✅ 모든 필수 항목 동의 시 다음 단계(휴대폰 인증)로 이동
 		if (!terms.termsOfUse || !terms.ageCheck || !terms.privacy) {
 			alert("필수 항목에 모두 동의해주세요.");
 			return;

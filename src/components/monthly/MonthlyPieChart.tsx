@@ -1,3 +1,10 @@
+/**
+ * MonthlyPieChart 컴포넌트
+ * 선택한 월의 지출 데이터를 카테고리별로 집계하여 파이 차트와 리스트 형태로 시각화합니다.
+ * Firebase Firestore에서 그룹의 지출 데이터를 불러와 해당 월의 항목만 필터링합니다.
+ * 날짜 이동 버튼으로 이전/다음 달 데이터를 확인할 수 있으며, PieChart는 recharts 라이브러리를 사용합니다.
+ */
+
 import { addMonths, format, subMonths } from "date-fns";
 import { ko } from "date-fns/locale";
 import { collection, getDocs } from "firebase/firestore";
@@ -30,6 +37,7 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
 
   useEffect(() => {
+    // Firestore에서 해당 그룹의 지출 데이터를 가져옵니다.
     const fetchExpenses = async () => {
       const ref = collection(db, "groups", groupId, "expenses");
       const snapshot = await getDocs(ref);
@@ -48,15 +56,19 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
   }, [groupId]);
 
   const currentMonthStr = format(selectedMonth, "yyyy-MM");
+  // 선택한 월의 지출 항목만 필터링합니다.
   const monthlyExpenses = expenses.filter((e) => e.date.startsWith(currentMonthStr));
 
+  // 해당 월 전체 지출 금액의 합계를 계산합니다.
   const totalAmount = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
 
+  // 카테고리별로 지출 금액을 합산하여 categoryMap에 저장합니다.
   const categoryMap: Record<string, number> = {};
   monthlyExpenses.forEach((e) => {
     categoryMap[e.category] = (categoryMap[e.category] || 0) + e.amount;
   });
 
+  // categoryMap을 기반으로 PieChart용 데이터 배열을 생성하고, 퍼센트도 계산합니다.
   const pieData: CategoryData[] = Object.entries(categoryMap).map(([name, value]) => ({
     name,
     value,
@@ -65,6 +77,7 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
 
   return (
     <div className="flex flex-col gap-[24px]">
+      {/* 월 이동 버튼 및 현재 월 표시 */}
       <div className="flex flex-[1] justify-center items-center gap-4 mb-4 text-lg font-semibold">
         <button onClick={() => onMonthChange(subMonths(selectedMonth, 1))}>◀</button>
         <span>{format(selectedMonth, "yyyy년 MM월", { locale: ko })}</span>
@@ -72,6 +85,7 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
       </div>
       <div className="flex flex-col">
         <div className="w-full md:w-1/2">
+          {/* 파이 차트 렌더링 */}
           <ResponsiveContainer width="100%" height={250}>
             <PieChart className="text-[14px]">
               <Pie
@@ -91,6 +105,7 @@ export default function CategoryPieChart({ groupId, selectedMonth, onMonthChange
           </ResponsiveContainer>
         </div>
 
+      {/* 하단 지출 내역 요약 리스트 */}
       <div className="w-full md:w-1/2 px-[24px] py-[16px] border rounded-[8px] text-[14px]">
         <p className="mb-[16px] pb-[12px] border-b-[1px] text-[16px] font-semibold">지출 전체 {totalAmount.toLocaleString()}원</p>
         <ul className="space-y-2">

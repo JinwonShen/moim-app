@@ -1,3 +1,11 @@
+/**
+ * 모임 초대 링크를 통해 참가자가 모임에 참여하는 페이지 컴포넌트.
+ * - 로그인하지 않은 사용자는 로그인 페이지로 리디렉션
+ * - groupId를 URL 파라미터로 받아 해당 모임 정보 및 참가자 목록을 불러옴
+ * - 참가자는 리스트 중 본인을 선택하여 uid를 연결
+ * - 참가 확정 시 참가자 문서의 uid 업데이트 및 지갑 문서 생성
+ */
+
 import {
 	collection,
 	doc,
@@ -94,6 +102,10 @@ export default function JoinGroup() {
 		fetchParticipants();
 	}, [groupId]);
 
+	// ✅ 참가자 선택 후 참가 확정 처리
+	// - 선택된 참가자 문서에 현재 사용자 uid를 연결
+	// - 지갑(wallets) 서브컬렉션에 초기 balance 0으로 생성
+	// - 완료 후 해당 모임 상세 페이지로 이동
 	const handleJoin = async () => {
 		if (!groupId || !selected || !user) return;
 

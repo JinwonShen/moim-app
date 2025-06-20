@@ -1,3 +1,10 @@
+/**
+ * AddExpenseModal 컴포넌트
+ * - Radix UI의 Dialog를 사용하여 지출 등록 모달을 구현
+ * - 선택된 모임의 지출을 Firebase Firestore에 등록하고 잔액을 차감
+ * - 등록 후 부모로부터 전달받은 콜백(onSuccess, fetchExpenses)을 통해 외부 상태를 갱신
+ */
+
 "use client";
 
 import {
@@ -26,6 +33,7 @@ interface Props {
 	fetchExpenses: () => Promise<void>;
 	onClose: () => void;
 	showGroupSelector?: boolean;
+	onSuccess: () => void;	
 }
 
 export default function AddExpenseModal({
@@ -36,6 +44,7 @@ export default function AddExpenseModal({
 	fetchExpenses,
 	onClose,
 	showGroupSelector,
+	onSuccess,
 }: Props) {
 	const [selectedGroupId, setSelectedGroupId] = useState(groupId);
 
@@ -85,26 +94,31 @@ export default function AddExpenseModal({
 				<ExpenseForm
 					onSubmit={async ({ date, amount, category, memo }) => {
 						try {
+							// 1. 선택된 모임의 지출 서브컬렉션에 문서 추가
 							const expensesRef = collection(db, "groups", selectedGroupId, "expenses");
 
-							// 1. 지출 등록
 							await addDoc(expensesRef, {
-								date,
-								amount,
-								category,
-								memo,
-								author: uid,
-								createdAt: new Date(),
+								date,           // 지출 날짜
+								amount,         // 지출 금액
+								category,       // 분류
+								memo,           // 메모
+								author: uid,    // 작성자 uid
+								createdAt: new Date(), // 생성 시각
 							});
 
-							// 2. 잔액 차감
+							// 2. 해당 모임의 잔액에서 지출 금액만큼 차감
 							const groupRef = doc(db, "groups", selectedGroupId);
 							await updateDoc(groupRef, {
 								balance: increment(-amount),
 							});
 
-							// 3. 지출 새로고침 및 모달 닫기
+							// 3. 외부에서 전달된 fetchExpenses 함수로 지출 목록을 갱신
 							await fetchExpenses();
+
+							// 4. 외부에서 전달된 onSuccess 콜백 실행 (e.g. 상태 갱신)
+							onSuccess();
+
+							// 5. 모달 닫기
 							onClose();
 						} catch (error) {
 							console.error("지출 등록 중 오류 발생:", error);

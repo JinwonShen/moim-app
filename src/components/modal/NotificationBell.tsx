@@ -1,3 +1,10 @@
+/**
+ * 사용자의 알림 목록을 표시하는 알림 아이콘 컴포넌트입니다.
+ * - 알림 아이콘 클릭 시 팝오버 형태로 알림 리스트가 열립니다.
+ * - 새로운 알림이 있을 경우, 빨간 점으로 시각적 표시를 합니다.
+ * - 각 알림을 클릭하면 해당 모임 상세 페이지로 이동합니다.
+ */
+
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import { FiBell } from "react-icons/fi";
@@ -8,6 +15,7 @@ import { useAuthStore } from "../../store/authStore";
 export default function NotificationBell() {
 	const [open, setOpen] = useState(false);
 	const user = useAuthStore((state) => state.user);
+	// 사용자 UID를 기반으로 실시간 알림 데이터를 가져오는 custom hook
 	const notifications = useNotifications(user?.uid); // ✅ custom hook 사용
 	const navigate = useNavigate();
 
@@ -20,6 +28,7 @@ export default function NotificationBell() {
 					aria-label="알림 열기"
 				>
 					<FiBell className="w-[24px] h-[24px] font-bold text-gray-800" />
+					{/* 알림이 존재하면 빨간 점을 표시하여 사용자에게 새로운 알림이 있음을 알림 */}
 					{notifications.length > 0 && (
 						<span className="absolute top-1 right-1 inline-block w-2 h-2 bg-primary rounded-full" />
 					)}
@@ -41,6 +50,7 @@ export default function NotificationBell() {
 								<li key={n.id}>
 									<button
 										type="button"
+										// 알림 클릭 시 해당 모임 상세 페이지로 이동
 										onClick={() => navigate(`/group/${n.groupId}`)}
 										className="text-sm text-gray-800 hover:underline cursor-pointer text-left"
 									>

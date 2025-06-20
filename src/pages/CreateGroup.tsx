@@ -1,3 +1,11 @@
+/**
+ * 새 모임 생성 페이지 컴포넌트.
+ * - 모임 이름, 설명, 기간, 참여자, 예산 등의 정보를 입력받아 모임 생성
+ * - 입력값 유효성 검사 후 Firestore에 그룹 문서, 지갑, 참가자 서브컬렉션 생성
+ * - 모임장 정보(uid, nickname)는 상태에서 불러오며 자동 포함됨
+ * - 생성 완료 후 공유/시작에 따라 적절한 경로로 이동
+ */
+
 import {
 	addDoc,
 	collection,
@@ -27,6 +35,10 @@ export default function CreateGroup() {
 	const [dueDate, setDueDate] = useState("");
 	const [agreeTerms, setAgreeTerms] = useState(false);
 
+	// ✅ 모임 생성 처리
+	// - 입력값 유효성 검사 (날짜, 예산, 참여자 등)
+	// - Firestore에 그룹 문서 및 서브컬렉션(wallets, participants) 생성
+	// - 그룹 목록 갱신 후 navigate 처리 (공유 or 시작에 따라 경로 분기)
 	const handleSubmit = async (type: "start" | "share") => {
 		if (!uid || !groupName.trim()) return;
 
@@ -165,22 +177,26 @@ export default function CreateGroup() {
 		}
 	};
 
+	// ✅ 참여자 추가
 	const handleAddParticipant = () => {
 		setParticipants([...participants, ""]);
 	};
 
+	// ✅ 참여자 제거
 	const handleRemoveParticipant = (index: number) => {
 		const updated = [...participants];
 		updated.splice(index, 1);
 		setParticipants(updated);
 	};
 
+	// ✅ 참여자 정보 변경
 	const handleChangeParticipant = (index: number, value: string) => {
 		const updated = [...participants];
 		updated[index] = value;
 		setParticipants(updated);
 	};
 
+	// ✅ 폼 초기화
 	const handleReset = () => {
 		setGroupName("");
 		setDescription("");

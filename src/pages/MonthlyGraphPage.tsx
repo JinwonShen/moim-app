@@ -1,3 +1,10 @@
+/**
+ * - 사용자가 만든 모임과 참여 중인 모임 중 하나를 선택하여 월별 통계를 시각적으로 확인
+ * - 선택된 모임과 월에 따라 카테고리별 파이 차트, 시간순 선형 차트, 지출 리스트를 표시
+ * - 기본 선택은 진행 중인 모임 중 가장 최근 시작된 모임을 우선 적용
+ * - Zustand로부터 그룹 상태를 받아오며, 선택 상태는 useState로 관리됨
+ */
+
 import { startOfMonth } from "date-fns";
 import { useState } from "react";
 import ExpenseList from "../components/group/ExpenseList";
@@ -9,12 +16,13 @@ export default function MonthlyGraphPage() {
   const { myGroups, joinedGroups } = useGroupStore();
   const allGroups = [...myGroups, ...joinedGroups];
 
-  // ✅ 진행 중인 모임 중 가장 최근 것을 기본 선택
+  // ✅ 현재 날짜 기준으로 진행 중인 모임 필터링
   const progressing = allGroups.filter((group) => {
     const now = new Date();
     return new Date(group.startDate) <= now && new Date(group.endDate) >= now;
   });
 
+  // ✅ 진행 중인 모임 중 가장 최근에 시작된 모임을 기본값으로 설정
   const defaultGroup = progressing.sort(
     (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
   )[0];
@@ -24,6 +32,7 @@ export default function MonthlyGraphPage() {
   );
   const [selectedMonth, setSelectedMonth] = useState<Date>(startOfMonth(new Date()));
 
+  // ✅ 선택된 그룹 ID에 해당하는 실제 그룹 객체를 조회
   const selectedGroup = allGroups.find((g) => g.id === selectedGroupId);
 
   return (

@@ -1,3 +1,11 @@
+/**
+ * - 선택된 모임의 기본 정보, 예산/입금 상태, 참여자 수, 공지사항, 지출 내역을 종합적으로 표시
+ * - 모임장 여부에 따라 수정/삭제, 참여자 관리, 지출 등록, 공지사항 작성, 입금 요청 기능 제공
+ * - 상태에 따라 입금 버튼 제어, 지출 입력 폼 및 공지 작성 폼은 조건부 렌더링됨
+ * - Firestore 데이터 불러오기, 쓰기, 수정, 삭제 및 Zustand 상태 활용
+ * - 지출 항목 및 공지사항은 편집 모드에서 일괄 삭제 및 단건 수정 가능
+ */
+
 import {
   type Timestamp,
   addDoc,
@@ -108,6 +116,8 @@ export default function GroupDetail() {
 		}[]
 	>([]);
 
+	// ✅ 최근 지출 내역 불러오기
+	// - Firestore에서 createdAt 기준으로 최신 5건을 조회하여 상태로 저장
 	const fetchExpenses = useCallback(async () => {
 		if (!groupId) return;
 		try {
@@ -143,7 +153,12 @@ export default function GroupDetail() {
 		);
 	};
 
+	// ✅ 지출 내역 다중 삭제
+	// - 체크된 항목이 없으면 리턴
+	// - 체크된 지출 항목들을 순회하며 삭제 예약, 일괄 삭제 커밋
+	// - 상태 초기화 및 지출 데이터 다시 불러오기
 	const handleBulkDelete = async () => {
+		// 체크된 항목이 없으면 리턴
 		if (!groupId || selectedExpenseIds.length === 0) return;
 
 		const confirmed = window.confirm("선택한 지출 항목을 삭제하시겠습니까?");
@@ -151,33 +166,47 @@ export default function GroupDetail() {
 
 		try {
 			const batch = writeBatch(db);
-
+			// 체크된 지출 항목들을 순회하며 삭제 예약
 			for (const id of selectedExpenseIds) {
 				const ref = doc(db, "groups", groupId, "expenses", id);
 				batch.delete(ref);
 			}
-
+			// 일괄 삭제 커밋
 			await batch.commit();
+
+			// 상태 초기화 및 지출 데이터 다시 불러오기
 			setSelectedExpenseIds([]);
 			await fetchExpenses();
 		} catch (error) {
-			console.error("일괄 삭제 중 오류 발생:", error);
+			console.error("지출 일괄 삭제 중 오류 발생:", error);
 		}
 	};
 
+	// ✅ 지출 항목 수정 저장
+	// - 편집 중인 지출 항목 ID 확인, 입력값 유효성 검사
+	// - Firestore의 해당 지출 문서 업데이트
+	// - 상태 초기화 및 데이터 다시 불러오기
 	const handleSaveEditExpense = async (id: string) => {
+		// 편집 중인 지출 항목 ID 확인
 		if (!groupId || !id) return;
+
+		// 입력값 유효성 검사
+		if (!editedExpense.amount || !editedExpense.category) return;
+
 		try {
+			// Firestore의 해당 지출 문서 업데이트
 			await updateDoc(doc(db, "groups", groupId, "expenses", id), {
 				date: editedExpense.date,
 				amount: Number(editedExpense.amount),
 				category: editedExpense.category,
 				memo: editedExpense.memo,
 			});
+
+			// 상태 초기화 및 데이터 다시 불러오기
 			setEditingExpenseId(null);
 			await fetchExpenses();
 		} catch (err) {
-			console.error("지출 수정 실패:", err);
+			console.error("지출 수정 중 오류 발생:", err);
 		}
 	};
 
@@ -199,6 +228,9 @@ export default function GroupDetail() {
 		setAuthorNames(names);
 	}, []);
 
+	// ✅ 최근 공지사항 불러오기
+	// - Firestore에서 createdAt 기준으로 최신 5건을 조회
+	// - 작성자 UID를 수집해 닉네임 정보도 함께 가져오기
 	const fetchNotices = useCallback(async () => {
 		if (!groupId) return;
 		try {
@@ -229,6 +261,8 @@ export default function GroupDetail() {
 		fetchNotices();
 	}, [groupId, fetchNotices]);
 
+	// ✅ 공지사항 등록
+	// - 입력값 유효성 검사 후 Firestore에 저장 및 상태 초기화
 	const handleAddNotice = async () => {
 		if (!groupId || !uid || !noticeTitle.trim() || !noticeContent.trim())
 			return;
@@ -251,6 +285,8 @@ export default function GroupDetail() {
 		}
 	};
 
+	// ✅ 선택된 공지사항 일괄 삭제
+	// - 체크된 항목만 삭제 후 상태 초기화
 	const handleDeleteSelectedNotices = async () => {
 		if (!groupId) return;
 		if (!confirm("선택한 공지를 삭제할까요?")) return;
@@ -269,21 +305,35 @@ export default function GroupDetail() {
 		}
 	};
 
+	// ✅ 공지사항 수정 저장
+	// - 편집 중인 공지사항 ID 확인, 입력값 유효성 검사
+	// - Firestore의 해당 공지사항 문서 업데이트
+	// - 상태 초기화 및 데이터 다시 불러오기
 	const handleSaveEditNotice = async (id: string) => {
+		// 편집 중인 공지사항 ID 확인
 		if (!groupId) return;
+
+		// 입력값 유효성 검사
+		if (!editedTitle || !editedContent) return;
+
 		try {
+			// Firestore의 해당 공지사항 문서 업데이트
 			await updateDoc(doc(db, "groups", groupId, "notices", id), {
 				title: editedTitle,
 				content: editedContent,
 			});
+
+			// 상태 초기화 및 데이터 다시 불러오기
 			alert("수정 완료!");
 			setEditingNoticeId(null);
 			await fetchNotices();
 		} catch (error) {
-			console.error("공지 수정 실패:", error);
+			console.error("공지사항 수정 중 오류 발생:", error);
 		}
 	};
 
+	// ✅ 모임 기본 정보 불러오기
+	// - Firestore에서 groupId 기준으로 문서 조회 및 상태 저장
 	const fetchGroup = useCallback(async () => {
 		if (!groupId) return;
 		try {
@@ -306,6 +356,8 @@ export default function GroupDetail() {
 		fetchGroup();
 	}, [fetchGroup]);
 
+	// ✅ 모임장 닉네임 불러오기
+	// - participants 서브컬렉션에서 isOwner가 true인 참가자 조회
 	useEffect(() => {
 		const fetchOwner = async () => {
 			const ref = collection(db, "groups", groupId, "participants");

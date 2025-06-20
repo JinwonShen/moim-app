@@ -1,3 +1,10 @@
+/**
+ * MonthlyCalendar 컴포넌트
+ * - 선택한 월의 날짜를 달력 형식으로 렌더링합니다.
+ * - Firebase에서 해당 모임(groupId)의 지출 데이터를 불러와서 날짜별 지출 금액을 표시합니다.
+ * - 월 이동 버튼으로 이전/다음 달로 변경할 수 있습니다.
+ */
+
 import {
   addMonths,
   eachDayOfInterval,
@@ -33,9 +40,11 @@ export default function MonthlyCalendar({
 
   useEffect(() => {
     const fetchExpenses = async () => {
+      // Firebase Firestore에서 해당 모임의 지출 문서들을 가져옵니다.
       const ref = collection(db, "groups", groupId, "expenses");
       const snapshot = await getDocs(ref);
 
+      // 각 문서를 ExpenseItem 형태로 변환하여 배열로 저장합니다.
       const items: ExpenseItem[] = snapshot.docs.map((doc) => {
         const data = doc.data();
         return {
@@ -56,6 +65,7 @@ export default function MonthlyCalendar({
   const days = eachDayOfInterval({ start, end });
   // const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
 
+  // 주어진 날짜(dateStr)에 해당하는 지출 금액의 총합을 계산합니다.
   const getExpenseTotal = (dateStr: string) =>
     expenses
       .filter((e) => e.date === dateStr)
@@ -108,6 +118,7 @@ export default function MonthlyCalendar({
             <div key={`empty-${i}`} />
           ))}
 
+        // 각 날짜를 셀로 렌더링하며, 해당 날짜의 지출 금액도 함께 표시합니다.
         {days.map((day) => {
           const dateStr = format(day, "yyyy-MM-dd");
           const isSunday = getDay(day) === 0;
@@ -134,6 +145,7 @@ export default function MonthlyCalendar({
               >
                 {day.getDate()}
               </span>
+              {/* 해당 날짜에 지출이 있을 경우 금액을 표시합니다. */}
               {amount > 0 && (
                 <span className="text-[11px] text-primary">
                   {amount.toLocaleString()}원
