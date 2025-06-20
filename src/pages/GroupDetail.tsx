@@ -634,7 +634,7 @@ export default function GroupDetail() {
               )}
             </div>
             <div className="flex gap-[12px]">
-              <span className="flex-[2] md:`flex-[1] font-semibold">
+              <span className="flex-[2] md:flex-[1] font-semibold">
                 모임 참여자
               </span>
               <span className="flex-[4]">
